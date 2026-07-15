@@ -1,0 +1,28 @@
+version: 1
+mode: standalone
+
+server:
+  host: 0.0.0.0
+  port: 8080
+
+database:
+  path: /var/lib/mmfdb/mmfdb.db
+
+object_store:
+  backend: local
+  root: /var/lib/mmfdb/objects
+
+auth:
+  provider: local
+
+# This deliberately implements the prerelease local default requested by the
+# project. It is safe only with Compose's loopback-only published port below.
+admin:
+  user: admin
+  password: ${MMFDB_ADMIN_PASSWORD:-admin}
+  allow_weak_bootstrap: true
+
+client:
+  mode: remote
+  base_url: http://127.0.0.1:8080
+  username: admin

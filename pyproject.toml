@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mmfdb"
+version = "0.1.0"
+description = "Multimodal fluorescence metadata and provenance database with a content-addressed object store and an mmCIF-derived schema."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Thomas-Otavio Peulen", email = "thomas.peulen@tu-dortmund.de"}
+]
+dependencies = [
+    "click",
+    "msgpack>=1.1.2",
+    "numpy>=1.21",
+    "PyYAML",
+]
+
+[project.scripts]
+mmfdb = "mmfdb.cli:cli"
+mmfdb-admin = "mmfdb.admin.cli:cli"
+
+[project.optional-dependencies]
+admin = []
+orm = [
+    "sqlalchemy>=2.0",
+]
+postgres = [
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.1",
+]
+ldap = [
+    "ldap3>=2.9",
+]
+s3 = [
+    "boto3>=1.34",
+]
+docs = [
+    "sphinx>=7",
+    "myst-nb>=1",
+    "furo",
+]
+examples = [
+    "tttrlib>=0.27",
+    "fretbursts",
+    "phconvert",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mmfdb*"]
+
+[tool.setuptools.package-data]
+"mmfdb" = [
+    "data/*.json",
+    "data/*.dic",
+    "data/*.db",
+    "data/*.sh",
+    "webadmin/templates/*.html",
+    "webadmin/static/*.css",
+    "webadmin/static/*.js",
+]

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}} · MMFDB</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <aside>
+    <a class="brand" href="/overview"><span>MM</span>FDB</a>
+    <nav aria-label="Administration">
+      <a href="/overview">📊 Overview</a>
+      <a href="/optical-components">🌈 Optical components</a>
+      <a href="/users">👥 Users</a>
+      <a href="/object-admin">📦 Objects</a>
+      <a href="/rpc-explorer">🛰️ RPC explorer</a>
+      <p>Entities</p>
+      {{entity_nav}}
+    </nav>
+  </aside>
+  <div class="shell">
+    <header><span>{{user}}</span><form method="post" action="/logout"><input type="hidden" name="csrf" value="{{csrf}}"><button class="quiet">Sign out</button></form></header>
+    <main>{{content}}</main>
+  </div>
+  <script src="/static/admin.js" defer></script>
+</body>
+</html>

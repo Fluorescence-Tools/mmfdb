@@ -1,0 +1,20 @@
+# Reproducible runtime dependency set for the production container.
+# Update deliberately together with a clean multi-architecture image build.
+boto3==1.43.46
+botocore==1.43.46
+click==8.4.2
+greenlet==3.5.3
+jmespath==1.1.0
+ldap3==2.9.1
+msgpack==1.2.1
+numpy==1.26.4
+psycopg==3.3.4
+psycopg-binary==3.3.4
+pyasn1==0.6.4
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+s3transfer==0.19.1
+six==1.17.0
+SQLAlchemy==2.0.51
+typing-extensions==4.16.0
+urllib3==2.7.0

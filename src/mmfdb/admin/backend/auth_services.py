@@ -1,0 +1,610 @@
+"""JSON-RPC handlers for MMFDB authentication, groups, and permissions."""
+
+from __future__ import annotations
+
+import sqlite3
+from typing import Any
+
+from mmfdb.admin.backend.password_services import evaluate_password, hash_password
+from mmfdb.repository import MFDatabase
+from mmfdb.security.auth import (
+    PERM_READ,
+    AuthError,
+    PermissionDenied,
+    Principal,
+    _utc_now_iso,
+    chgrp,
+    chmod,
+    chown,
+    grant_acl,
+    list_sessions,
+    principal_from_rpc_auth,
+    require_access,
+    require_authenticated,
+    revoke_acl,
+    revoke_session,
+)
+from mmfdb.store.database_resolver import resolve_database_path
+
+
+def _get_db():
+    return MFDatabase(resolve_database_path())
+
+
+def _auth_config() -> dict[str, Any] | None:
+    """Return the active auth configuration (provider selection + LDAP block).
+
+    Delegates to :func:`mmfdb.config.configured_auth_config` (host resolver →
+    ``MMFDB_AUTH_PROVIDER`` env → ``None`` for the default ``local`` provider).
+    """
+    from mmfdb.config import configured_auth_config
+
+    return configured_auth_config()
+
+
+def _get_conn(db):
+    return db.conn
+
+
+def register_services(dispatcher_or_context: Any) -> None:
+    """Register auth/group/permission RPC handlers."""
+    dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
+
+    # Auth
+    dispatcher.register("mmfdb.security.auth.login", lambda params: login_handler(**params))
+    dispatcher.register("mmfdb.security.auth.logout", lambda params: logout_handler(**params))
+    dispatcher.register("mmfdb.security.auth.me", lambda params: me_handler(**params))
+    dispatcher.register("mmfdb.security.auth.change_password", lambda params: change_password_handler(**params))
+
+    # Sessions
+    dispatcher.register("mmfdb.security.auth.sessions.list", lambda params: sessions_list_handler(**params))
+    dispatcher.register("mmfdb.security.auth.sessions.revoke", lambda params: sessions_revoke_handler(**params))
+
+    # Groups
+    dispatcher.register("mmfdb.groups.list", lambda params: groups_list_handler(**params))
+    dispatcher.register("mmfdb.groups.get", lambda params: groups_get_handler(**params))
+    dispatcher.register("mmfdb.groups.create", lambda params: groups_create_handler(**params))
+    dispatcher.register("mmfdb.groups.update", lambda params: groups_update_handler(**params))
+    dispatcher.register("mmfdb.groups.delete", lambda params: groups_delete_handler(**params))
+
+    # Group members
+    dispatcher.register("mmfdb.groups.members.list", lambda params: members_list_handler(**params))
+    dispatcher.register("mmfdb.groups.members.add", lambda params: members_add_handler(**params))
+    dispatcher.register("mmfdb.groups.members.remove", lambda params: members_remove_handler(**params))
+
+    # Permissions
+    dispatcher.register("mmfdb.permissions.get", lambda params: permissions_get_handler(**params))
+    dispatcher.register("mmfdb.permissions.chmod", lambda params: permissions_chmod_handler(**params))
+    dispatcher.register("mmfdb.permissions.chown", lambda params: permissions_chown_handler(**params))
+    dispatcher.register("mmfdb.permissions.chgrp", lambda params: permissions_chgrp_handler(**params))
+    dispatcher.register("mmfdb.permissions.grant", lambda params: permissions_grant_handler(**params))
+    dispatcher.register("mmfdb.permissions.revoke", lambda params: permissions_revoke_handler(**params))
+
+
+# ---- Auth handlers ----
+
+
+def login_handler(
+    user_id: str,
+    password: str = "",
+    client_metadata: dict[str, Any] | None = None,
+    provider: str | None = None,
+) -> dict[str, Any]:
+    """Authenticate a user and return a session token.
+
+    Delegates to the pluggable auth orchestrator (:func:`mmfdb.security.login.login`),
+    which selects an auth provider (``local`` by default, or ``ldap``/other per
+    config), resolves/JIT-provisions the MMFDB user, syncs mapped groups, and mints
+    a session.
+
+    Parameters
+    ----------
+    user_id : str
+        User identifier (or directory login name for external providers).
+    password : str
+        Password for the user.
+    client_metadata : dict, optional
+        Optional client info (host, name, etc.).
+    provider : str, optional
+        Explicit provider override (``"local"`` / ``"ldap"``); defaults to the
+        configured provider.
+
+    Returns
+    -------
+    dict
+        ``{ok, authenticated, token, expires_at, user}`` on success, or raises
+        ``AuthError``.
+    """
+    from mmfdb.security.login import login as _login
+
+    with _get_db() as db:
+        return _login(
+            _get_conn(db),
+            provider=provider,
+            user_id=user_id,
+            password=password,
+            client_metadata=client_metadata,
+            config=_auth_config(),
+        )
+
+
+def logout_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Revoke the current session."""
+    if not auth or not isinstance(auth, dict):
+        return {"ok": True}
+    token = auth.get("token", "")
+    if not token:
+        return {"ok": True}
+    with _get_db() as db:
+        conn = _get_conn(db)
+        revoke_session_by_token(conn, token)
+        conn.commit()
+    return {"ok": True}
+
+
+def me_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Return the authenticated user info, or raise if anonymous."""
+    with _get_db() as db:
+        principal = principal_from_rpc_auth(_get_conn(db), auth)
+        require_authenticated(principal)
+        row = _get_conn(db).execute(
+            "SELECT user_id, display_name, is_admin FROM flr_sample_users WHERE user_id = ?",
+            (principal.user_id,),
+        ).fetchone()
+        if not row:
+            raise AuthError("User not found")
+        return {
+            "ok": True,
+            "user": {
+                "user_id": row[0],
+                "display_name": row[1],
+                "is_admin": bool(row[2]),
+            },
+        }
+
+
+def change_password_handler(
+    auth: dict[str, Any] | None = None,
+    password: str = "",
+) -> dict[str, Any]:
+    """Change the authenticated user's password.
+
+    Uses the session token for authentication instead of legacy ``requester_id``.
+    """
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        user_id = principal.user_id
+
+        row = conn.execute(
+            "SELECT is_admin, auth_provider FROM flr_sample_users WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        is_target_admin = row and row[0] == 1
+
+        # External-provider users have no local password to change — their
+        # credential lives in the directory / IdP.
+        if row and (row[1] or "local") != "local":
+            raise AuthError("Password is managed by your external identity provider")
+
+        if is_target_admin:
+            if not password:
+                raise AuthError("Admin password cannot be empty")
+            strength = evaluate_password(password)
+            if strength["score"] < 4:
+                raise AuthError(
+                    f"Admin password is too weak. Requirements: {', '.join(strength['feedback'])}"
+                )
+
+        password_hash = hash_password(password) if password else None
+        with conn:
+            db.dao.update("flr_sample_users", user_id, {"password_hash": password_hash})
+        return {"ok": True}
+
+
+# ---- Session handlers ----
+
+
+def sessions_list_handler(
+    auth: dict[str, Any] | None = None,
+    user_id: str | None = None,
+) -> dict[str, Any]:
+    """List active sessions. Admin can see all; users see their own."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        if user_id and not principal.is_admin:
+            user_id = principal.user_id
+
+        sessions = list_sessions(conn, user_id=user_id)
+
+        safe_sessions = []
+        for s in sessions:
+            safe = dict(s)
+            safe.pop("token_hash", None)
+            safe_sessions.append(safe)
+
+        return {"ok": True, "sessions": safe_sessions}
+
+
+def sessions_revoke_handler(
+    auth: dict[str, Any] | None = None,
+    session_id: str | None = None,
+) -> dict[str, Any]:
+    """Revoke a session by ID. Admin can revoke any; users revoke their own."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        if not principal.is_admin:
+            row = conn.execute(
+                "SELECT user_id FROM mmfdb_session WHERE session_id = ?",
+                (session_id,),
+            ).fetchone()
+            if not row or row[0] != principal.user_id:
+                raise PermissionDenied()
+
+        revoke_session(conn, session_id)
+        conn.commit()
+        return {"ok": True}
+
+
+# ---- Group handlers ----
+
+
+def groups_list_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
+    """List all groups."""
+    with _get_db() as db:
+        principal = principal_from_rpc_auth(_get_conn(db), auth)
+        require_authenticated(principal)
+
+        rows = _get_conn(db).execute(
+            "SELECT * FROM mmfdb_group WHERE deleted_at IS NULL ORDER BY display_name"
+        ).fetchall()
+        groups = [dict(r) for r in rows]
+        return {"ok": True, "groups": groups}
+
+
+def groups_get_handler(
+    auth: dict[str, Any] | None = None,
+    group_id: str | None = None,
+) -> dict[str, Any]:
+    """Get a single group by ID."""
+    with _get_db() as db:
+        principal = principal_from_rpc_auth(_get_conn(db), auth)
+        require_authenticated(principal)
+
+        row = _get_conn(db).execute(
+            "SELECT * FROM mmfdb_group WHERE group_id = ? AND deleted_at IS NULL",
+            (group_id,),
+        ).fetchone()
+        if not row:
+            return {"ok": True, "group": None}
+        return {"ok": True, "group": dict(row)}
+
+
+def groups_create_handler(
+    auth: dict[str, Any] | None = None,
+    group: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Create a new group. Admin only."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        if not principal.is_admin:
+            raise PermissionDenied("Only admins can create groups")
+
+        group_id = str(group.get("group_id", "")).strip()
+        display_name = str(group.get("display_name", "")).strip()
+        if not group_id:
+            raise ValueError("group_id is required")
+        if not display_name:
+            group_id = display_name
+
+        description = group.get("description")
+
+        db.dao.insert(
+            "mmfdb_group",
+            {
+                "group_id": group_id,
+                "display_name": display_name,
+                "description": description,
+                "created_by_user_id": principal.user_id,
+            },
+        )
+        return {"ok": True, "group": {"group_id": group_id, "display_name": display_name}}
+
+
+def groups_update_handler(
+    auth: dict[str, Any] | None = None,
+    group: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Update a group. Admin or group manager only."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        group_id = str(group.get("group_id", "")).strip()
+        if not group_id:
+            raise ValueError("group_id is required")
+
+        if not principal.is_admin:
+            row = conn.execute(
+                "SELECT 1 FROM mmfdb_group_member WHERE group_id = ? AND user_id = ? AND role IN ('owner', 'manager') AND deleted_at IS NULL",
+                (group_id, principal.user_id),
+            ).fetchone()
+            if not row:
+                raise PermissionDenied()
+
+        display_name = group.get("display_name")
+        description = group.get("description")
+
+        updates: dict[str, Any] = {}
+        if display_name is not None:
+            updates["display_name"] = display_name
+        if description is not None:
+            updates["description"] = description
+
+        if updates:
+            db.dao.update("mmfdb_group", group_id, updates)
+
+        return {"ok": True}
+
+
+def groups_delete_handler(
+    auth: dict[str, Any] | None = None,
+    group_id: str | None = None,
+) -> dict[str, Any]:
+    """Soft-delete a group. Admin only. Built-in groups cannot be deleted."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        if not principal.is_admin:
+            raise PermissionDenied("Only admins can delete groups")
+
+        if group_id in ("admins", "users", "public"):
+            raise ValueError("Built-in groups cannot be deleted")
+
+        db.dao.soft_delete("mmfdb_group", group_id)
+        return {"ok": True}
+
+
+# ---- Group member handlers ----
+
+
+def members_list_handler(
+    auth: dict[str, Any] | None = None,
+    group_id: str | None = None,
+) -> dict[str, Any]:
+    """List members of a group."""
+    with _get_db() as db:
+        principal = principal_from_rpc_auth(_get_conn(db), auth)
+        require_authenticated(principal)
+
+        rows = _get_conn(db).execute(
+            """SELECT gm.*, u.display_name AS user_display_name
+               FROM mmfdb_group_member gm
+               JOIN flr_sample_users u ON u.user_id = gm.user_id
+               WHERE gm.group_id = ? AND gm.deleted_at IS NULL""",
+            (group_id,),
+        ).fetchall()
+        return {"ok": True, "members": [dict(r) for r in rows]}
+
+
+def members_add_handler(
+    auth: dict[str, Any] | None = None,
+    group_id: str | None = None,
+    user_id: str | None = None,
+    role: str = "member",
+) -> dict[str, Any]:
+    """Add a member to a group. Admin or group manager/owner only."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        if not principal.is_admin:
+            row = conn.execute(
+                "SELECT 1 FROM mmfdb_group_member WHERE group_id = ? AND user_id = ? AND role IN ('owner', 'manager') AND deleted_at IS NULL",
+                (group_id, principal.user_id),
+            ).fetchone()
+            if not row:
+                raise PermissionDenied()
+
+        # INSERT OR IGNORE semantics on the UNIQUE(group_id, user_id) junction:
+        # a row (even soft-deleted) already occupying the pair is left untouched.
+        if not db.dao.list(
+            "mmfdb_group_member",
+            filters={"group_id": group_id, "user_id": user_id},
+            include_deleted=True,
+            limit=1,
+        ):
+            db.dao.insert(
+                "mmfdb_group_member",
+                {
+                    "group_id": group_id,
+                    "user_id": user_id,
+                    "role": role,
+                    "created_by_user_id": principal.user_id,
+                },
+            )
+        return {"ok": True}
+
+
+def members_remove_handler(
+    auth: dict[str, Any] | None = None,
+    group_id: str | None = None,
+    user_id: str | None = None,
+) -> dict[str, Any]:
+    """Remove a member from a group. Admin or group manager/owner only."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        if not principal.is_admin:
+            row = conn.execute(
+                "SELECT 1 FROM mmfdb_group_member WHERE group_id = ? AND user_id = ? AND role IN ('owner', 'manager') AND deleted_at IS NULL",
+                (group_id, principal.user_id),
+            ).fetchone()
+            if not row:
+                raise PermissionDenied()
+
+        # raw: composite-key soft delete — mmfdb_group_member has no single PK
+        # (only UNIQUE(group_id, user_id)), which dao.soft_delete cannot target.
+        conn.execute(
+            "UPDATE mmfdb_group_member SET deleted_at = ? WHERE group_id = ? AND user_id = ?",
+            (_utc_now_iso(), group_id, user_id),
+        )
+        return {"ok": True}
+
+
+# ---- Permission handlers ----
+
+
+def _resolve_object_acl(conn, object_type, object_id):
+    """Return the ACL for an object, or None."""
+    row = conn.execute(
+        "SELECT * FROM mmfdb_object_acl WHERE object_type = ? AND object_id = ? AND deleted_at IS NULL",
+        (object_type, object_id),
+    ).fetchone()
+    if not row:
+        return None
+    acl = dict(row)
+    entries = conn.execute(
+        "SELECT * FROM mmfdb_acl_entry WHERE object_type = ? AND object_id = ? AND deleted_at IS NULL",
+        (object_type, object_id),
+    ).fetchall()
+    acl["entries"] = [dict(e) for e in entries]
+    return acl
+
+
+def permissions_get_handler(
+    auth: dict[str, Any] | None = None,
+    object_type: str | None = None,
+    object_id: str | None = None,
+) -> dict[str, Any]:
+    """Get the ACL for an object. Requires read access on the object."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+
+        acl = _resolve_object_acl(conn, object_type, object_id)
+        if acl is None:
+            return {"ok": True, "acl": None}
+
+        require_access(conn, principal, object_type, object_id, PERM_READ)
+        return {"ok": True, "acl": acl}
+
+
+def permissions_chmod_handler(
+    auth: dict[str, Any] | None = None,
+    object_type: str | None = None,
+    object_id: str | None = None,
+    mode: int | None = None,
+) -> dict[str, Any]:
+    """Change mode bits on an object. Requires manage (``x``)."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        chmod(conn, principal, object_type, object_id, mode)
+        return {"ok": True}
+
+
+def permissions_chown_handler(
+    auth: dict[str, Any] | None = None,
+    object_type: str | None = None,
+    object_id: str | None = None,
+    owner_user_id: str | None = None,
+) -> dict[str, Any]:
+    """Change object owner. Requires manage (``x``)."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        chown(conn, principal, object_type, object_id, owner_user_id)
+        return {"ok": True}
+
+
+def permissions_chgrp_handler(
+    auth: dict[str, Any] | None = None,
+    object_type: str | None = None,
+    object_id: str | None = None,
+    owner_group_id: str | None = None,
+) -> dict[str, Any]:
+    """Change object owning group. Requires manage (``x``)."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        chgrp(conn, principal, object_type, object_id, owner_group_id)
+        return {"ok": True}
+
+
+def permissions_grant_handler(
+    auth: dict[str, Any] | None = None,
+    object_type: str | None = None,
+    object_id: str | None = None,
+    subject_type: str | None = None,
+    subject_id: str | None = None,
+    permissions: int | None = None,
+    effect: str = "allow",
+) -> dict[str, Any]:
+    """Grant or deny a permission on an object. Requires manage (``x``)."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        grant_acl(conn, principal, object_type, object_id, subject_type, subject_id, permissions, effect)
+        return {"ok": True}
+
+
+def permissions_revoke_handler(
+    auth: dict[str, Any] | None = None,
+    entry_id: int | None = None,
+) -> dict[str, Any]:
+    """Revoke an ACL entry. Requires manage (``x``) on the referenced object."""
+    with _get_db() as db:
+        conn = _get_conn(db)
+        principal = principal_from_rpc_auth(conn, auth)
+        require_authenticated(principal)
+        revoke_acl(conn, principal, entry_id)
+        return {"ok": True}
+
+
+def revoke_session_by_token(conn, token):
+    """Revoke a session by its raw token."""
+    from mmfdb.security.auth import revoke_session_by_token as _revoke
+    _revoke(conn, token)
+
+
+def extract_principal_and_conn(auth):
+    """Return the principal, connection, and db for an auth dict."""
+    db = _get_db()
+    conn = _get_conn(db)
+    principal = principal_from_rpc_auth(conn, auth)
+    return principal, conn, db
+
+
+def require_handler_auth(
+    auth: dict[str, Any] | None = None,
+) -> tuple[Any, sqlite3.Connection, Principal]:
+    """Open the DB, extract principal, and require authentication.
+
+    Returns ``(db, conn, principal)``. Caller must close ``db``.
+    """
+    from mmfdb.repository import MFDatabase
+    db = MFDatabase(resolve_database_path())
+    conn = db.conn
+    principal = principal_from_rpc_auth(conn, auth)
+    require_authenticated(principal)
+    return db, conn, principal

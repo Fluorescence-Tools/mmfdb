@@ -1,0 +1,14 @@
+include LICENSE
+include README.md
+include pyproject.toml
+
+# Package data (also declared via [tool.setuptools.package-data]; kept here for sdists)
+recursive-include src/mmfdb/data *.json *.dic *.db *.sh
+recursive-include src/mmfdb/webadmin/templates *.html
+recursive-include src/mmfdb/webadmin/static *.css *.js
+
+# Deployment templates
+include Dockerfile compose.yaml mmfdb.compose.yaml mmfdb.example.yaml docker-constraints.txt
+
+prune docs/_build
+global-exclude __pycache__ *.py[cod]

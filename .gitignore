@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.benchmarks/
+.mypy_cache/
+.ruff_cache/
+
+# Docs
+docs/_build/
+
+# Local state / artifacts
+*.db-wal
+*.db-shm
+.DS_Store
+examples/**/None

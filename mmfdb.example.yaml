@@ -1,0 +1,33 @@
+# MMFDB configuration schema version. Unknown keys are rejected.
+version: 1
+mode: standalone
+
+server:
+  host: 0.0.0.0
+  port: 8080
+
+database:
+  path: /var/lib/mmfdb/mmfdb.db
+  # For a provisioned server database, replace path with:
+  # url: postgresql://mmfdb:secret@postgres/mmfdb
+
+object_store:
+  backend: local
+  root: /var/lib/mmfdb/objects
+
+auth:
+  provider: local
+
+# Used only if the database has no active administrator. The password is never
+# reset on restart. ${NAME} interpolation fails if NAME is not set.
+admin:
+  user: admin
+  password: ${MMFDB_ADMIN_PASSWORD}
+  allow_weak_bootstrap: false
+
+# Reusable hints for ChiSurf or another embedding/remote client. Passwords are
+# intentionally not part of the persisted client block.
+client:
+  mode: remote
+  base_url: http://127.0.0.1:8080
+  username: admin

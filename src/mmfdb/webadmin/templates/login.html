@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · MMFDB</title><link rel="stylesheet" href="/static/admin.css">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <a class="brand" href="/login"><span>MM</span>FDB</a>
+    <p class="eyebrow">Database administration</p><h1>Welcome back</h1>
+    <p class="notice {{error_class}}">{{error}}</p>
+    <form method="post" class="login-form">
+      <label>User ID<input name="user_id" autocomplete="username" autofocus required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button type="submit">Sign in</button>
+    </form>
+  </main>
+</body>
+</html>
