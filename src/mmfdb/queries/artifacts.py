@@ -759,7 +759,9 @@ class ArtifactOpsMixin:
         kind = artifact_kind or artifact_type or "raw_data"
         self.validate_extensible_vocab("artifact_kind", kind)
         if data_format is not None:
-            self.validate_extensible_vocab("data_format", data_format)
+            # ``data_format`` is open-ended (derived from the file suffix), so
+            # record new formats instead of rejecting them.
+            self.ensure_extensible_vocab("data_format", data_format)
         validate_vocabulary(storage_mode, STORAGE_MODES, "storage_mode")
         validate_vocabulary(validation_status, VALIDATION_STATUS_VALUES, "validation_status")
         _validate_checksum(checksum, checksum_algorithm)
@@ -1126,7 +1128,9 @@ class ArtifactOpsMixin:
         data_format = artifact.get("data_format")
         self.validate_extensible_vocab("artifact_kind", kind)
         if data_format is not None:
-            self.validate_extensible_vocab("data_format", data_format)
+            # ``data_format`` is open-ended (derived from the file suffix), so
+            # record new formats instead of rejecting them.
+            self.ensure_extensible_vocab("data_format", data_format)
         validate_vocabulary(storage_mode, STORAGE_MODES, "storage_mode")
         validate_vocabulary(validation_status, VALIDATION_STATUS_VALUES, "validation_status")
         return {

@@ -460,6 +460,26 @@ class MFDatabase(
         if not rows[0]["is_active"]:
             raise ValueError(f"Inactive extensible vocabulary value {value!r} for field {field_name!r}")
 
+    def ensure_extensible_vocab(self, field_name: str, value: str | None) -> None:
+        """Ensure an open-ended extensible vocabulary value exists, registering it if new.
+
+        Unlike :meth:`validate_extensible_vocab`, which rejects unknown values for
+        controlled vocabularies (e.g. ``artifact_kind``), this is for open-ended
+        fields such as ``data_format`` that are derived from arbitrary file
+        suffixes: any value is admissible and the vocabulary simply records the
+        formats that have been seen. Inactive values are still rejected.
+        """
+        if value is None:
+            return
+        rows = self.dao.list(
+            "mmfdb_vocabulary", filters={"field_name": field_name, "value": value},
+            include_deleted=True, limit=1,
+        )
+        if not rows:
+            self.register_vocabulary_value(field_name, value)
+        elif not rows[0]["is_active"]:
+            raise ValueError(f"Inactive extensible vocabulary value {value!r} for field {field_name!r}")
+
     def register_vocabulary_value(
         self,
         field_name: str,

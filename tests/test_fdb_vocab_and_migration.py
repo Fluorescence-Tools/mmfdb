@@ -485,3 +485,44 @@ def test_vocabulary_constants_are_populated() -> None:
     assert len(VALIDATION_STATUS_VALUES) > 0
     assert len(STORAGE_MODES) > 0
     assert len(PARAMETER_TYPES) > 0
+
+
+# ── 6. Open-ended data_format vocabulary auto-extends ─────────────────────
+
+def test_register_artifact_accepts_new_data_format(tmp_path: pathlib.Path) -> None:
+    """``data_format`` is derived from arbitrary file suffixes, so a previously
+    unseen value must be recorded rather than rejected (unlike ``artifact_kind``)."""
+    db_path = tmp_path / "test_dataformat.db"
+    with MFDatabase(db_path) as db:
+        db.register_artifact(
+            "art_fmt", artifact_type="raw_data", storage_mode="local",
+            data_format="dat",
+        )
+        rows = db.dao.list(
+            "mmfdb_vocabulary",
+            filters={"field_name": "data_format", "value": "dat"},
+            limit=1,
+        )
+        assert rows, "new data_format should be registered in the vocabulary"
+        assert rows[0]["is_active"]
+
+
+def test_ensure_extensible_vocab_registers_missing_value(tmp_path: pathlib.Path) -> None:
+    db_path = tmp_path / "test_ensure_vocab.db"
+    with MFDatabase(db_path) as db:
+        db.ensure_extensible_vocab("data_format", "ptu")
+        # Idempotent: a second call does not raise or duplicate.
+        db.ensure_extensible_vocab("data_format", "ptu")
+        rows = db.dao.list(
+            "mmfdb_vocabulary",
+            filters={"field_name": "data_format", "value": "ptu"},
+        )
+        assert len(rows) == 1
+
+
+def test_ensure_extensible_vocab_rejects_inactive_value(tmp_path: pathlib.Path) -> None:
+    db_path = tmp_path / "test_inactive_vocab.db"
+    with MFDatabase(db_path) as db:
+        db.register_vocabulary_value("data_format", "sdt", is_active=False)
+        with pytest.raises(ValueError, match="Inactive"):
+            db.ensure_extensible_vocab("data_format", "sdt")
