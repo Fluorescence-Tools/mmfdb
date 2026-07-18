@@ -1,0 +1,69 @@
+# 06 · Real smFRET burst analysis on tttrlib (needs tttrlib + a real data file).
+#
+# Unlike 01–05, this one uses a real scientific tool and a real measurement, so
+# it is validated (parsed/ordered) on every test run but only *runs* once you
+# provide a TTTR/SPC file at the source `path` and install tttrlib. Run it with:
+#
+#     mmfdb workflow validate examples/workflows/06_smfret_tttrlib.yaml
+#     mmfdb workflow run      examples/workflows/06_smfret_tttrlib.yaml \
+#         --database /tmp/mmfdb.sqlite --workdir /tmp/fret-run \
+#         --output-dir /tmp/fret-run/publish
+#
+# It is the YAML form of the hand-wired provenance in
+# examples/mmfdb_06_external_tool_provenance.ipynb: one raw source, one
+# command-line tool, and a publish block.
+version: 1
+name: smfret-burst-analysis
+description: >
+  Single-molecule FRET burst analysis: run the standalone tttrlib burst-search
+  CLI on one measurement and record the run in the MMFDB provenance graph.
+
+# Raw inputs, registered into MMFDB as raw_measurement artifacts before any step.
+sources:
+  photons:
+    path: ../data/measurement.spc      # relative to this YAML file
+    kind: raw_measurement
+    metadata:
+      file_type: SPC-130
+
+# Each step runs one tool and becomes one operation in the provenance DAG.
+steps:
+  - id: burst_search
+    operation_type: burst_selection
+    software:
+      package: fret_burst_tool
+      version: tttrlib
+    inputs:
+      photons: photons                 # local name -> source/step-output reference
+    params:
+      min_photons: 20
+      background_cps: 500
+    # A command-line tool run as a subprocess. Placeholders {inputs.X},
+    # {outputs.Y}, {params.Z}, {workdir}, and {workflow_dir} are filled in at run
+    # time; {workflow_dir} resolves tool paths relative to this YAML file.
+    cmd: >
+      python {workflow_dir}/../external_tools/fret_burst_tool.py {inputs.photons}
+      --file-type SPC-130 --min-photons {params.min_photons}
+      --background-cps {params.background_cps} --output {outputs.bursts}
+    outputs:
+      bursts:
+        kind: burst_table
+        path: bursts_cli.csv
+
+  # A second tool can be a Python callable instead of a CLI. It receives a
+  # StepContext (ctx.inputs / ctx.outputs / ctx.params, all pathlib.Path/dict),
+  # writes its declared outputs, and may return a summary dict:
+  #
+  # - id: fretbursts
+  #   operation_type: burst_selection
+  #   software: {package: FRETBursts, version: "0.8.3"}
+  #   inputs: {photons: photons}
+  #   params: {F: 6, m: 10, size_threshold: 20}
+  #   python: tools/fretbursts_adapter.py:run   # module:callable or file.py:callable
+  #   outputs:
+  #     bursts: {kind: burst_table, path: bursts_fb.csv}
+
+# What to export for publication once the workflow has run.
+publish:
+  seed: photons                        # export the provenance graph from here
+  formats: [report, mmcif, bundle]     # methods report, mmCIF/FLR, deposition ZIP

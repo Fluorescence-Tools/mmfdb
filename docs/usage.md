@@ -56,6 +56,41 @@ inputs/outputs, then queried as a lineage graph.
 → {doc}`mmfdb_06_external_tool_provenance.ipynb <examples/mmfdb_06_external_tool_provenance>` (drives the click CLI
 {download}`external_tools/fret_burst_tool.py <../examples/external_tools/fret_burst_tool.py>` **and** FRETBursts)
 
+### Stitch tools together with a plain-YAML workflow
+
+Declare a pipeline in one YAML file — its raw *sources*, a sequence of *steps*
+that each run a command-line tool (`cmd:`) or a Python callable
+(`python: module:callable`), and a *publish* block — and let MMFDB coordinate the
+run. Every step becomes one operation in the provenance graph (`source → tool →
+result`), and the publish block exports the workflow for a paper: a Markdown
+**methods report**, an **mmCIF/FLR** metadata file, and a self-contained
+**deposition ZIP**.
+
+```bash
+mmfdb workflow validate examples/workflows/01_quickstart.yaml
+mmfdb workflow run examples/workflows/04_mixed_cli_python.yaml \
+    --database mmfdb.sqlite --workdir run/ --output-dir run/publish/
+```
+
+A worked set lives in {download}`examples/workflows/ <../examples/workflows>` (see
+its `README.md`): `01_quickstart` (one CLI step), `02_chained` (a step feeding
+the next), `03_python_step` (an in-process Python adapter), `04_mixed_cli_python`
+(a CLI and a Python tool in one run), `05_fan_in` (a multi-input merge),
+`06_smfret_tttrlib` (the real tttrlib pipeline, the declarative form of
+{doc}`mmfdb_06_external_tool_provenance.ipynb
+<examples/mmfdb_06_external_tool_provenance>`), and `07_release` (package a set of
+results into **one** self-contained, reproducible mmCIF deposit for Zenodo/OSF).
+Every example is validated on each test run and the self-contained ones are
+executed end to end. The Python API is `mmfdb.workflow` (`load_workflow`,
+`run_workflow`, `export_publication`, `write_single_cif`, `read_single_cif`).
+
+The `cif` publish format writes a single self-describing `.deposit.cif` — FLR
+metadata, the provenance graph, the workflow definition, and every data file
+embedded — governed by the shipped `mmfdb_workflow_ext.dic` dictionary and
+declared via `_audit_conform`. Unpack one with `mmfdb workflow extract
+<file>.deposit.cif --output-dir <dir>`, which recovers the inputs and the
+workflow YAML byte-for-byte so the analysis can be re-run.
+
 ### Archive or share a dataset (deposition)
 
 Export a self-contained ZIP (native raw files + database snapshot + provenance +

@@ -6,8 +6,9 @@ photons and the exact tool that produced it. It is a standalone package usable
 embedded or as an HTTP/JSON-RPC service, independent of any analysis application.
 
 New to MMFDB? Read {doc}`concepts` for the data model, then {doc}`installation` to
-set it up. To run the worked analyses, see {doc}`usage`; to drive a server or
-build a client in any language, see {doc}`rpc-clients`.
+set it up. To run the worked analyses, see {doc}`usage`; to stitch tools together
+in a plain-YAML pipeline and export it for publication, see {doc}`workflows`; to
+drive a server or build a client in any language, see {doc}`rpc-clients`.
 
 ## What it provides
 
@@ -30,6 +31,7 @@ build a client in any language, see {doc}`rpc-clients`.
 installation
 concepts
 usage
+workflows
 rpc-clients
 webadmin
 ```

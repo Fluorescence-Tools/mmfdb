@@ -1,0 +1,32 @@
+# 01 · Quickstart — one source, one command-line step, one report.
+#
+# The smallest useful workflow: register a burst table, summarise it with a
+# command-line tool, and export a methods report. Run it with:
+#
+#     mmfdb workflow run examples/workflows/01_quickstart.yaml \
+#         --database /tmp/mmfdb.sqlite --workdir /tmp/wf01 --output-dir /tmp/wf01/publish
+#
+# Tool paths use {workflow_dir} so they resolve no matter where --workdir points.
+version: 1
+name: quickstart
+description: Summary statistics of a burst table, recorded and published.
+
+sources:
+  bursts:
+    path: data/bursts.csv
+    kind: burst_table
+
+steps:
+  - id: stats
+    operation_type: analysis
+    software: {package: summary_stats, version: "1.0"}
+    inputs: {table: bursts}
+    cmd: >
+      python {workflow_dir}/tools/summary_stats.py {inputs.table}
+      --column proximity_ratio --output {outputs.stats}
+    outputs:
+      stats: {kind: processed_data, path: stats.csv}
+
+publish:
+  seed: bursts          # seed at the raw node so the report captures the full lineage
+  formats: [report]

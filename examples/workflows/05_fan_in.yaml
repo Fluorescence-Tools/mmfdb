@@ -1,0 +1,43 @@
+# 05 · Fan-in — a step with two inputs (a multi-input operation).
+#
+# Two replicate measurements are merged into one table, which the provenance
+# graph records as a single operation with two input artifacts and a
+# derived_from edge to each. The merged table is then summarised.
+version: 1
+name: fan-in
+description: Merge two replicates, then summarise the pooled bursts.
+
+sources:
+  rep1:
+    path: data/bursts_rep1.csv
+    kind: burst_table
+  rep2:
+    path: data/bursts_rep2.csv
+    kind: burst_table
+
+steps:
+  - id: merge
+    operation_type: analysis
+    software: {package: merge_tables, version: "1.0"}
+    inputs:
+      a: rep1                            # two inputs -> a multi-input step
+      b: rep2
+    cmd: >
+      python {workflow_dir}/tools/merge_tables.py {inputs.a} {inputs.b}
+      --output {outputs.merged}
+    outputs:
+      merged: {kind: burst_table, path: merged.csv}
+
+  - id: stats
+    operation_type: analysis
+    software: {package: summary_stats, version: "1.0"}
+    inputs: {table: merge.merged}
+    cmd: >
+      python {workflow_dir}/tools/summary_stats.py {inputs.table}
+      --column proximity_ratio --output {outputs.summary}
+    outputs:
+      summary: {kind: processed_data, path: stats.csv}
+
+publish:
+  seed: stats.summary     # seed at the pooled result so the report shows both replicates upstream
+  formats: [report, bundle]

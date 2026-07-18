@@ -1,0 +1,29 @@
+# 03 · Python step — stitch in software in-process, not as a subprocess.
+#
+# The step's `python:` target is `file.py:callable`, resolved relative to this
+# YAML. The callable receives a StepContext (ctx.inputs / ctx.outputs / ctx.params,
+# all pathlib.Path / dict), writes its declared output, and returns a summary
+# dict that MMFDB records in the operation settings. No install or PYTHONPATH
+# needed — the adapter ships next to the workflow.
+version: 1
+name: python-step
+description: Split a burst table into low/high FRET populations with a Python adapter.
+
+sources:
+  bursts:
+    path: data/bursts.csv
+    kind: burst_table
+
+steps:
+  - id: populations
+    operation_type: analysis
+    software: {package: population_split, version: "1.0"}
+    inputs: {table: bursts}
+    params: {column: proximity_ratio, threshold: 0.5}
+    python: tools/population_split.py:run
+    outputs:
+      populations: {kind: processed_data, path: populations.csv}
+
+publish:
+  seed: bursts
+  formats: [report]

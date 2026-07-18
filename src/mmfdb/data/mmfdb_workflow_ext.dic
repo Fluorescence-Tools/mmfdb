@@ -1,0 +1,407 @@
+##############################################################################
+# mmfdb_workflow_ext.dic — MMFDB workflow, provenance, and deposit-bundle
+# categories.
+#
+# This dictionary DESCRIBES the extra categories MMFDB writes into a
+# self-contained deposit CIF (see mmfdb.workflow.export.write_single_cif): the
+# workflow definition, its provenance graph, and the embedded data files. Unlike
+# mmfdb_flr_ext.dic, these categories are NOT database-backed — they carry no
+# _mmfdb_schema.* items and are not part of the runtime schema (they are not in
+# MmcifDictionary.BUNDLED_DICTS). Their sole purpose is to make a single deposit
+# CIF self-describing and reproducible: the categories below, plus the embedded
+# workflow YAML and the embedded original data files, are everything needed to
+# re-run the analysis.
+##############################################################################
+
+data_mmfdb_workflow_ext.dic
+
+    _dictionary.title            mmfdb_workflow_ext.dic
+    _dictionary.datablock_id     mmfdb_workflow_ext.dic
+    _dictionary.version          1.0
+
+#############
+## CATEGORY: mmfdb_workflow
+#############
+
+save_mmfdb_workflow
+   _category.id              mmfdb_workflow
+   _category.description
+;     The declarative workflow that produced the deposit: its identity and the
+;     verbatim YAML definition, so the pipeline can be re-run. One row.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_workflow.name"
+
+save__mmfdb_workflow.name
+   _item.name                "_mmfdb_workflow.name"
+   _item.category_id         mmfdb_workflow
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_workflow.version
+   _item.name                "_mmfdb_workflow.version"
+   _item.category_id         mmfdb_workflow
+   _item_type.code           int
+   _item.mandatory_code      no
+
+save__mmfdb_workflow.description
+   _item.name                "_mmfdb_workflow.description"
+   _item.category_id         mmfdb_workflow
+   _item_type.code           text
+   _item.mandatory_code      no
+
+save__mmfdb_workflow.definition
+   _item.name                "_mmfdb_workflow.definition"
+   _item.category_id         mmfdb_workflow
+   _item_type.code           text
+   _item.mandatory_code      no
+   _item_description.description
+;     The verbatim workflow YAML, embedded so the deposit is reproducible
+;     without any external file.
+;
+
+#############
+## CATEGORY: mmfdb_workflow_step
+#############
+
+save_mmfdb_workflow_step
+   _category.id              mmfdb_workflow_step
+   _category.description
+;     One declared step of the workflow: the tool it runs and how.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_workflow_step.step_id"
+
+save__mmfdb_workflow_step.ordinal
+   _item.name                "_mmfdb_workflow_step.ordinal"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           int
+   _item.mandatory_code      yes
+
+save__mmfdb_workflow_step.step_id
+   _item.name                "_mmfdb_workflow_step.step_id"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_workflow_step.operation_type
+   _item.name                "_mmfdb_workflow_step.operation_type"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_workflow_step.software_package
+   _item.name                "_mmfdb_workflow_step.software_package"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_workflow_step.software_version
+   _item.name                "_mmfdb_workflow_step.software_version"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_workflow_step.run_kind
+   _item.name                "_mmfdb_workflow_step.run_kind"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           code
+   _item.mandatory_code      no
+    loop_
+    _item_enumeration.value
+      cmd
+      python
+
+save__mmfdb_workflow_step.run
+   _item.name                "_mmfdb_workflow_step.run"
+   _item.category_id         mmfdb_workflow_step
+   _item_type.code           text
+   _item.mandatory_code      no
+   _item_description.description
+;     The command-line template (for a cmd step) or the module:callable target
+;     (for a python step).
+;
+
+#############
+## CATEGORY: mmfdb_provenance_operation
+#############
+
+save_mmfdb_provenance_operation
+   _category.id              mmfdb_provenance_operation
+   _category.description
+;     One recorded operation node: the exact tool invocation that produced a
+;     result, with software, version, command line, and timing.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_provenance_operation.operation_id"
+
+save__mmfdb_provenance_operation.ordinal
+   _item.name                "_mmfdb_provenance_operation.ordinal"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           int
+   _item.mandatory_code      yes
+
+save__mmfdb_provenance_operation.operation_id
+   _item.name                "_mmfdb_provenance_operation.operation_id"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_provenance_operation.operation_type
+   _item.name                "_mmfdb_provenance_operation.operation_type"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.software_package
+   _item.name                "_mmfdb_provenance_operation.software_package"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.software_version
+   _item.name                "_mmfdb_provenance_operation.software_version"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.status
+   _item.name                "_mmfdb_provenance_operation.status"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.command_line
+   _item.name                "_mmfdb_provenance_operation.command_line"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.parameters
+   _item.name                "_mmfdb_provenance_operation.parameters"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _item_description.description
+;     JSON object of the step parameters, recorded for exact re-run.
+;
+
+save__mmfdb_provenance_operation.started_at
+   _item.name                "_mmfdb_provenance_operation.started_at"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           yyyy-mm-dd:hh:mm
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_operation.ended_at
+   _item.name                "_mmfdb_provenance_operation.ended_at"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           yyyy-mm-dd:hh:mm
+   _item.mandatory_code      no
+
+#############
+## CATEGORY: mmfdb_provenance_artifact
+#############
+
+save_mmfdb_provenance_artifact
+   _category.id              mmfdb_provenance_artifact
+   _category.description
+;     One data node in the provenance graph (a source, intermediate, or result).
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_provenance_artifact.artifact_id"
+
+save__mmfdb_provenance_artifact.ordinal
+   _item.name                "_mmfdb_provenance_artifact.ordinal"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           int
+   _item.mandatory_code      yes
+
+save__mmfdb_provenance_artifact.artifact_id
+   _item.name                "_mmfdb_provenance_artifact.artifact_id"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_provenance_artifact.artifact_kind
+   _item.name                "_mmfdb_provenance_artifact.artifact_kind"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_artifact.data_format
+   _item.name                "_mmfdb_provenance_artifact.data_format"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_artifact.checksum
+   _item.name                "_mmfdb_provenance_artifact.checksum"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_artifact.checksum_algorithm
+   _item.name                "_mmfdb_provenance_artifact.checksum_algorithm"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+
+#############
+## CATEGORY: mmfdb_provenance_edge
+#############
+
+save_mmfdb_provenance_edge
+   _category.id              mmfdb_provenance_edge
+   _category.description
+;     A directed edge in the provenance graph (e.g. an output derived_from an
+;     input, or an artifact input_to an operation).
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_provenance_edge.ordinal"
+
+save__mmfdb_provenance_edge.ordinal
+   _item.name                "_mmfdb_provenance_edge.ordinal"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           int
+   _item.mandatory_code      yes
+
+save__mmfdb_provenance_edge.source_node_type
+   _item.name                "_mmfdb_provenance_edge.source_node_type"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_edge.source_node_id
+   _item.name                "_mmfdb_provenance_edge.source_node_id"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_edge.target_node_type
+   _item.name                "_mmfdb_provenance_edge.target_node_type"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_edge.target_node_id
+   _item.name                "_mmfdb_provenance_edge.target_node_id"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_provenance_edge.relationship_type
+   _item.name                "_mmfdb_provenance_edge.relationship_type"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+
+#############
+## CATEGORY: mmfdb_bundle_file
+#############
+
+save_mmfdb_bundle_file
+   _category.id              mmfdb_bundle_file
+   _category.description
+;     A data file embedded in the deposit, base64-encoded, so the CIF is a
+;     single self-contained, reproducible archive. The original file is kept
+;     verbatim (never re-encoded); verify it against the recorded sha256.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_bundle_file.ordinal"
+
+save__mmfdb_bundle_file.ordinal
+   _item.name                "_mmfdb_bundle_file.ordinal"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           int
+   _item.mandatory_code      yes
+
+save__mmfdb_bundle_file.artifact_id
+   _item.name                "_mmfdb_bundle_file.artifact_id"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.name
+   _item.name                "_mmfdb_bundle_file.name"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_bundle_file.data_format
+   _item.name                "_mmfdb_bundle_file.data_format"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.media_type
+   _item.name                "_mmfdb_bundle_file.media_type"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.size_bytes
+   _item.name                "_mmfdb_bundle_file.size_bytes"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           int
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.sha256
+   _item.name                "_mmfdb_bundle_file.sha256"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.md5
+   _item.name                "_mmfdb_bundle_file.md5"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_file.encoding
+   _item.name                "_mmfdb_bundle_file.encoding"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           code
+   _item.mandatory_code      no
+    loop_
+    _item_enumeration.value
+      base64
+
+save__mmfdb_bundle_file.content
+   _item.name                "_mmfdb_bundle_file.content"
+   _item.category_id         mmfdb_bundle_file
+   _item_type.code           text
+   _item.mandatory_code      yes
+   _item_description.description
+;     Base64 of the file's exact bytes, wrapped to fixed-width lines.
+;
+
+#############
+## CATEGORY: mmfdb_bundle_document
+#############
+
+save_mmfdb_bundle_document
+   _category.id              mmfdb_bundle_document
+   _category.description
+;     A text document carried in the deposit (the methods report, the JSON
+;     manifest, and this dictionary), so the CIF is self-describing.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_bundle_document.name"
+
+save__mmfdb_bundle_document.name
+   _item.name                "_mmfdb_bundle_document.name"
+   _item.category_id         mmfdb_bundle_document
+   _item_type.code           line
+   _item.mandatory_code      yes
+
+save__mmfdb_bundle_document.media_type
+   _item.name                "_mmfdb_bundle_document.media_type"
+   _item.category_id         mmfdb_bundle_document
+   _item_type.code           line
+   _item.mandatory_code      no
+
+save__mmfdb_bundle_document.content
+   _item.name                "_mmfdb_bundle_document.content"
+   _item.category_id         mmfdb_bundle_document
+   _item_type.code           text
+   _item.mandatory_code      yes

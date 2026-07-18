@@ -1,0 +1,39 @@
+# 04 · Mixed pipeline — a command-line tool and a Python tool in one workflow.
+#
+# This is the core promise: stitch *anything* together. Step 1 is a subprocess
+# CLI (select_bursts); step 2 is an in-process Python callable
+# (population_split) consuming step 1's output. Both are recorded as operations
+# with their own tool, version, and parameters.
+version: 1
+name: mixed-cli-python
+description: A CLI selection step feeding a Python population-split step.
+
+sources:
+  bursts:
+    path: data/bursts.csv
+    kind: burst_table
+
+steps:
+  - id: select
+    operation_type: burst_selection
+    software: {package: select_bursts, version: "1.0"}
+    inputs: {table: bursts}
+    params: {min_size: 0}
+    cmd: >
+      python {workflow_dir}/tools/select_bursts.py {inputs.table}
+      --column size --min {params.min_size} --output {outputs.selected}
+    outputs:
+      selected: {kind: burst_table, path: selected.csv}
+
+  - id: populations
+    operation_type: analysis
+    software: {package: population_split, version: "1.0"}
+    inputs: {table: select.selected}
+    params: {column: proximity_ratio, threshold: 0.5}
+    python: tools/population_split.py:run
+    outputs:
+      populations: {kind: processed_data, path: populations.csv}
+
+publish:
+  seed: bursts
+  formats: [report, mmcif, bundle]

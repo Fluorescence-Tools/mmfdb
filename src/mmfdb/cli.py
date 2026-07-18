@@ -100,5 +100,130 @@ def serve(config_path: str | None, host: str | None, port: int | None) -> None:
     serve_webadmin(host=host or config.server.host, port=port or config.server.port)
 
 
+@cli.group("workflow")
+def workflow() -> None:
+    """Define, run, and export YAML-declared analysis workflows."""
+
+
+def _database_target(database: str | None) -> str:
+    return database or os.fspath(resolve_database_path())
+
+
+@workflow.command("validate")
+@click.argument("workflow_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--json", "as_json", is_flag=True, help="Emit machine-readable output.")
+def workflow_validate(workflow_path: str, as_json: bool) -> None:
+    """Load and validate a workflow YAML without running anything."""
+    from mmfdb.workflow.spec import WorkflowError, load_workflow
+
+    try:
+        wf = load_workflow(workflow_path)
+    except WorkflowError as exc:
+        raise click.ClickException(str(exc)) from exc
+    steps = [s.id for s in wf.ordered_steps()]
+    if as_json:
+        click.echo(json.dumps({"ok": True, "name": wf.name, "steps": steps}))
+    else:
+        click.echo(f"Workflow {wf.name!r} is valid: {len(steps)} step(s) [{' -> '.join(steps)}]")
+
+
+@workflow.command("run")
+@click.argument("workflow_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--database", default=None, help="SQLite path or database URL (default: configured).")
+@click.option("--workdir", default=None, type=click.Path(file_okay=False), help="Where step outputs are written.")
+@click.option("--output-dir", "output_dir", default=None, type=click.Path(file_okay=False),
+              help="Write the workflow's publish outputs here (defaults to the workflow's publish block).")
+@click.option("--json", "as_json", is_flag=True, help="Emit machine-readable output.")
+def workflow_run(
+    workflow_path: str, database: str | None, workdir: str | None, output_dir: str | None, as_json: bool
+) -> None:
+    """Execute a workflow, recording provenance, and export its publish outputs."""
+    from mmfdb.workflow.export import export_publication
+    from mmfdb.workflow.runner import WorkflowRunError, run_workflow
+    from mmfdb.workflow.spec import WorkflowError, load_workflow
+
+    try:
+        wf = load_workflow(workflow_path)
+    except WorkflowError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+    exports: dict[str, str] = {}
+    with MFDatabase(_database_target(database)) as db:
+        try:
+            run = run_workflow(wf, db, workdir=workdir)
+        except (WorkflowRunError, WorkflowError) as exc:
+            raise click.ClickException(str(exc)) from exc
+        if wf.publish is not None and run.seed_artifact_id:
+            out = output_dir or str((run.workdir or wf.base_dir))
+            exports = export_publication(
+                db, run.seed_artifact_id, out, wf.publish.formats, name=wf.name,
+                workflow=wf, workflow_yaml=Path(workflow_path).read_text(encoding="utf-8"),
+            )
+
+    payload = {
+        "ok": True,
+        "name": wf.name,
+        "sources": run.sources,
+        "steps": {s.step_id: s.outputs for s in run.steps},
+        "seed_artifact_id": run.seed_artifact_id,
+        "exports": exports,
+    }
+    if as_json:
+        click.echo(json.dumps(payload))
+        return
+    click.echo(f"Ran workflow {wf.name!r}: {len(run.steps)} step(s), {len(run.sources)} source(s)")
+    for name, path in exports.items():
+        click.echo(f"  {name}: {path}")
+
+
+@workflow.command("export")
+@click.argument("workflow_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--seed", "seed_artifact_id", required=True, help="Artifact id to seed the provenance graph.")
+@click.option("--output-dir", "output_dir", required=True, type=click.Path(file_okay=False))
+@click.option("--database", default=None, help="SQLite path or database URL (default: configured).")
+@click.option("--format", "formats", multiple=True, help="report | mmcif | bundle (repeatable).")
+def workflow_export(
+    workflow_path: str, seed_artifact_id: str, output_dir: str, database: str | None, formats: tuple[str, ...]
+) -> None:
+    """Re-export publication artifacts from a previously recorded run."""
+    from mmfdb.workflow.export import export_publication
+    from mmfdb.workflow.spec import WorkflowError, load_workflow
+
+    try:
+        wf = load_workflow(workflow_path)
+    except WorkflowError as exc:
+        raise click.ClickException(str(exc)) from exc
+    chosen = list(formats) or (list(wf.publish.formats) if wf.publish else ["report"])
+    with MFDatabase(_database_target(database)) as db:
+        produced = export_publication(
+            db, seed_artifact_id, output_dir, chosen, name=wf.name,
+            workflow=wf, workflow_yaml=Path(workflow_path).read_text(encoding="utf-8"),
+        )
+    for name, path in produced.items():
+        click.echo(f"{name}: {path}")
+
+
+@workflow.command("extract")
+@click.argument("cif_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--output-dir", "output_dir", required=True, type=click.Path(file_okay=False))
+def workflow_extract(cif_path: str, output_dir: str) -> None:
+    """Unpack a single deposit CIF: recover its data files and documents."""
+    from mmfdb.workflow.export import read_single_cif
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    extracted = read_single_cif(cif_path)
+    written = []
+    for name, data in extracted["files"].items():
+        (out / name).write_bytes(data)
+        written.append(name)
+    for name, text in extracted["documents"].items():
+        (out / name).write_text(text, encoding="utf-8")
+        written.append(name)
+    click.echo(f"Extracted {len(written)} item(s) to {out}:")
+    for name in sorted(written):
+        click.echo(f"  {name}")
+
+
 if __name__ == "__main__":
     cli()

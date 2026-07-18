@@ -1,0 +1,58 @@
+# 07 · Release — package a set of results into ONE publication CIF file.
+#
+# The deliverable is a single self-contained mmCIF (`release.deposit.cif`): the
+# FLR metadata, the provenance graph, the workflow definition, and every data
+# file embedded (base64) — all described by the shipped mmfdb_workflow_ext.dic,
+# referenced via _audit_conform. One text file, readable and reproducible: unpack
+# it with `mmfdb workflow extract` to recover the inputs and the workflow YAML.
+#
+# The set to publish is the three member tables below. A multi-input `release`
+# step writes a manifest over them, which gives the whole set a single seed node
+# — so seeding the deposit there captures every member. Run it with:
+#
+#     mmfdb workflow run examples/workflows/07_release.yaml \
+#         --database /tmp/mmfdb.sqlite --workdir /tmp/release \
+#         --output-dir /tmp/release/publish
+#
+# -> /tmp/release/publish/release.deposit.cif
+#    mmfdb workflow extract that.cif --output-dir unpacked/   # recover everything
+version: 1
+name: release
+description: Assemble a set of result tables and export a publication deposition ZIP.
+
+# The set being released — each is registered and travels into the bundle.
+sources:
+  pooled:
+    path: data/bursts.csv
+    kind: burst_table
+  replicate_1:
+    path: data/bursts_rep1.csv
+    kind: burst_table
+  replicate_2:
+    path: data/bursts_rep2.csv
+    kind: burst_table
+
+steps:
+  - id: release
+    operation_type: analysis
+    software: {package: make_release, version: "1.0"}
+    inputs:                              # multi-input: all members feed the manifest
+      pooled: pooled
+      replicate_1: replicate_1
+      replicate_2: replicate_2
+    cmd: >
+      python {workflow_dir}/tools/make_release.py
+      {inputs.pooled} {inputs.replicate_1} {inputs.replicate_2}
+      --output {outputs.manifest}
+    outputs:
+      manifest: {kind: processed_data, path: manifest.csv}
+
+publish:
+  seed: release.manifest                 # seed at the manifest -> the whole set is upstream
+  formats: [cif]                         # ONE self-contained, reproducible deposit CIF
+  # Other formats are available if you prefer a ZIP or split files:
+  #   bundle   readable ZIP (mmCIF + JSON provenance + originals, no database)
+  #   archive  the ZIP plus a SQLite snapshot for exact MMFDB re-import
+  #   report   a standalone Markdown methods section
+  #   mmcif    metadata-only mmCIF (no embedded data)
+  # e.g. formats: [cif, bundle, report]
