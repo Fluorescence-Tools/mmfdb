@@ -2351,6 +2351,78 @@ save__flr_chisurf_parameter.xDOnly
    _item_description.description
 ;     Fraction of donors subject to additional quenching or rate channels (dimensionless).
 ;
+save__flr_chisurf_parameter.Veff
+   _item.name                "_flr_chisurf_parameter.Veff"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name veff
+   _item_description.description
+;     Effective detection volume of the confocal/MDF spot (femtolitres).
+;
+save__flr_chisurf_parameter.conc
+   _item.name                "_flr_chisurf_parameter.conc"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name conc
+   _item_description.description
+;     Sample concentration derived from particle number and effective detection volume (nanomolar).
+;
+save__flr_chisurf_parameter.diam
+   _item.name                "_flr_chisurf_parameter.diam"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name diam
+   _item_description.description
+;     Known inter-focus separation for two-focus (dual-focus) FCS calibration (nanometres); 0 = single-focus.
+;
+save__flr_chisurf_parameter.lam_em
+   _item.name                "_flr_chisurf_parameter.lam_em"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name lam_em
+   _item_description.description
+;     Emission wavelength used in the confocal detection-volume model (nanometres).
+;
+save__flr_chisurf_parameter.lam_ex
+   _item.name                "_flr_chisurf_parameter.lam_ex"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name lam_ex
+   _item_description.description
+;     Excitation wavelength used in the confocal detection-volume model (nanometres).
+;
+save__flr_chisurf_parameter.mag
+   _item.name                "_flr_chisurf_parameter.mag"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name mag
+   _item_description.description
+;     Detection-path magnification used in the confocal detection-volume model.
+;
+save__flr_chisurf_parameter.pinhole
+   _item.name                "_flr_chisurf_parameter.pinhole"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name pinhole
+   _item_description.description
+;     Confocal pinhole diameter, back-projected into the image plane (micrometres).
+;
+save__flr_chisurf_parameter.wem
+   _item.name                "_flr_chisurf_parameter.wem"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name wem
+   _item_description.description
+;     Emission-side Gauss-Lorentz collection-efficiency waist parameter of the Enderlein molecule-detection function (nanometres).
+;
 
 save_mmfdb_setup
    _category.id              mmfdb_setup
