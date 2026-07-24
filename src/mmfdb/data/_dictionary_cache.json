@@ -177462,6 +177462,23 @@
           "schema_column": "wem",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "brightness": {
+          "name": "_flr_chisurf_parameter.brightness",
+          "category": "flr_chisurf_parameter",
+          "attribute": "brightness",
+          "description": " Background-corrected molecular brightness, mean count rate per particle (kilohertz). ",
+          "type_code": "float",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "flr_chisurf_parameter",
+          "schema_column": "brightness",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     },
@@ -351894,6 +351911,23 @@
       "schema_status": "",
       "schema_foreign_key": ""
     },
+    "_flr_chisurf_parameter.brightness": {
+      "name": "_flr_chisurf_parameter.brightness",
+      "category": "flr_chisurf_parameter",
+      "attribute": "brightness",
+      "description": " Background-corrected molecular brightness, mean count rate per particle (kilohertz). ",
+      "type_code": "float",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "flr_chisurf_parameter",
+      "schema_column": "brightness",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
     "_mmfdb_setup.setup_id": {
       "name": "_mmfdb_setup.setup_id",
       "category": "mmfdb_setup",
@@ -356134,6 +356168,6 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1784841461.870896
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1784870960.1208124
   }
 }

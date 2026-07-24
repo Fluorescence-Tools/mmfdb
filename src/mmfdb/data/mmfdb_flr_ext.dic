@@ -2423,6 +2423,15 @@ save__flr_chisurf_parameter.wem
    _item_description.description
 ;     Emission-side Gauss-Lorentz collection-efficiency waist parameter of the Enderlein molecule-detection function (nanometres).
 ;
+save__flr_chisurf_parameter.brightness
+   _item.name                "_flr_chisurf_parameter.brightness"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name brightness
+   _item_description.description
+;     Background-corrected molecular brightness, mean count rate per particle (kilohertz).
+;
 
 save_mmfdb_setup
    _category.id              mmfdb_setup
