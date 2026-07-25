@@ -2058,6 +2058,15 @@ def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
     # Some historical migration helpers commit internally. Keep an online
     # connection snapshot so the public direct migration API still has all-or-
     # nothing recovery semantics when any later step fails.
+    #
+    # Commit first: ``Connection.backup`` retries a busy source *forever* (it
+    # loops on SQLITE_BUSY with a sleep and has no timeout), and a connection
+    # holding an open write transaction is busy against itself — so a caller
+    # that wrote without committing and then asked to migrate would hang here
+    # rather than fail. Committing is also the correct snapshot semantics: those
+    # pending writes are part of the pre-migration state the rollback restores.
+    if conn.in_transaction:
+        conn.commit()
     snapshot = sqlite3.connect(":memory:")
     conn.backup(snapshot)
     try:
