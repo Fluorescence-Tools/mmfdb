@@ -1784,6 +1784,26 @@ save__flr_chisurf_parameter.rh_min
    _item_description.description
 ;     ChiSurf parameter rh_min.
 ;
+save__flr_chisurf_parameter.ics_alpha
+   _item.name                "_flr_chisurf_parameter.ics_alpha"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name ics_alpha
+   _item_description.description
+;     Anomalous diffusion exponent alpha in MSD(tau) = 4*D*tau^alpha. 1 is
+;     normal diffusion; below 1 subdiffusion, above 1 directed transport.
+;
+save__flr_chisurf_parameter.rics_frame_dur
+   _item.name                "_flr_chisurf_parameter.rics_frame_dur"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name rics_frame_dur
+   _item_description.description
+;     Frame time t_frame in ms of a raster scan. Converts a frame lag into a
+;     lag time, so it scales every diffusion coefficient fitted from frame lags.
+;
 save__flr_chisurf_parameter.rics_D
    _item.name                "_flr_chisurf_parameter.rics_D"
    _item.category_id         flr_chisurf_parameter
