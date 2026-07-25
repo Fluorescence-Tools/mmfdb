@@ -78,11 +78,13 @@ def handle_list_probes(
             f"{op} AS cut_off, "
             f"{op} AS center_wavelength, "
             f"{op} AS bandwidth, "
-            f"{op} AS optical_density "
+            f"{op} AS optical_density, "
+            f"{op} AS d25 "
             f"FROM probes p WHERE {where} ORDER BY p.chromophore_name LIMIT ? OFFSET ?",
             ["abs_max", "em_max", "qy",
              "Cut-On Wavelength (nm)", "Cut-Off Wavelength (nm)",
-             "Center Wavelength (nm)", "Bandwidth (nm)", "Optical Density"] + params + [limit, offset],
+             "Center Wavelength (nm)", "Bandwidth (nm)", "Optical Density",
+             "d25"] + params + [limit, offset],
         ).fetchall()
     return {
         "probes": [dict(r) for r in rows],
@@ -188,6 +190,25 @@ def handle_import_default_spectra(
     with _db() as db:
         counts = db.import_default_spectra(mark_verified=mark_verified)
     return {"ok": True, **counts}
+
+
+def handle_import_reference_diffusion(
+    mark_verified: bool = True,
+    auth: dict | None = None,
+) -> dict[str, Any]:
+    """Seed literature diffusion coefficients as probe properties."""
+    with _db() as db:
+        counts = db.import_reference_diffusion(mark_verified=mark_verified)
+    return {"ok": True, **counts}
+
+
+def handle_get_diffusion_reference(
+    seed_if_empty: bool = True,
+    auth: dict | None = None,
+) -> dict[str, Any]:
+    """List every probe carrying a diffusion coefficient D(25 °C, water)."""
+    with _db() as db:
+        return {"species": db.get_diffusion_reference(seed_if_empty=seed_if_empty)}
 
 
 def handle_lookup_forster_radius(
@@ -470,6 +491,10 @@ def register_services(
     dispatcher.register("fluorophores.set_quality", _kw(handle_set_probe_quality))
     dispatcher.register("fluorophores.import_reference_set", _kw(handle_import_reference_set))
     dispatcher.register("fluorophores.import_default_set", _kw(handle_import_default_spectra))
+    dispatcher.register(
+        "fluorophores.import_diffusion_reference", _kw(handle_import_reference_diffusion)
+    )
+    dispatcher.register("fluorophores.diffusion_reference", _kw(handle_get_diffusion_reference))
     dispatcher.register("fluorophores.forster_radius.lookup", _kw(handle_lookup_forster_radius))
     if deterministic_checks is not None:
         dispatcher.register(

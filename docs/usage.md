@@ -42,6 +42,23 @@ Correlate the photon stream with `tttrlib.Correlator` to recover the diffusion
 time `τ_D = w0²/4D`.
 → {doc}`mmfdb_04_fcs.ipynb <examples/mmfdb_04_fcs>`
 
+Turning `τ_D` into a focal volume needs a species whose `D` is known. Diffusion
+is a property of the species, so MMFDB stores it on the probe alongside quantum
+yield and extinction coefficient: the `d25` entry in `optical_properties` holds
+`D(25 °C, water)` in µm²/s, with the literature citation in the row's `details`.
+A curated set of dyes (rhodamines, ATTO, Alexa, Cy5) plus a few calibration
+species (BSA, sucrose, RNase A) ships in `data/reference_diffusion.json`:
+
+```python
+with MFDatabase(path) as db:
+    db.import_reference_diffusion()          # idempotent; reuses matching probes
+    species = db.get_diffusion_reference()   # [{name, d25_um2_s, unit, sources}, …]
+```
+
+The same two calls are exposed as the `fluorophores.import_diffusion_reference`
+and `fluorophores.diffusion_reference` RPC methods, and the value is shown and
+curated as the `D₂₅` column/field in the fluorophore views of the web-admin.
+
 ### Reconstruct a confocal image (CLSM/FLIM)
 
 Store a raster-scanned photon stream in MMFDB and reconstruct it with

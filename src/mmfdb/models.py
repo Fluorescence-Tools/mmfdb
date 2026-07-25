@@ -116,6 +116,41 @@ def _load_default_spectra() -> dict[str, dict[str, Any]]:
 DEFAULT_FLUOROPHORE_SPECTRA: dict[str, dict[str, Any]] = _load_default_spectra()
 
 
+def _load_reference_diffusion() -> tuple[dict[str, Any], ...]:
+    """Load the reference translational-diffusion table from JSON.
+
+    Each entry names a reference species (dye, protein or small molecule),
+    its probe category and its translational diffusion coefficient in water
+    at 25 °C in µm²/s, together with literature sources. Falls back to an
+    empty tuple when the data file is unavailable.
+
+    Returns
+    -------
+    tuple of dict
+        Reference-diffusion entries.
+    """
+    filepath = _DATA_DIR / "reference_diffusion.json"
+    if not filepath.exists():
+        return ()
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if not isinstance(data, list):
+            return ()
+        return tuple(entry for entry in data if isinstance(entry, dict))
+    except (json.JSONDecodeError, OSError):
+        return ()
+
+
+# Reference translational-diffusion coefficients D(25 °C, water) (loaded from JSON)
+REFERENCE_DIFFUSION: tuple[dict[str, Any], ...] = _load_reference_diffusion()
+
+# ``optical_properties.property_name`` used for the diffusion coefficient of a
+# probe in water at 25 °C. Values are stored in µm²/s.
+DIFFUSION_PROPERTY_NAME = "d25"
+DIFFUSION_PROPERTY_UNIT = "um^2/s"
+
+
 # ── Entity Definition ──────────────────────────────────────────────────────────
 
 

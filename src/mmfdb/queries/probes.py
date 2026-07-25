@@ -8,6 +8,7 @@ and resolve cross-concern calls via the MFDatabase MRO.
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from typing import Any
 
@@ -787,6 +788,179 @@ class ProbeMixin:
             "spectra": upserted_spectra,
             "optical_properties": upserted_props,
         }
+
+    # -- translational diffusion (a probe property, like QY or ε) --------------
+
+    def import_reference_diffusion(self, *, mark_verified: bool = True) -> dict[str, int]:
+        """Seed literature translational-diffusion coefficients as probe properties.
+
+        Diffusion is a property of the labelled species, so ``D(25 °C, water)``
+        is stored per probe in ``optical_properties`` under the
+        :data:`~mmfdb.models.DIFFUSION_PROPERTY_NAME` key, in µm²/s, exactly
+        like quantum yield or extinction coefficient. The reference set (dyes
+        plus a few calibration species such as BSA and sucrose) ships in
+        ``data/reference_diffusion.json``.
+
+        An existing probe with a matching name or alias is reused, so the
+        coefficient attaches to the catalogue entry that already carries the
+        spectra; only unknown species create a new probe. The import is
+        idempotent — re-running refreshes the property value in place.
+
+        Parameters
+        ----------
+        mark_verified : bool, default True
+            Stamp newly created probes as approved / high quality, since these
+            are curated literature values rather than scraped candidates.
+
+        Returns
+        -------
+        dict
+            Counts of inserted probes, matched (reused) probes and upserted
+            diffusion properties.
+        """
+        from mmfdb.admin.backend.duplicate_grouping import normalize_name
+        from mmfdb.models import (
+            DIFFUSION_PROPERTY_NAME,
+            DIFFUSION_PROPERTY_UNIT,
+            REFERENCE_DIFFUSION,
+        )
+
+        now = _utc_now()
+        verification = "approved" if mark_verified else "unverified"
+        quality = "high" if mark_verified else "unknown"
+        inserted_probes = matched_probes = upserted_props = 0
+
+        # Name → probe_id map for alias resolution against the existing catalogue.
+        existing_by_norm: dict[str, int] = {}
+        for row in self.conn.execute(
+            "SELECT probe_id, chromophore_name FROM probes WHERE deleted_at IS NULL"
+        ).fetchall():
+            key = normalize_name(row["chromophore_name"])
+            if key:
+                existing_by_norm.setdefault(key, int(row["probe_id"]))
+
+        with self.conn:
+            for entry in REFERENCE_DIFFUSION:
+                name = str(entry.get("name") or "").strip()
+                value = entry.get("d25_um2_s")
+                if not name or value is None:
+                    continue
+
+                probe_id = None
+                for candidate in [name, *entry.get("aliases", [])]:
+                    probe_id = existing_by_norm.get(normalize_name(str(candidate)))
+                    if probe_id is not None:
+                        matched_probes += 1
+                        break
+
+                if probe_id is None:
+                    probe_id = self.dao.insert(
+                        "probes",
+                        {
+                            "chromophore_name": name,
+                            "category": entry.get("category") or "other",
+                            "source": "reference_diffusion",
+                            "source_ref": "reference_diffusion.json",
+                            "probe_origin": "extrinsic",
+                            "probe_link_type": "covalent",
+                            "fluorophore_type": "unspecified",
+                            "reactive_probe_flag": "no",
+                            "verification_status": verification,
+                            "quality": quality,
+                            "is_curated": 1 if mark_verified else 0,
+                            "verified_by": "reference_diffusion" if mark_verified else None,
+                            "verified_at": now if mark_verified else None,
+                            "description": "Reference species with a literature diffusion coefficient",
+                            "deleted_at": None,
+                        },
+                    )
+                    inserted_probes += 1
+                    key = normalize_name(name)
+                    if key:
+                        existing_by_norm.setdefault(key, int(probe_id))
+
+                self.dao.upsert(
+                    "optical_properties",
+                    {
+                        "probe_id": probe_id,
+                        "property_name": DIFFUSION_PROPERTY_NAME,
+                        "property_value": str(float(value)),
+                        "unit": DIFFUSION_PROPERTY_UNIT,
+                        "details": json.dumps(
+                            {"sources": entry.get("sources", [])}, ensure_ascii=False
+                        ),
+                        "deleted_at": None,
+                    },
+                    conflict=["probe_id", "property_name"],
+                )
+                upserted_props += 1
+
+        return {
+            "probes": inserted_probes,
+            "matched": matched_probes,
+            "diffusion_properties": upserted_props,
+        }
+
+    def get_diffusion_reference(self, *, seed_if_empty: bool = True) -> list[dict[str, Any]]:
+        """Return every probe that carries a diffusion coefficient.
+
+        Parameters
+        ----------
+        seed_if_empty : bool, default True
+            Import the shipped reference set when no probe carries a diffusion
+            coefficient yet, so a fresh database is usable without a manual
+            curation step. Set to ``False`` for a strictly read-only lookup.
+
+        Returns
+        -------
+        list of dict
+            One entry per probe with keys ``probe_id``, ``name``, ``category``,
+            ``d25_um2_s``, ``unit`` and ``sources``, ordered by name.
+        """
+        from mmfdb.models import DIFFUSION_PROPERTY_NAME
+
+        def _query() -> list[Any]:
+            return self.conn.execute(
+                "SELECT p.probe_id, p.chromophore_name, p.category, p.source, "
+                "       o.property_value, o.unit, o.details "
+                "FROM probes p JOIN optical_properties o ON o.probe_id = p.probe_id "
+                "WHERE o.property_name = ? AND o.deleted_at IS NULL AND p.deleted_at IS NULL "
+                "ORDER BY p.chromophore_name",
+                (DIFFUSION_PROPERTY_NAME,),
+            ).fetchall()
+
+        rows = _query()
+        if not rows and seed_if_empty:
+            self.import_reference_diffusion()
+            rows = _query()
+
+        entries: list[dict[str, Any]] = []
+        for row in rows:
+            try:
+                value = float(row["property_value"])
+            except (TypeError, ValueError):
+                continue
+            sources: list[dict[str, Any]] = []
+            details = row["details"]
+            if details:
+                try:
+                    parsed = json.loads(details)
+                    if isinstance(parsed, dict):
+                        sources = list(parsed.get("sources") or [])
+                except (json.JSONDecodeError, TypeError):
+                    sources = [{"citation": str(details), "url": "", "methods": []}]
+            entries.append(
+                {
+                    "probe_id": int(row["probe_id"]),
+                    "name": row["chromophore_name"],
+                    "category": row["category"],
+                    "source": row["source"],
+                    "d25_um2_s": value,
+                    "unit": row["unit"] or "um^2/s",
+                    "sources": sources,
+                }
+            )
+        return entries
 
     def consolidate_probes(self, aggressive: bool = False) -> dict[str, int]:
         """Merge duplicate probes, then delete the secondary copies.

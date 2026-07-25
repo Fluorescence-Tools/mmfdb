@@ -91,6 +91,7 @@ COMPONENT_TYPES: tuple[dict[str, Any], ...] = (
         "detail": _IDENTITY_HEAD + (
             ("abs_max", "Abs max"), ("em_max", "Em max"), ("qy", "QY"),
             ("ext_coeff", "Extinction"), ("lifetime", "Lifetime"),
+            ("d25", "D₂₅ (µm²/s)"),
         ) + _COMMON_TAIL[:1] + (("quality", "Quality"),) + _COMMON_TAIL[1:],
     },
     {
@@ -151,6 +152,7 @@ _PROPERTY_ALIASES = {
     "qy": ("qy",),
     "ext_coeff": ("ext_coeff",),
     "lifetime": ("lifetime",),
+    "d25": ("d25", "d25_um2_s", "D25_um2_s", "diffusion_coefficient"),
     "cut_on": ("cut_on", "Cut-On Wavelength (nm)"),
     "cut_off": ("cut_off", "Cut-Off Wavelength (nm)"),
     "center_wavelength": ("center_wavelength", "Center Wavelength (nm)"),

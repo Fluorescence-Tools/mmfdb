@@ -1,0 +1,278 @@
+[
+  {
+    "name": "Rhodamine 6G",
+    "category": "organic_dye",
+    "aliases": [
+      "Rh6G",
+      "Rhodamine 6G (Rh6G)"
+    ],
+    "d25_um2_s": 414.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) Absolute Diffusion Coefficients, PicoQuant App Note — Table",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS",
+          "PFG-NMR",
+          "PB/CF"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rhodamine B",
+    "category": "organic_dye",
+    "aliases": [],
+    "d25_um2_s": 427.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (PB/CF 4.27 ± 0.04; PFG-NMR also listed)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "PB/CF",
+          "PFG-NMR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rhodamine 123",
+    "category": "organic_dye",
+    "aliases": [],
+    "d25_um2_s": 460.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (PFG-NMR)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "PFG-NMR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rhodamine 110",
+    "category": "organic_dye",
+    "aliases": [
+      "Rh110"
+    ],
+    "d25_um2_s": 470.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (PFG-NMR)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "PFG-NMR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Fluorescein",
+    "category": "organic_dye",
+    "aliases": [
+      "FITC"
+    ],
+    "d25_um2_s": 425.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (PB/CF 4.25 ± 0.01)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "PB/CF"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Oregon Green 488",
+    "category": "organic_dye",
+    "aliases": [],
+    "d25_um2_s": 411.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS ~4.11)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ATTO 488 (COOH)",
+    "category": "organic_dye",
+    "aliases": [
+      "ATTO488 carboxy"
+    ],
+    "d25_um2_s": 400.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS 4.0 ± 0.1)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ATTO 655 (COOH)",
+    "category": "organic_dye",
+    "aliases": [
+      "ATTO655 carboxy"
+    ],
+    "d25_um2_s": 426.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS/PFG-NMR)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS",
+          "PFG-NMR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ATTO 655 (maleimide)",
+    "category": "organic_dye",
+    "aliases": [
+      "ATTO655 maleimide"
+    ],
+    "d25_um2_s": 407.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS/PFG-NMR/pmFCS)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS",
+          "PFG-NMR",
+          "pmFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ATTO 655 (NHS)",
+    "category": "organic_dye",
+    "aliases": [
+      "ATTO655 NHS ester"
+    ],
+    "d25_um2_s": 425.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Cy5",
+    "category": "organic_dye",
+    "aliases": [
+      "Cyanine 5"
+    ],
+    "d25_um2_s": 360.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS 3.6 ± 0.1)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Alexa Fluor 647",
+    "category": "organic_dye",
+    "aliases": [
+      "Alexa 647",
+      "AF647"
+    ],
+    "d25_um2_s": 330.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS 3.3 ± 0.1)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Alexa Fluor 633",
+    "category": "organic_dye",
+    "aliases": [
+      "Alexa 633",
+      "AF633"
+    ],
+    "d25_um2_s": 340.0,
+    "sources": [
+      {
+        "citation": "Kapusta (2010) App Note — Table (2fFCS 3.4 ± 0.1)",
+        "url": "https://www.picoquant.com/images/uploads/page/files/7353/appnote_diffusioncoefficients.pdf",
+        "methods": [
+          "2fFCS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Bovine Serum Albumin",
+    "category": "protein",
+    "aliases": [
+      "BSA",
+      "Bovine Serum Albumin (BSA)"
+    ],
+    "d25_um2_s": 59.9,
+    "sources": [
+      {
+        "citation": "Meechai et al. (1999) Translational diffusion coefficients of bovine serum albumin in aqueous solution at high ionic strength",
+        "url": "",
+        "methods": [
+          "DLS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Sucrose",
+    "category": "other",
+    "aliases": [],
+    "d25_um2_s": 458.6,
+    "sources": [
+      {
+        "citation": "Atkins (2002) Atkins' physical chemistry",
+        "url": "",
+        "methods": [
+          "?"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ribonuclease A",
+    "category": "protein",
+    "aliases": [
+      "RNase A",
+      "RNase",
+      "Ribonuclease A (RNase)"
+    ],
+    "d25_um2_s": 119.0,
+    "sources": [
+      {
+        "citation": "Atkins (2002) Atkins' physical chemistry",
+        "url": "",
+        "methods": [
+          "?"
+        ]
+      }
+    ]
+  }
+]
