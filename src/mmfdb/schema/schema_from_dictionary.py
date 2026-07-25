@@ -24,6 +24,17 @@ from typing import Any
 
 from mmfdb.schema.pdbx_metadata import DictItem, MmcifDictionary
 
+
+class UnknownCategoryError(LookupError):
+    """A requested dictionary category does not exist.
+
+    Raised rather than returned as a comment: the DDL for these categories is
+    built at import time into the migration's table list, so degrading to a
+    no-op would create a database that stamps itself as migrated while
+    silently missing tables. The failure would then surface far away as an
+    unrelated "no such table".
+    """
+
 # ---------------------------------------------------------------------------
 # SQL type map — counterpart of TYPE_CODE_WIDGET_MAP in entity_schema.py
 # ---------------------------------------------------------------------------
@@ -170,10 +181,18 @@ def generate_create_table_for_category(
     -------
     str
         The ``CREATE TABLE`` DDL statement.
+
+    Raises
+    ------
+    UnknownCategoryError
+        If ``category_name`` is not declared in the dictionary.
     """
     cat = dic.get_category(category_name)
     if cat is None:
-        return f"-- Category {category_name!r} not found in dictionary"
+        raise UnknownCategoryError(
+            f"category {category_name!r} is not declared in the dictionary; "
+            "cannot generate its DDL"
+        )
 
     table_name = _resolve_table_name(category_name, dic)
     pk_attr = _pk_attribute(cat)
@@ -310,10 +329,9 @@ def reconcile_schema(
 
         # -- 1. Create missing table --
         if table_name not in live:
-            ddl = generate_create_table_for_category(dictionary, cat_name)
-            if ddl.startswith("--"):
-                continue
-            conn.execute(ddl)
+            # cat_name came from dictionary.categories(), so the category is
+            # known by construction and the lookup below cannot fail.
+            conn.execute(generate_create_table_for_category(dictionary, cat_name))
             report["tables_added"].append(table_name)
             # Refresh live schema after CREATE
             cols = {

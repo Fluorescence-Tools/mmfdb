@@ -12,6 +12,8 @@ import os
 import sqlite3
 import tempfile
 
+import pytest
+
 from mmfdb.schema.dictionary_schema_map import introspect_sqlite_schema
 from mmfdb.schema.pdbx_metadata import MmcifDictionary
 from mmfdb.schema.schema_from_dictionary import (
@@ -137,3 +139,67 @@ def test_generate_index() -> None:
         "CREATE INDEX IF NOT EXISTS idx_mmfdb_setup_detector_channel_setup_id "
         "ON mmfdb_setup_detector_channel (setup_id)"
     )
+
+
+def test_unknown_category_raises_instead_of_emitting_a_comment():
+    """A missing category must fail loudly, not degrade to a no-op comment.
+
+    The DDL for the dictionary-generated tables is built into
+    ``CREATE_TABLES_SQL`` at import time. Returning a SQL comment for an
+    unknown category meant the statement executed as a no-op, so the database
+    stamped itself as migrated while silently missing a table -- surfacing much
+    later as an unrelated "no such table".
+    """
+    from mmfdb.schema.schema_from_dictionary import UnknownCategoryError
+
+    dic = MmcifDictionary.load_bundled()
+    with pytest.raises(UnknownCategoryError, match="mmfdb_no_such_category"):
+        generate_create_table_for_category(dic, "mmfdb_no_such_category")
+
+
+def test_every_dictionary_generated_migration_table_resolves():
+    """Each category CREATE_TABLES_SQL generates must exist in the dictionary.
+
+    This is the guard for the failure above: it caught a stale
+    ``_get_dict_ddl("mmfdb_microtime_shift")`` whose category had been removed
+    by the PRD-19 collapse, so that entry had silently been a comment while the
+    same module's ``_drop_legacy_tables`` dropped the table.
+    """
+    import re
+    from pathlib import Path
+
+    import mmfdb.schema.schema as schema_mod
+
+    source = Path(schema_mod.__file__).read_text(encoding="utf-8")
+    categories = re.findall(r'_get_dict_ddl\(\s*"([^"]+)"\s*\)', source)
+    assert categories, "no _get_dict_ddl call sites found -- has the pattern changed?"
+
+    dic = MmcifDictionary.load_bundled()
+    missing = [c for c in categories if dic.get_category(c) is None]
+    assert not missing, f"CREATE_TABLES_SQL asks for undeclared categories: {missing}"
+
+
+def test_generated_tables_are_actually_created_in_a_fresh_database(tmp_path):
+    """End-to-end: a fresh database really contains the generated tables."""
+    from mmfdb.repository import MFDatabase
+
+    db = MFDatabase(os.path.join(tmp_path, "fresh.db"))
+    try:
+        live = {
+            row[0]
+            for row in db.conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        for table in (
+            "mmfdb_setup_detector_channel",
+            "mmfdb_setup_pie_window",
+            "mmfdb_setup_fcs_pair",
+            "mmfdb_setup_calibration",
+            "mmfdb_artifact_owner",
+        ):
+            assert table in live, f"{table} was not created"
+        # Retired by PRD-19; _drop_legacy_tables removes it.
+        assert "mmfdb_microtime_shift" not in live
+    finally:
+        db.close()

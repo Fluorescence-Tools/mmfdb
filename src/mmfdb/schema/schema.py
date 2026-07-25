@@ -696,7 +696,12 @@ CREATE_TABLES_SQL = [
     _get_dict_ddl("mmfdb_setup_pie_window"),
     _get_dict_ddl("mmfdb_setup_fcs_pair"),
     _get_dict_ddl("mmfdb_setup_calibration"),
-    _get_dict_ddl("mmfdb_microtime_shift"),
+    # mmfdb_microtime_shift is deliberately absent: the bespoke table was
+    # retired by the PRD-19 collapse in favour of role-indexed mmfdb_parameter
+    # rows, and _drop_legacy_tables() drops it. Its category was removed from
+    # the dictionary, so this line generated a no-op SQL comment -- which is
+    # exactly why the contradiction (create it here, drop it there) went
+    # unnoticed until generate_create_table_for_category started failing loudly.
     _get_dict_ddl("mmfdb_artifact_owner"),
     """CREATE TABLE IF NOT EXISTS mmfdb_audit_log (
         log_id INTEGER PRIMARY KEY AUTOINCREMENT,
