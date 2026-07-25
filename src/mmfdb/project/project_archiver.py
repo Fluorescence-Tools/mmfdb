@@ -339,7 +339,7 @@ def archive_project_to_mmfdb(
                 )
 
         # -- 3. Per-fit: decompose into chinet session, nodes, parameters -
-        for fit_record in fits:
+        for fit_idx, fit_record in enumerate(fits):
             if not isinstance(fit_record, dict):
                 continue
             fit_uid = fit_record.get("id", "")
@@ -502,6 +502,14 @@ def archive_project_to_mmfdb(
                         "fit_range": fit_record.get("fit_range"),
                         "plot_state": fit_record.get("plot_state"),
                         "local_fits_count": len(fit_record.get("local_fits", [])),
+                        # Position of this artifact within the project, so the
+                        # restore side can rebuild one fit group holding all of
+                        # its local fits in the original order. A global fit
+                        # writes one artifact per local fit; without these the
+                        # group cannot be reassembled (lf_id is not always the
+                        # index, so artifact-id order is not enough).
+                        "fit_index": fit_idx,
+                        "local_fit_index": lf_idx,
                         "model_module": fit_state_payload.get(
                             "model_module"
                         ),
@@ -646,6 +654,73 @@ def _parse_ds_id(aid: str) -> str | None:
     return None
 
 
+def _regroup_fit_artifacts(
+    entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Rebuild fit-group records from per-local-fit ``fit_result`` artifacts.
+
+    A global fit is archived as one artifact per local fit, every one carrying
+    the same fit UID in its envelope. Restoring them one-to-one would yield N
+    fit groups that each hold a single local fit and all share an ``id`` --
+    global fits silently shattered, and duplicate UIDs downstream. This merges
+    them back into one record per UID.
+
+    Order is taken from the ``fit_index`` / ``local_fit_index`` recorded at
+    archive time; archives written before those existed fall back to the order
+    the artifacts were encountered, since ``lf_id`` is not necessarily the
+    local-fit index and artifact-id ordering is therefore unreliable.
+
+    Parameters
+    ----------
+    entries : list of dict
+        One entry per ``fit_result`` artifact, with keys ``artifact_id``,
+        ``envelope``, ``local_fit``, ``fit_index`` and ``local_fit_index``.
+
+    Returns
+    -------
+    list of dict
+        Fit-group records with ``id``, ``name``, ``model_name``, ``fit_range``,
+        ``plot_state`` and a ``local_fits`` list.
+    """
+    grouped: dict[str, dict[str, Any]] = {}
+    seen_artifacts: set[str] = set()
+
+    for order, entry in enumerate(entries):
+        artifact_id = entry.get("artifact_id") or ""
+        # The same artifact can be reached both as a project output and through
+        # the fit-operation query; counting it twice would duplicate local fits.
+        if artifact_id and artifact_id in seen_artifacts:
+            continue
+        if artifact_id:
+            seen_artifacts.add(artifact_id)
+
+        envelope = entry.get("envelope") or {}
+        # Fits archived without a UID cannot be merged with anything, so give
+        # each its own bucket rather than collapsing them all into one group.
+        uid = envelope.get("id") or f"__anonymous__{order}"
+        group = grouped.get(uid)
+        if group is None:
+            group = {**envelope, "local_fits": [], "_order": order, "_locals": []}
+            grouped[uid] = group
+
+        fit_index = entry.get("fit_index")
+        if isinstance(fit_index, int):
+            group["_order"] = min(group["_order"], fit_index)
+        group["_locals"].append((entry.get("local_fit_index"), order, entry.get("local_fit")))
+
+    records: list[dict[str, Any]] = []
+    for group in sorted(grouped.values(), key=lambda g: g["_order"]):
+        locals_ = group.pop("_locals")
+        if all(isinstance(lf_idx, int) for lf_idx, _, _ in locals_):
+            locals_.sort(key=lambda item: item[0])
+        else:
+            locals_.sort(key=lambda item: item[1])
+        group["local_fits"] = [lf for _, _, lf in locals_ if lf]
+        group.pop("_order", None)
+        records.append(group)
+    return records
+
+
 def restore_project_from_artifacts(
     db: MFDatabase,
     version_id: str,
@@ -678,6 +753,8 @@ def restore_project_from_artifacts(
 
     datasets: dict[str, Any] = {}
     fits: list[dict[str, Any]] = []
+    #: One entry per ``fit_result`` artifact, regrouped into fit records below.
+    fit_groups: list[dict[str, Any]] = []
     chinet_sessions: list[dict[str, Any]] = []
     fit_operation_ids: set[str] = set()
     project_metadata: dict[str, Any] = {}
@@ -740,35 +817,48 @@ def restore_project_from_artifacts(
             datasets[ds_id] = data
 
         elif kind == "fit_result":
+            meta = art.get("metadata_json") or {}
+            if isinstance(meta, str):
+                meta = _json_loads(meta) or {}
             fit_data_is_full_record = isinstance(data, dict) and "local_fit" in data
             if fit_data_is_full_record:
-                fit_record = {
+                envelope = {
                     "id": data.get("id", ""),
                     "name": data.get("name", ""),
                     "model_name": data.get("model_name", ""),
                     "fit_range": data.get("fit_range"),
                     "plot_state": data.get("plot_state"),
-                    "local_fits": [data.get("local_fit", {})],
                 }
-                fits.append(fit_record)
+                local_fit = data.get("local_fit", {})
             else:
-                meta = art.get("metadata_json") or {}
-                if isinstance(meta, str):
-                    meta = _json_loads(meta) or {}
-                fits.append({
+                envelope = {
                     "id": meta.get("fit_id", str(uuid.uuid4())),
                     "name": meta.get("fit_name", "Restored Fit"),
                     "model_name": meta.get("model_name", ""),
                     "fit_range": meta.get("fit_range"),
                     "plot_state": meta.get("plot_state"),
-                    "local_fits": [data] if data else [],
-                })
+                }
+                local_fit = data
+            # A global fit is archived as one artifact per local fit, all sharing
+            # the fit UID. Collect them under that UID so the group is rebuilt
+            # whole; appending per artifact would return N single-local-fit
+            # groups that all carry the *same* id, shattering global fits and
+            # colliding on anything keyed by fit id.
+            fit_groups.append({
+                "artifact_id": art.get("artifact_id", ""),
+                "envelope": envelope,
+                "local_fit": local_fit,
+                "fit_index": meta.get("fit_index"),
+                "local_fit_index": meta.get("local_fit_index"),
+            })
             fit_op_id = art.get("operation_id", "")
             if fit_op_id:
                 fit_operation_ids.add(fit_op_id)
 
         elif kind == "chinet_session":
             chinet_sessions.append(data)
+
+    fits = _regroup_fit_artifacts(fit_groups)
 
     if not datasets and not fits:
         return None
