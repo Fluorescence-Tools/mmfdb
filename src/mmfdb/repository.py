@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import math
 import os
 import platform
 import sqlite3
@@ -58,6 +59,88 @@ if TYPE_CHECKING:
     from mmfdb.schema.dao import DictionaryDao
 
 logger = logging.getLogger(__name__)
+
+#: Reserved ``metadata_json`` key holding the numeric parameter fields whose
+#: value was NaN. SQLite silently coerces NaN to NULL on insert (±Inf survive
+#: intact), so without this a diverged fit's ``standard_error = NaN`` is stored
+#: as NULL and becomes indistinguishable from "no error was computed" -- the
+#: single most misleading thing a provenance record can claim. The column still
+#: has to be NULL, since REAL cannot represent NaN; this keeps the fact
+#: recoverable and lets :meth:`MFDatabase.get_parameter` restore it.
+NAN_FIELDS_KEY = "_nan_fields"
+
+#: Numeric ``mmfdb_parameter`` columns subject to the NaN coercion above.
+_NAN_CHECKED_FIELDS = (
+    "value",
+    "standard_error",
+    "confidence_interval_low",
+    "confidence_interval_high",
+    "initial_value",
+    "lower_bound",
+    "upper_bound",
+)
+
+
+def _preserve_nan_fields(
+    metadata: dict[str, Any] | None, **fields: float | None
+) -> dict[str, Any] | None:
+    """Record which numeric parameter fields were NaN, in the metadata.
+
+    Parameters
+    ----------
+    metadata : dict or None
+        Caller-supplied parameter metadata; not mutated.
+    **fields
+        Numeric field name to value, as passed to ``record_parameter``.
+
+    Returns
+    -------
+    dict or None
+        ``metadata`` unchanged when nothing was NaN, otherwise a copy carrying
+        the NaN field names under :data:`NAN_FIELDS_KEY`.
+    """
+    nan_fields = sorted(
+        name for name, val in fields.items()
+        if isinstance(val, float) and math.isnan(val)
+    )
+    if not nan_fields:
+        return metadata
+    enriched = dict(metadata or {})
+    enriched[NAN_FIELDS_KEY] = nan_fields
+    return enriched
+
+
+def _restore_nan_fields(row: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Put NaN back into the fields :func:`_preserve_nan_fields` flagged.
+
+    Parameters
+    ----------
+    row : dict or None
+        A ``mmfdb_parameter`` row, with ``metadata_json`` either decoded or raw.
+
+    Returns
+    -------
+    dict or None
+        The row with flagged fields set back to NaN.
+    """
+    if not row:
+        return row
+    metadata = row.get("metadata_json")
+    if isinstance(metadata, str):
+        try:
+            metadata = json.loads(metadata)
+        except (TypeError, ValueError):
+            return row
+    if not isinstance(metadata, dict):
+        return row
+    nan_fields = metadata.get(NAN_FIELDS_KEY)
+    if not isinstance(nan_fields, list):
+        return row
+    for name in nan_fields:
+        if name in _NAN_CHECKED_FIELDS:
+            row[name] = float("nan")
+    return row
+
 
 class MFDatabase(
     AnalysisMixin,
@@ -1522,6 +1605,16 @@ class MFDatabase(
         role: str | None = None,
     ) -> str:
         validate_vocabulary(parameter_type, PARAMETER_TYPES, "parameter_type")
+        metadata = _preserve_nan_fields(
+            metadata,
+            value=value,
+            standard_error=standard_error,
+            confidence_interval_low=confidence_interval_low,
+            confidence_interval_high=confidence_interval_high,
+            initial_value=initial_value,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+        )
         now = _utc_now()
         with self._transaction():
             self.conn.execute(
@@ -1588,12 +1681,15 @@ class MFDatabase(
         # PRD-26 Task 2: parameterised, schema-driven get. Look up by the
         # parameter_uuid column, not the table PK (parameter_id) — callers
         # identify parameters by their UUID.
-        return self.dao.get(
+        row = self.dao.get(
             "mmfdb_parameter",
             parameter_uuid,
             pk_column="parameter_uuid",
             include_deleted=True,
         )
+        # NaN cannot survive a REAL column, so restore it from the marker
+        # record_parameter left behind (see NAN_FIELDS_KEY).
+        return _restore_nan_fields(row)
 
     def list_parameters(
         self,
