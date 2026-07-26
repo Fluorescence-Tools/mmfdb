@@ -13,7 +13,6 @@ except ModuleNotFoundError as exc:
     chinet = None
 
 from mmfdb.models import (
-    OPERATION_TYPES,
     PARAMETER_TYPES,
     RELATIONSHIP_TYPES,
     STATUS_VALUES,
@@ -888,7 +887,9 @@ def store_chinet_session(
     dict
         Created IDs and counts.
     """
-    validate_vocabulary(operation_type, OPERATION_TYPES, "operation_type")
+    # ``operation_type`` is left to ``db.record_operation`` below, which checks
+    # the extensible ``mmfdb_vocabulary`` table; the static dictionary enum
+    # would reject a site-registered type (DATA-05).
     validate_vocabulary("pending", STATUS_VALUES, "status")
     validate_vocabulary("contains", RELATIONSHIP_TYPES, "relationship_type")
     validate_vocabulary("parameter_depends_on", RELATIONSHIP_TYPES, "relationship_type")

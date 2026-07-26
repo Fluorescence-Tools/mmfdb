@@ -17,7 +17,6 @@ from typing import Any
 
 from mmfdb.models import (
     DIRECTIONS,
-    OPERATION_TYPES,
     RELATIONSHIP_TYPES,
     STATUS_VALUES,
     STORAGE_MODES,
@@ -1227,7 +1226,10 @@ class ArtifactOpsMixin:
         dict
             Counts of registered artifacts, links, and parameters.
         """
-        validate_vocabulary(operation_type, OPERATION_TYPES, "operation_type")
+        # ``operation_type`` is validated by ``record_operation`` against the
+        # extensible ``mmfdb_vocabulary`` table — the single authority. Checking
+        # the static dictionary enum here as well would reject a site-registered
+        # type that the plain record path accepts (DATA-05).
         validate_vocabulary(status, STATUS_VALUES, "status")
         input_payloads = [self._normalize_artifact_payload(art, experiment_id) for art in (input_artifacts or [])]
         output_payloads = [self._normalize_artifact_payload(art, experiment_id) for art in (output_artifacts or [])]

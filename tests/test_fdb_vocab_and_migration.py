@@ -14,7 +14,6 @@ from unittest.mock import patch
 import pytest
 
 from mmfdb.repository import MFDatabase
-from mmfdb.schema import schema
 from mmfdb.models import (
     ARTIFACT_KINDS,
     OPERATION_TYPES,
@@ -60,6 +59,52 @@ def test_record_operation_rejects_invalid_operation_type(tmp_path: pathlib.Path)
     with MFDatabase(db_path) as db:
         with pytest.raises(ValueError, match="operation_type"):
             db.record_operation("bad_op", operation_type="quantum_computing")
+
+
+def test_record_operation_with_artifacts_rejects_invalid_operation_type(
+    tmp_path: pathlib.Path,
+) -> None:
+    db_path = tmp_path / "test_vocab.db"
+    with MFDatabase(db_path) as db:
+        with pytest.raises(ValueError, match="operation_type"):
+            db.record_operation_with_artifacts(
+                operation_id="bad_op_art",
+                operation_type="quantum_computing",
+                output_artifacts=[{"artifact_id": "out", "artifact_kind": "processed_data"}],
+            )
+        for table in ("mmfdb_operation", "mmfdb_artifact", "mmfdb_operation_artifact"):
+            assert db.conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 0
+
+
+def test_both_record_paths_share_the_extensible_operation_type_vocabulary(
+    tmp_path: pathlib.Path,
+) -> None:
+    """A site-registered operation type is accepted by both record paths.
+
+    The two paths used to disagree: ``record_operation`` checked the extensible
+    ``mmfdb_vocabulary`` table while ``record_operation_with_artifacts`` checked
+    the static dictionary enum on top of it, so an extension registered through
+    the documented mechanism was usable from one path only (DATA-05).
+    """
+    db_path = tmp_path / "test_vocab.db"
+    with MFDatabase(db_path) as db:
+        assert "external_tool" not in OPERATION_TYPES
+        db.register_vocabulary_value("operation_type", "external_tool")
+
+        db.record_operation("op_plain", operation_type="external_tool")
+        db.record_operation_with_artifacts(
+            operation_id="op_art",
+            operation_type="external_tool",
+            output_artifacts=[{"artifact_id": "out", "artifact_kind": "processed_data"}],
+        )
+
+        recorded = {
+            row["operation_id"]: row["operation_type"]
+            for row in db.conn.execute(
+                "SELECT operation_id, operation_type FROM mmfdb_operation"
+            ).fetchall()
+        }
+        assert recorded == {"op_plain": "external_tool", "op_art": "external_tool"}
 
 
 def test_record_operation_rejects_invalid_status(tmp_path: pathlib.Path) -> None:
