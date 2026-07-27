@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 45
+SCHEMA_VERSION = 46
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -2024,6 +2024,31 @@ def _migrate_v45_external_tool_provenance(conn: sqlite3.Connection) -> None:
 
 
 MIGRATIONS[45] = _migrate_v45_external_tool_provenance
+
+
+def _migrate_v46_reconcile_canonical_columns(conn: sqlite3.Connection) -> None:
+    """Repair live databases that are stamped current but miss canonical columns.
+
+    Databases exist in the field that carry a v44/v45 stamp while
+    ``mmfdb_object`` never gained ``content_sha256`` (v44's column), so every
+    object write failed with *"table mmfdb_object has no column named
+    content_sha256"* and rolled back — the store deduplicated the payload,
+    logged a refcount bump, and then lost the row. Version gating means those
+    databases can never be repaired by the migration that introduced the
+    column, so this reconciliation migration re-adds **any** canonical column
+    missing from an existing table (``_ensure_canonical_columns`` already
+    strips the ``UNIQUE``/``PRIMARY KEY`` clauses SQLite refuses in
+    ``ALTER TABLE ADD COLUMN``) and restores the uniqueness that clause carried
+    as a partial index.
+    """
+    _ensure_canonical_columns(conn)
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS ix_mmfdb_object_sha256 "
+        "ON mmfdb_object(content_sha256) WHERE content_sha256 IS NOT NULL"
+    )
+
+
+MIGRATIONS[46] = _migrate_v46_reconcile_canonical_columns
 
 
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
