@@ -100,6 +100,41 @@ def serve(config_path: str | None, host: str | None, port: int | None) -> None:
     serve_webadmin(host=host or config.server.host, port=port or config.server.port)
 
 
+@cli.group("export")
+def export() -> None:
+    """Export recorded metadata out of MMFDB in exchange formats."""
+
+
+@export.command("cif")
+@click.option("--analysis", "analysis_id", default=None,
+              help="Analysis to export (default: the first one).")
+@click.option("--output", "output_path", default=None, type=click.Path(dir_okay=False),
+              help="Write the CIF here instead of to stdout.")
+@click.option("--no-extension", is_flag=True, help="Emit only standard PDBx/FLR categories.")
+@click.option("--token", envvar="MMFDB_TOKEN", default=None,
+              help="Session token (see `mmfdb-admin auth login`).")
+def export_cif(
+    analysis_id: str | None, output_path: str | None, no_extension: bool, token: str | None
+) -> None:
+    """Export one analysis and its sample description as an mmCIF document."""
+    from mmfdb.api import export_cif as export_cif_api
+    from mmfdb.security.auth import AuthError, PermissionDenied
+
+    try:
+        result = export_cif_api(
+            analysis_id=analysis_id,
+            output_path=output_path,
+            include_extension=not no_extension,
+            auth={"token": token} if token else None,
+        )
+    except (AuthError, PermissionDenied) as exc:
+        raise click.ClickException(str(exc)) from exc
+    if output_path:
+        click.echo(f"{result['analysis_id']}: {result['output_path']}")
+    else:
+        click.echo(result["text"], nl=False)
+
+
 @cli.group("workflow")
 def workflow() -> None:
     """Define, run, and export YAML-declared analysis workflows."""

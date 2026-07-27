@@ -115,6 +115,21 @@ mmCIF metadata), re-import it into another MMFDB instance, or upload it to
 Zenodo/OSF with their own tools.
 → {doc}`mmfdb_07_deposition.ipynb <examples/mmfdb_07_deposition>`
 
+### Export one analysis as mmCIF
+
+Emit the flrCIF record for a single analysis — its sample description, probes,
+spectra, and photon streams — without archiving a whole deposition:
+
+```bash
+mmfdb export cif --analysis <analysis-id> --output analysis.cif --token "$MMFDB_TOKEN"
+```
+
+The command reads a session token (`mmfdb-admin auth login`, or `MMFDB_TOKEN`)
+and goes through the authenticated `mmfdb.api.export_cif` boundary, so the export
+obeys the same read permissions as every other API call. Omit `--output` to write
+the document to stdout, and pass `--no-extension` for standard PDBx/FLR
+categories only.
+
 ### Use MMFDB on its own
 
 Import `mmfdb` directly and combine any libraries (here `tttrlib` and FRETBursts)

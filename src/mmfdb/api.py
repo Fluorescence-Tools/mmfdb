@@ -1839,3 +1839,87 @@ def get_user_active_branch(user_id: str, auth: dict[str, Any] | None = None) -> 
         target = _effective_target_user(principal, user_id)
         branch = db.get_user_active_branch(target)
         return {"branch": branch}
+
+
+def _resolve_export_analysis(
+    db: MFDatabase, analysis_id: str | None
+) -> tuple[str | None, str | None]:
+    """Resolve the analysis to export and the sample that owns it.
+
+    Parameters
+    ----------
+    db : MFDatabase
+        Open repository handle.
+    analysis_id : str or None
+        Requested analysis; when ``None`` the first recorded analysis is used.
+
+    Returns
+    -------
+    tuple of (str or None, str or None)
+        The resolved analysis identifier and its sample identifier. Either is
+        ``None`` when the database holds no matching row.
+    """
+    if analysis_id is None:
+        rows = db.dao.list("flr_fret_analysis", order_by="analysis_id", limit=1)
+    else:
+        rows = db.dao.list(
+            "flr_fret_analysis",
+            filters={"analysis_id": analysis_id},
+            include_deleted=True,
+            limit=1,
+        )
+    if not rows:
+        return analysis_id, None
+    row = rows[0]
+    return row.get("analysis_id") or analysis_id, row.get("sample_id")
+
+
+def export_cif(
+    analysis_id: str | None = None,
+    output_path: str | None = None,
+    include_extension: bool = True,
+    auth: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Export one FRET analysis and its sample description as mmCIF.
+
+    This is the public, transport-agnostic counterpart to the admin-only
+    ``sample.export`` handler: it emits the same flrCIF text through the
+    authenticated API boundary, so a standalone consumer can deposit metadata
+    without reaching into the repository.
+
+    Parameters
+    ----------
+    analysis_id : str, optional
+        Analysis to export. When omitted the first recorded analysis is used.
+    output_path : str, optional
+        Write the CIF to this file instead of returning its text.
+    include_extension : bool, default=True
+        Emit the local dictionary extension categories alongside the standard
+        PDBx/FLR ones.
+    auth : dict, optional
+        Session auth dict; the exported sample must be readable.
+
+    Returns
+    -------
+    dict
+        RPC result with the resolved ``analysis_id`` plus either ``text`` (the
+        CIF document) or ``output_path`` (the file written).
+    """
+    from pathlib import Path
+
+    with _database(auth) as db:
+        principal = _principal(db, auth)
+        resolved, sample_id = _resolve_export_analysis(db, analysis_id)
+        if sample_id:
+            _check_acl_access(db.conn, principal, "sample", sample_id)
+        elif not principal.is_admin:
+            raise AuthError("Authentication required")
+        if output_path:
+            written = db.export_flr_cif(
+                Path(output_path), analysis_id=resolved, include_extension=include_extension
+            )
+            return {"analysis_id": resolved, "output_path": str(written)}
+        text = db.export_flr_cif_to_text(
+            analysis_id=resolved, include_extension=include_extension
+        )
+        return {"analysis_id": resolved, "text": text}
