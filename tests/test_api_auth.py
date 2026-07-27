@@ -116,3 +116,46 @@ def test_api_admin_may_target_other_user(tmp_path: Path, monkeypatch) -> None:
     # An admin may read another user's active branch.
     result = api.get_user_active_branch("frank", auth=admin)
     assert "branch" in result
+
+
+def test_api_records_external_tool_command_line_and_exit_code(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The public API surface carries the two external-tool columns (DATA-05).
+
+    This is the boundary the versioned RPC methods
+    ``mmfdb.v1.operations.record`` / ``.record_with_artifacts`` dispatch to, so a
+    caller that only speaks JSON-RPC gets them too.
+    """
+    db_path = _setup(tmp_path, monkeypatch)
+    _user(db_path, "grace")
+    grace = _token(db_path, "grace")
+
+    assert api.record_operation(
+        "op_cli",
+        operation_type="external_tool",
+        command_line="fret_burst_tool --min-photons 20 raw.spc",
+        exit_code=0,
+        auth=grace,
+    )["ok"]
+    assert api.record_operation_with_artifacts(
+        operation_id="op_cli_art",
+        operation_type="external_tool",
+        command_line="fret_burst_tool --min-photons 20 missing.spc",
+        exit_code=1,
+        output_artifacts=[{"artifact_id": "out_art", "artifact_kind": "processed_data"}],
+        auth=grace,
+    )["ok"]
+
+    db = MFDatabase(db_path)
+    try:
+        rows = {
+            row["operation_id"]: (row["command_line"], row["exit_code"])
+            for row in db.conn.execute(
+                "SELECT operation_id, command_line, exit_code FROM mmfdb_operation"
+            )
+        }
+    finally:
+        db.close()
+    assert rows["op_cli"] == ("fret_burst_tool --min-photons 20 raw.spc", 0)
+    assert rows["op_cli_art"][1] == 1

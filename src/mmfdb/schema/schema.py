@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 44
+SCHEMA_VERSION = 45
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -606,6 +606,8 @@ CREATE_TABLES_SQL = [
         status TEXT DEFAULT 'pending',
         error_message TEXT,
         traceback_summary TEXT,
+        command_line TEXT,
+        exit_code INTEGER,
         metadata_json TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -897,6 +899,8 @@ _CANONICAL_TABLE_DEFS: dict[str, _TableDef] = {
                 check="status IN ('pending','running','succeeded','failed','cancelled','success','converged')"),
         _Column("error_message", "TEXT"),
         _Column("traceback_summary", "TEXT"),
+        _Column("command_line", "TEXT"),
+        _Column("exit_code", "INTEGER"),
         _Column("metadata_json", "TEXT"),
         _Column("created_at", "TEXT", default="CURRENT_TIMESTAMP"),
         _Column("updated_at", "TEXT", default="CURRENT_TIMESTAMP"),
@@ -2004,6 +2008,22 @@ def _migrate_v44_resource_acls(conn: sqlite3.Connection) -> None:
 
 
 MIGRATIONS[44] = _migrate_v44_resource_acls
+
+
+def _migrate_v45_external_tool_provenance(conn: sqlite3.Connection) -> None:
+    """Make an externally executed operation first-class (DATA-05).
+
+    Adds the ``command_line`` / ``exit_code`` columns to ``mmfdb_operation`` and
+    seeds the ``external_tool`` value of the ``operation_type`` vocabulary, so a
+    CLI or script run no longer has to masquerade as an analysis type with its
+    invocation buried in free-form ``settings_json``.
+    """
+    _ensure_column(conn, "mmfdb_operation", "command_line", "TEXT")
+    _ensure_column(conn, "mmfdb_operation", "exit_code", "INTEGER")
+    bootstrap_vocabulary(conn)
+
+
+MIGRATIONS[45] = _migrate_v45_external_tool_provenance
 
 
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:

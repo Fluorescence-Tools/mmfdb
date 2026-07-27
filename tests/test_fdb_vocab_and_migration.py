@@ -88,13 +88,13 @@ def test_both_record_paths_share_the_extensible_operation_type_vocabulary(
     """
     db_path = tmp_path / "test_vocab.db"
     with MFDatabase(db_path) as db:
-        assert "external_tool" not in OPERATION_TYPES
-        db.register_vocabulary_value("operation_type", "external_tool")
+        assert "site_custom_tool" not in OPERATION_TYPES
+        db.register_vocabulary_value("operation_type", "site_custom_tool")
 
-        db.record_operation("op_plain", operation_type="external_tool")
+        db.record_operation("op_plain", operation_type="site_custom_tool")
         db.record_operation_with_artifacts(
             operation_id="op_art",
-            operation_type="external_tool",
+            operation_type="site_custom_tool",
             output_artifacts=[{"artifact_id": "out", "artifact_kind": "processed_data"}],
         )
 
@@ -104,7 +104,106 @@ def test_both_record_paths_share_the_extensible_operation_type_vocabulary(
                 "SELECT operation_id, operation_type FROM mmfdb_operation"
             ).fetchall()
         }
-        assert recorded == {"op_plain": "external_tool", "op_art": "external_tool"}
+        assert recorded == {"op_plain": "site_custom_tool", "op_art": "site_custom_tool"}
+
+
+def test_external_tool_is_a_builtin_operation_type(tmp_path: pathlib.Path) -> None:
+    """A CLI/script run has its own operation type, no registration needed.
+
+    An external tool used to have to masquerade as an analysis type such as
+    ``burst_selection`` because the dictionary enum had no generic value for
+    it (DATA-05).
+    """
+    assert "external_tool" in OPERATION_TYPES
+    db_path = tmp_path / "test_external_tool.db"
+    with MFDatabase(db_path) as db:
+        seeded = db.conn.execute(
+            "SELECT is_builtin FROM mmfdb_vocabulary "
+            "WHERE field_name = 'operation_type' AND value = 'external_tool'"
+        ).fetchone()
+        assert seeded is not None and seeded["is_builtin"] == 1
+        db.record_operation("op_ext", operation_type="external_tool")
+
+
+def test_record_operation_stores_command_line_and_exit_code(tmp_path: pathlib.Path) -> None:
+    """The invocation and exit status are queryable columns, not settings JSON.
+
+    Both used to be buried in free-form ``settings_json``, so no query could ask
+    "which runs failed" or "which runs used this flag" (DATA-05).
+    """
+    db_path = tmp_path / "test_external_tool_cols.db"
+    with MFDatabase(db_path) as db:
+        db.record_operation(
+            "op_ok",
+            operation_type="external_tool",
+            command_line="tttrlib-burstid --min-photons 60 in.ptu",
+            exit_code=0,
+        )
+        db.record_operation_with_artifacts(
+            operation_id="op_fail",
+            operation_type="external_tool",
+            command_line="tttrlib-burstid --min-photons 60 missing.ptu",
+            exit_code=2,
+            output_artifacts=[{"artifact_id": "out", "artifact_kind": "processed_data"}],
+        )
+
+        failed = db.conn.execute(
+            "SELECT operation_id, command_line FROM mmfdb_operation WHERE exit_code != 0"
+        ).fetchall()
+        assert [row["operation_id"] for row in failed] == ["op_fail"]
+        assert failed[0]["command_line"].endswith("missing.ptu")
+
+        ok = db.conn.execute(
+            "SELECT command_line, exit_code FROM mmfdb_operation WHERE operation_id = 'op_ok'"
+        ).fetchone()
+        assert ok["exit_code"] == 0
+        assert ok["command_line"] == "tttrlib-burstid --min-photons 60 in.ptu"
+
+
+def test_record_operation_upsert_updates_command_line_and_exit_code(
+    tmp_path: pathlib.Path,
+) -> None:
+    """Re-recording a running operation on completion writes its exit status."""
+    db_path = tmp_path / "test_external_tool_upsert.db"
+    with MFDatabase(db_path) as db:
+        db.record_operation(
+            "op_run",
+            operation_type="external_tool",
+            command_line="analyze --in a.ptu",
+            status="running",
+        )
+        db.record_operation(
+            "op_run",
+            operation_type="external_tool",
+            command_line="analyze --in a.ptu",
+            status="failed",
+            exit_code=-9,
+        )
+        row = db.conn.execute(
+            "SELECT status, exit_code FROM mmfdb_operation WHERE operation_id = 'op_run'"
+        ).fetchone()
+        assert row["status"] == "failed"
+        assert row["exit_code"] == -9
+
+
+def test_migration_adds_command_line_and_exit_code_to_an_old_database(
+    tmp_path: pathlib.Path,
+) -> None:
+    """A database created before v45 gains the two columns on open."""
+    from mmfdb.schema.schema import get_schema_version, set_schema_version, SCHEMA_VERSION
+
+    db_path = tmp_path / "test_external_tool_migration.db"
+    with MFDatabase(db_path) as db:
+        db.conn.execute("ALTER TABLE mmfdb_operation DROP COLUMN command_line")
+        db.conn.execute("ALTER TABLE mmfdb_operation DROP COLUMN exit_code")
+        set_schema_version(db.conn, SCHEMA_VERSION - 1)
+        db.conn.commit()
+
+    with MFDatabase(db_path) as db:
+        assert get_schema_version(db.conn) == SCHEMA_VERSION
+        columns = {row[1] for row in db.conn.execute("PRAGMA table_info(mmfdb_operation)")}
+        assert {"command_line", "exit_code"} <= columns
+        db.record_operation("op_after", operation_type="external_tool", exit_code=1)
 
 
 def test_record_operation_rejects_invalid_status(tmp_path: pathlib.Path) -> None:

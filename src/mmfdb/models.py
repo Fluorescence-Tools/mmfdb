@@ -1163,6 +1163,8 @@ class MmfdbOperation:
     status: str = "pending"
     error_message: Optional[str] = None
     traceback_summary: Optional[str] = None
+    command_line: Optional[str] = None
+    exit_code: Optional[int] = None
     metadata_json: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

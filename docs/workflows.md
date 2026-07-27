@@ -92,6 +92,18 @@ and timing. Registration of the raw sources is attributed to MMFDB itself. The
 result is that the workflow's DAG *is* the provenance graph — queryable with the
 same `export_provenance_graph` everything else uses, and exportable for a paper.
 
+The rendered invocation and the process exit status are **columns** —
+`mmfdb_operation.command_line` and `mmfdb_operation.exit_code` — not entries in
+the free-form `settings_json`, so they can be queried directly:
+
+```sql
+SELECT operation_id, command_line FROM mmfdb_operation WHERE exit_code != 0;
+```
+
+`exit_code` is `NULL` for an in-process `python:` step, which has no process to
+exit. A tool run outside a workflow — a bare CLI call recorded by hand — should
+use the `external_tool` operation type with the same two columns.
+
 ## Publishing
 
 The `publish` block seeds the provenance graph at one node — a **source** for a

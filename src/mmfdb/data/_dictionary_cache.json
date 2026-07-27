@@ -178649,7 +178649,8 @@
             "local_fit",
             "global_fit",
             "project",
-            "analysis_run"
+            "analysis_run",
+            "external_tool"
           ],
           "enum_details": {},
           "default_value": "",
@@ -178704,6 +178705,40 @@
           "child": null,
           "schema_table": "mmfdb_operation",
           "schema_column": "validation_status",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "command_line": {
+          "name": "_mmfdb_operation.command_line",
+          "category": "mmfdb_operation",
+          "attribute": "command_line",
+          "description": " The command line that produced this operation, for operations run by an external tool (operation_type ``external_tool``).  Stored verbatim as the invocation string so that the exact call is queryable rather than buried in free-form settings_json.  Null for in-process operations. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "mmfdb_operation",
+          "schema_column": "command_line",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "exit_code": {
+          "name": "_mmfdb_operation.exit_code",
+          "category": "mmfdb_operation",
+          "attribute": "exit_code",
+          "description": " Process exit status of an externally executed operation: 0 on success, non-zero on failure, negative on POSIX signal termination.  Distinct from ``status``, which is the recorded provenance lifecycle state.  Null for in-process operations. ",
+          "type_code": "int",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "mmfdb_operation",
+          "schema_column": "exit_code",
           "schema_status": "",
           "schema_foreign_key": ""
         },
@@ -353067,7 +353102,8 @@
         "local_fit",
         "global_fit",
         "project",
-        "analysis_run"
+        "analysis_run",
+        "external_tool"
       ],
       "enum_details": {},
       "default_value": "",
@@ -353122,6 +353158,40 @@
       "child": null,
       "schema_table": "mmfdb_operation",
       "schema_column": "validation_status",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_mmfdb_operation.command_line": {
+      "name": "_mmfdb_operation.command_line",
+      "category": "mmfdb_operation",
+      "attribute": "command_line",
+      "description": " The command line that produced this operation, for operations run by an external tool (operation_type ``external_tool``).  Stored verbatim as the invocation string so that the exact call is queryable rather than buried in free-form settings_json.  Null for in-process operations. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "mmfdb_operation",
+      "schema_column": "command_line",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_mmfdb_operation.exit_code": {
+      "name": "_mmfdb_operation.exit_code",
+      "category": "mmfdb_operation",
+      "attribute": "exit_code",
+      "description": " Process exit status of an externally executed operation: 0 on success, non-zero on failure, negative on POSIX signal termination.  Distinct from ``status``, which is the recorded provenance lifecycle state.  Null for in-process operations. ",
+      "type_code": "int",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "mmfdb_operation",
+      "schema_column": "exit_code",
       "schema_status": "",
       "schema_foreign_key": ""
     },
@@ -356236,6 +356306,6 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1784999557.4538882
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1785131412.2053244
   }
 }

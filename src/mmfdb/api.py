@@ -388,6 +388,8 @@ def record_operation(
     status: str = "pending",
     error_message: str | None = None,
     traceback_summary: str | None = None,
+    command_line: str | None = None,
+    exit_code: int | None = None,
     metadata: dict[str, Any] | None = None,
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -425,6 +427,11 @@ def record_operation(
         Error message if execution failed.
     traceback_summary : str, optional
         Traceback summary if execution failed.
+    command_line : str, optional
+        Invocation string of an externally executed tool, stored verbatim so
+        the exact call is queryable.
+    exit_code : int, optional
+        Process exit status of an externally executed tool.
     metadata : dict, optional
         User metadata dict.
     auth : dict, optional
@@ -463,6 +470,8 @@ def record_operation(
                 status=status,
                 error_message=error_message,
                 traceback_summary=traceback_summary,
+                command_line=command_line,
+                exit_code=exit_code,
                 metadata=metadata,
             )
             _new_object_acl(db.conn, "operation", str(op_id), owner)
@@ -488,6 +497,8 @@ def record_operation_with_artifacts(
     parameters: list[dict[str, Any]] | None = None,
     error_message: str | None = None,
     traceback_summary: str | None = None,
+    command_line: str | None = None,
+    exit_code: int | None = None,
     metadata: dict[str, Any] | None = None,
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -531,6 +542,11 @@ def record_operation_with_artifacts(
         Failure message.
     traceback_summary : str, optional
         Traceback summary.
+    command_line : str, optional
+        Invocation string of an externally executed tool, stored verbatim so
+        the exact call is queryable.
+    exit_code : int, optional
+        Process exit status of an externally executed tool.
     metadata : dict, optional
         Operation metadata.
     auth : dict, optional
@@ -583,6 +599,8 @@ def record_operation_with_artifacts(
                 parameters=parameters,
                 error_message=error_message,
                 traceback_summary=traceback_summary,
+                command_line=command_line,
+                exit_code=exit_code,
                 metadata=metadata,
             )
             _new_object_acl(db.conn, "operation", operation_id, owner)
@@ -857,7 +875,6 @@ def record_operation_link(
     dict
         RPC result dictionary with key 'ok'.
     """
-    from mmfdb.security.auth import PERM_WRITE, require_access
 
     with _database(auth) as db:
         principal = _principal(db, auth)
@@ -1107,7 +1124,6 @@ def record_parameter(
     dict
         RPC result dictionary with keys 'ok' and 'parameter_uuid'.
     """
-    from mmfdb.security.auth import PERM_WRITE, require_access
 
     with _database(auth) as db:
         principal = _principal(db, auth)

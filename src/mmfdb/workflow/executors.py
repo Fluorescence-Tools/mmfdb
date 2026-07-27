@@ -47,10 +47,11 @@ class StepContext:
 
 @dataclass
 class Invocation:
-    """How a step ran — recorded verbatim into the operation's settings."""
+    """How a step ran — recorded verbatim on the operation."""
 
     kind: str  # "cmd" or "python"
     command_line: str
+    #: Process exit status; ``None`` for an in-process (``python``) step.
     returncode: int | None = None
     stdout: str = ""
     summary: dict[str, Any] = field(default_factory=dict)
@@ -107,7 +108,7 @@ class PythonExecutor:
         return Invocation(
             kind="python",
             command_line=step.python,
-            returncode=0,
+            returncode=None,  # in-process: there is no process to exit
             stdout="",
             summary=summary,
         )

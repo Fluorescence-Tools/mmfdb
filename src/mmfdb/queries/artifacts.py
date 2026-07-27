@@ -874,6 +874,8 @@ class ArtifactOpsMixin:
         status: str = "pending",
         error_message: str | None = None,
         traceback_summary: str | None = None,
+        command_line: str | None = None,
+        exit_code: int | None = None,
         metadata: dict[str, Any] | None = None,
         setup_version: int | None = None,
         acl_owner_user_id: str | None = None,
@@ -895,10 +897,11 @@ class ArtifactOpsMixin:
                     settings_json, settings_hash, operator_user_id,
                     software_package, software_module, software_version,
                     runtime_environment_json, started_at, ended_at, status,
-                    error_message, traceback_summary, metadata_json,
+                    error_message, traceback_summary, command_line, exit_code,
+                    metadata_json,
                     protocol_id, protocol_version,
                     created_at, updated_at, deleted_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(operation_id) DO UPDATE SET
                     operation_type=excluded.operation_type,
                     experiment_id=excluded.experiment_id,
@@ -915,6 +918,8 @@ class ArtifactOpsMixin:
                     status=excluded.status,
                     error_message=excluded.error_message,
                     traceback_summary=excluded.traceback_summary,
+                    command_line=excluded.command_line,
+                    exit_code=excluded.exit_code,
                     metadata_json=excluded.metadata_json,
                     protocol_id=excluded.protocol_id,
                     protocol_version=excluded.protocol_version,
@@ -937,6 +942,8 @@ class ArtifactOpsMixin:
                     status,
                     error_message,
                     traceback_summary,
+                    command_line,
+                    exit_code,
                     _json_dumps(metadata),
                     protocol_id,
                     protocol_version,
@@ -1176,6 +1183,8 @@ class ArtifactOpsMixin:
         parameters: list[dict[str, Any]] | None = None,
         error_message: str | None = None,
         traceback_summary: str | None = None,
+        command_line: str | None = None,
+        exit_code: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Record an operation, artifacts, links, and parameters atomically.
@@ -1218,6 +1227,10 @@ class ArtifactOpsMixin:
             Failure message.
         traceback_summary : str, optional
             Traceback summary.
+        command_line : str, optional
+            Invocation string of an externally executed tool.
+        exit_code : int, optional
+            Process exit status of an externally executed tool.
         metadata : dict, optional
             Operation metadata.
 
@@ -1262,6 +1275,8 @@ class ArtifactOpsMixin:
                 ended_at=ended_at,
                 error_message=error_message,
                 traceback_summary=traceback_summary,
+                command_line=command_line,
+                exit_code=exit_code,
                 metadata=metadata,
             )
             counts["operation_inserted"] = 0 if operation_existed else 1

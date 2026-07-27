@@ -3197,6 +3197,7 @@ save__mmfdb_operation.operation_type
       global_fit
       project
       analysis_run
+      external_tool
 
 save__mmfdb_operation.status
    _item.name                "_mmfdb_operation.status"
@@ -3228,6 +3229,34 @@ save__mmfdb_operation.validation_status
       valid
       invalid
       warning
+
+save__mmfdb_operation.command_line
+   _item.name                "_mmfdb_operation.command_line"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name command_line
+   _item_description.description
+;     The command line that produced this operation, for operations run by an
+;     external tool (operation_type ``external_tool``).  Stored verbatim as the
+;     invocation string so that the exact call is queryable rather than buried
+;     in free-form settings_json.  Null for in-process operations.
+;
+
+save__mmfdb_operation.exit_code
+   _item.name                "_mmfdb_operation.exit_code"
+   _item.category_id         mmfdb_operation
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name exit_code
+   _item_description.description
+;     Process exit status of an externally executed operation: 0 on success,
+;     non-zero on failure, negative on POSIX signal termination.  Distinct from
+;     ``status``, which is the recorded provenance lifecycle state.  Null for
+;     in-process operations.
+;
 
 save_mmfdb_operation_artifact
    _category.id              mmfdb_operation_artifact

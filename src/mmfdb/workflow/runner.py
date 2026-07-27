@@ -191,7 +191,7 @@ def _run_step(
             raise WorkflowRunError(f"step {step.id!r} could not register output {out_name!r}")
         op_id = _producing_operation(db, artifact_id)
         if op_id:
-            _stamp_operation(db, op_id, step, settings, started, ended)
+            _stamp_operation(db, op_id, step, invocation, settings, started, ended)
             _link_extra_inputs(db, op_id, artifact_id, input_artifacts[1:])
         step_run.outputs[out_name] = artifact_id
         ref_paths[f"{step.id}.{out_name}"] = out_path
@@ -200,15 +200,19 @@ def _run_step(
 
 
 def _settings(step: StepSpec, invocation: Invocation, started: str, ended: str) -> dict:
+    """Build the operation settings blob.
+
+    The invocation string and the exit status are *not* included: they are
+    first-class ``mmfdb_operation`` columns (see :func:`_stamp_operation`), so
+    keeping a second copy here would make them queryable in two disagreeing
+    places.
+    """
     settings = {
-        "command_line": invocation.command_line,
         "step_kind": invocation.kind,
         "params": dict(step.params),
         "started_at": started,
         "ended_at": ended,
     }
-    if invocation.returncode is not None:
-        settings["exit_code"] = invocation.returncode
     if invocation.summary:
         settings["tool_summary"] = invocation.summary
     if invocation.stdout:
@@ -217,7 +221,13 @@ def _settings(step: StepSpec, invocation: Invocation, started: str, ended: str) 
 
 
 def _stamp_operation(
-    db: MMFDBClientBase, op_id: str, step: StepSpec, settings: dict, started: str, ended: str
+    db: MMFDBClientBase,
+    op_id: str,
+    step: StepSpec,
+    invocation: Invocation,
+    settings: dict,
+    started: str,
+    ended: str,
 ) -> None:
     """Attach tool/version/command-line to the operation register_result created."""
     db.record_operation(
@@ -227,6 +237,8 @@ def _stamp_operation(
         software_package=step.software.package or None,
         software_version=step.software.version or None,
         settings=settings,
+        command_line=invocation.command_line,
+        exit_code=invocation.returncode,
         started_at=started,
         ended_at=ended,
         metadata={"step": step.id},

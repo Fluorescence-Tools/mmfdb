@@ -98,11 +98,23 @@ publish: {{seed: fit.result, formats: [report]}}
         )
         assert rows == {"demo_tool": "1.0", "pyadapter": "0.1"}
 
-        # the command line was captured in the operation settings
-        settings = db.conn.execute(
-            "SELECT settings_json FROM mmfdb_operation WHERE software_package='demo_tool'"
-        ).fetchone()[0]
-        assert "--min 5" in settings
+        # the command line and exit status are first-class columns, not
+        # settings_json entries, so "which runs failed / used this flag" is a query
+        cmd_row = db.conn.execute(
+            "SELECT command_line, exit_code, settings_json FROM mmfdb_operation "
+            "WHERE software_package='demo_tool'"
+        ).fetchone()
+        assert "--min 5" in cmd_row["command_line"]
+        assert cmd_row["exit_code"] == 0
+        assert "command_line" not in cmd_row["settings_json"]
+
+        # an in-process Python step has no exit code to report
+        py_row = db.conn.execute(
+            "SELECT command_line, exit_code FROM mmfdb_operation "
+            "WHERE software_package='pyadapter'"
+        ).fetchone()
+        assert py_row["command_line"] == "wf_helper:run"
+        assert py_row["exit_code"] is None
 
         # lineage: fit result is downstream of the raw measurement
         graph = db.export_provenance_graph("artifact", run.sources["raw"])
