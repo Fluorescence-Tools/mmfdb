@@ -485,3 +485,72 @@ def test_enumerations_present(dic, field, expected_enum):
     """Test that specific enumerations are present."""
     enums = dic.get_enumerations(field)
     assert expected_enum in enums, f"Expected enum '{expected_enum}' not found in {field}"
+
+# --- Bundled vs export-only dictionaries -----------------------------------
+#
+# `data/` ships two kinds of .dic file: the ones parsed into the live
+# vocabulary (BUNDLED_DICTS) and the ones that only describe a serialization
+# format (EXPORT_ONLY_DICTS). A file in neither list is silently invisible to
+# every consumer of `load_bundled()`, which is how `mmfdb_workflow_ext.dic`
+# went unnoticed; these tests make that omission loud.
+
+#: The categories a deposit CIF writes, defined by ``mmfdb_workflow_ext.dic``.
+DEPOSIT_CATEGORIES = [
+    "mmfdb_workflow",
+    "mmfdb_workflow_step",
+    "mmfdb_provenance_operation",
+    "mmfdb_provenance_artifact",
+    "mmfdb_provenance_edge",
+    "mmfdb_bundle_file",
+    "mmfdb_bundle_document",
+]
+
+
+def _shipped_dictionary_names():
+    """Return the ``.dic`` file names shipped in ``data/`` (``.gz`` stripped)."""
+    names = set()
+    for path in MmcifDictionary.DATA_DIR.iterdir():
+        if path.name.endswith(".dic"):
+            names.add(path.name)
+        elif path.name.endswith(".dic.gz"):
+            names.add(path.name[: -len(".gz")])
+    return names
+
+
+def test_every_shipped_dictionary_is_accounted_for():
+    """No ``.dic`` in ``data/`` may be silently ignored by the parser."""
+    known = set(MmcifDictionary.BUNDLED_DICTS) | set(MmcifDictionary.EXPORT_ONLY_DICTS)
+    unaccounted = _shipped_dictionary_names() - known
+    assert not unaccounted, (
+        f"dictionaries shipped but listed nowhere: {sorted(unaccounted)}. "
+        "Add them to BUNDLED_DICTS (live vocabulary) or EXPORT_ONLY_DICTS "
+        "(serialization-only)."
+    )
+
+
+def test_bundled_and_export_only_lists_are_disjoint():
+    """A dictionary is either parsed into the vocabulary or export-only."""
+    overlap = set(MmcifDictionary.BUNDLED_DICTS) & set(MmcifDictionary.EXPORT_ONLY_DICTS)
+    assert not overlap
+
+
+def test_deposit_categories_stay_out_of_the_live_vocabulary(dic):
+    """The export-only workflow categories are not live ``mmfdb_*`` tables.
+
+    Loading ``mmfdb_workflow_ext.dic`` into the bundled vocabulary would make
+    dictionary-driven schema reconciliation materialise these seven categories
+    as tables duplicating the real provenance model.
+    """
+    live = set(dic.categories())
+    for category in DEPOSIT_CATEGORIES:
+        assert category not in live, f"{category} leaked into the live vocabulary"
+
+
+def test_export_only_dictionary_defines_the_deposit_categories():
+    """``mmfdb_workflow_ext.dic`` is the authority for the deposit CIF."""
+    from mmfdb.workflow.export import WORKFLOW_DICTIONARY
+
+    assert WORKFLOW_DICTIONARY in MmcifDictionary.EXPORT_ONLY_DICTS
+    workflow_dic = MmcifDictionary(MmcifDictionary._resolve_dic(WORKFLOW_DICTIONARY))
+    defined = set(workflow_dic.categories())
+    assert set(DEPOSIT_CATEGORIES) <= defined

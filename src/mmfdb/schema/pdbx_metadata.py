@@ -133,15 +133,34 @@ class MmcifDictionary:
     CACHE_VERSION = 4
     _cached_dict: Optional["MmcifDictionary"] = None
     
+    #: Dictionaries parsed by :meth:`load_bundled`. Every ``mmfdb_*`` category
+    #: defined here is treated as a live table by
+    #: :func:`mmfdb.schema.schema_from_dictionary.reconcile_schema`, so adding a
+    #: file to this list creates tables — see :data:`EXPORT_ONLY_DICTS`.
     BUNDLED_DICTS = [
         "mmcif_ddl.dic",
-        "mmcif_std.dic", 
+        "mmcif_std.dic",
         "mmcif_pdbx_v50.dic",
         "mmcif_pdbx_v5_next.dic",
         "mmcif_ma.dic",
         "mmcif_ihm_ext.dic",
         "mmcif_ihm_flr_ext.dic",
         "mmfdb_flr_ext.dic",  # MMFDB/ChiSurf-specific extensions
+    ]
+
+    #: Dictionaries shipped in ``data/`` that describe a **serialization**
+    #: vocabulary rather than the live schema, and are therefore deliberately
+    #: kept out of :data:`BUNDLED_DICTS`.
+    #:
+    #: ``mmfdb_workflow_ext.dic`` defines the seven categories a deposit CIF
+    #: writes (``mmfdb_workflow``/``_step``, ``mmfdb_provenance_operation``/
+    #: ``_artifact``/``_edge``, ``mmfdb_bundle_file``/``_document``) and travels
+    #: inside the bundle so the deposit is self-describing. Those categories are
+    #: an export projection of the live provenance tables (``mmfdb_operation``,
+    #: ``mmfdb_artifact``, ``mmfdb_edge``), not tables of their own; loading it
+    #: here would make schema reconciliation materialise seven duplicate tables.
+    EXPORT_ONLY_DICTS = [
+        "mmfdb_workflow_ext.dic",
     ]
 
     def __init__(self, *dic_paths: Path) -> None:
