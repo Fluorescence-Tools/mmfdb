@@ -181,6 +181,25 @@ def test_search_items(dic):
     assert any("sample" in n.lower() for n in names)
 
 
+def test_item_names_are_sorted_full_names(dic):
+    """item_names() exposes every parsed item as a sorted ``_cat.attr`` list."""
+    names = dic.item_names()
+    assert len(names) > 5000
+    assert names == sorted(names)
+    assert all(n.startswith("_") and "." in n for n in names)
+    assert "_entity.type" in names
+    assert "_flr_sample.entity_assembly_id" in names
+
+
+def test_item_descriptions_skip_items_without_one(dic):
+    """item_descriptions() maps item name -> description and omits empty ones."""
+    descriptions = dic.item_descriptions()
+    assert len(descriptions) > 1000
+    assert set(descriptions) <= set(dic.item_names())
+    assert all(text for text in descriptions.values())
+    assert "entity" in descriptions["_atom_site.label_entity_id"].lower()
+
+
 def test_cache_roundtrip(tmp_path):
     """Parsed dictionary survives JSON cache serialize/deserialize."""
     dic1 = MmcifDictionary.load_bundled()

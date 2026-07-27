@@ -626,6 +626,14 @@ class MmcifDictionary:
     def categories(self) -> List[str]:
         return sorted(self._categories.keys())
 
+    def item_names(self) -> List[str]:
+        """Return every ``_category.attribute`` item name, sorted."""
+        return sorted(self._items.keys())
+
+    def item_descriptions(self) -> Dict[str, str]:
+        """Return item name -> description, omitting items that define none."""
+        return {name: item.description for name, item in self._items.items() if item.description}
+
     def flr_categories(self) -> List[str]:
         return sorted([n for n in self._categories.keys() if n.startswith("flr_")])
 
