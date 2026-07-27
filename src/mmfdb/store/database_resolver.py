@@ -24,15 +24,21 @@ USER_DB_RELATIVE = Path("flr") / SOURCE_DB_NAME
 
 
 def source_database_path() -> Path:
-    """Return the curated source database shipped with MMFDB."""
+    """Return the curated source database shipped with MMFDB.
+
+    The path is returned whether or not the file exists; a missing seed is a
+    broken installation and is reported by :func:`resolve_database_location`
+    rather than masked by a placeholder database.
+
+    Returns
+    -------
+    pathlib.Path
+        Configured source path, else the seed packaged in ``mmfdb/data/``.
+    """
     configured = configured_source_database_path()
     if configured is not None:
         return configured
-    data_dir = Path(__file__).resolve().parent.parent / "data"
-    packaged_source = data_dir / SOURCE_DB_NAME
-    if packaged_source.exists():
-        return packaged_source
-    return data_dir / "example.db"
+    return Path(__file__).resolve().parent.parent / "data" / SOURCE_DB_NAME
 
 
 def user_database_path() -> Path:
@@ -84,6 +90,12 @@ def resolve_database_location() -> str | Path:
         if source_path.exists():
             _copy_database(source_path, user_path)
         else:
+            logger.warning(
+                "Curated MMFDB seed missing at %s; creating an empty database at %s. "
+                "The installation ships no reference probes, spectra or samples.",
+                source_path,
+                user_path,
+            )
             _create_empty_database(user_path)
     return user_path
 
