@@ -178423,6 +178423,7 @@
             "tcspc_decay",
             "anisotropy_curve",
             "pda_histogram",
+            "pch_histogram",
             "fit_results",
             "derived_product",
             "gmm_summary",
@@ -352892,6 +352893,7 @@
         "tcspc_decay",
         "anisotropy_curve",
         "pda_histogram",
+        "pch_histogram",
         "fit_results",
         "derived_product",
         "gmm_summary",
@@ -356306,6 +356308,6 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1785131412.2053244
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1785147094.751074
   }
 }

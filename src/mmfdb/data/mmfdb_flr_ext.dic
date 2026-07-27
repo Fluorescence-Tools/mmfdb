@@ -3030,6 +3030,7 @@ save__mmfdb_artifact.artifact_kind
       tcspc_decay
       anisotropy_curve
       pda_histogram
+      pch_histogram
       fit_results
       derived_product
       gmm_summary
