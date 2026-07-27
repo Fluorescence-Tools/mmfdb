@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 46
+SCHEMA_VERSION = 47
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -2049,6 +2049,23 @@ def _migrate_v46_reconcile_canonical_columns(conn: sqlite3.Connection) -> None:
 
 
 MIGRATIONS[46] = _migrate_v46_reconcile_canonical_columns
+
+
+def _migrate_v47_reconcile_missing_tables(conn: sqlite3.Connection) -> None:
+    """Repair databases that are missing whole *tables*, not just columns.
+
+    v46 re-added missing canonical columns, which was only half the damage: the
+    same stamped-but-incomplete databases never ran v44 at all, so they also
+    lack the tables it creates — the first write after the column fix failed
+    with *"no such table: mmfdb_object_reference"*. This runs the full
+    reconciliation (create every canonical table that is absent, re-add missing
+    columns, re-apply the indices), which is idempotent and the sanctioned path
+    for exactly this situation.
+    """
+    reconcile_current_schema(conn)
+
+
+MIGRATIONS[47] = _migrate_v47_reconcile_missing_tables
 
 
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
