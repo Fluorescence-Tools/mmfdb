@@ -207,9 +207,14 @@ class TestMFDatabaseExport:
             out = pathlib.Path(d) / "export.cif"
             db.export_flr_cif(out, analysis_id="analysis_export")
             text = out.read_text()
-            assert "_chisurf_probe_spectrum" in text
-            assert "_chisurf_photon_stream" in text
+            assert "_mmfdb_probe_spectrum" in text
+            assert "_mmfdb_photon_stream" in text
             assert "mCherry" in text
+            # The local extension *category* namespace is keyed on the store,
+            # not on a consuming application (PRD-44). The data block name is
+            # still branded and has out-of-repo consumers; that is separate.
+            branded = [line for line in text.splitlines() if line.startswith("_chisurf_")]
+            assert not branded, branded
 
     def test_export_flr_cif_fallback_analysis_id(self, db):
         """Export works without specifying analysis_id (auto-fallback to first)."""
@@ -247,7 +252,7 @@ class TestMFDatabaseExport:
             out = pathlib.Path(d) / "analysis_data.cif"
             db.export_flr_cif(out, analysis_id="analysis_data")
             text = out.read_text()
-            assert "_chisurf_analysis_data" in text
+            assert "_mmfdb_analysis_data" in text
             assert "decay" in text
             assert "donor_decay" in text
             assert "0 1 2 3" in text

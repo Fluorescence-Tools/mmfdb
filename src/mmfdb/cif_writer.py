@@ -11,6 +11,51 @@ import math
 from contextlib import AbstractContextManager
 from typing import Any, Literal, TextIO
 
+#: Legacy spelling -> canonical spelling for MMFDB's own flrCIF extension
+#: categories.  These carry the data no standard mmCIF/flrCIF category has a
+#: home for (probe spectra, optical properties, photon streams, analysis
+#: curves), so they live in a local extension namespace.  That namespace is
+#: keyed on the **store** (``mmfdb``) rather than on a consuming application,
+#: the same de-branding PRD-44 applied to the dictionary's schema-mapping tags;
+#: files written before the rename carry the ``_chisurf_*`` spelling and are
+#: still read.
+EXTENSION_CATEGORY_ALIASES: dict[str, str] = {
+    "_chisurf_analysis_metadata": "_mmfdb_analysis_metadata",
+    "_chisurf_probe_property": "_mmfdb_probe_property",
+    "_chisurf_probe_spectrum": "_mmfdb_probe_spectrum",
+    "_chisurf_photon_stream": "_mmfdb_photon_stream",
+    "_chisurf_analysis_data": "_mmfdb_analysis_data",
+}
+
+#: The canonical extension categories an MMFDB export writes.
+EXTENSION_CATEGORIES: frozenset[str] = frozenset(EXTENSION_CATEGORY_ALIASES.values())
+
+
+def canonical_extension_category(name: str) -> str:
+    """Map an extension category name onto its canonical spelling.
+
+    Parameters
+    ----------
+    name : str
+        A CIF category name including its leading underscore, e.g.
+        ``"_chisurf_probe_spectrum"``.
+
+    Returns
+    -------
+    str
+        The canonical ``_mmfdb_*`` spelling if *name* is a known legacy
+        extension category, otherwise *name* unchanged — standard mmCIF
+        categories pass through untouched.
+
+    Examples
+    --------
+    >>> canonical_extension_category("_chisurf_probe_spectrum")
+    '_mmfdb_probe_spectrum'
+    >>> canonical_extension_category("_flr_sample")
+    '_flr_sample'
+    """
+    return EXTENSION_CATEGORY_ALIASES.get(name, name)
+
 
 def _format_value(value: Any) -> str:
     """Serialize one scalar as a CIF token."""

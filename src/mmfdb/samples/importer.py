@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 
+from mmfdb.cif_writer import canonical_extension_category
 from mmfdb.repository import MFDatabase
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ def import_structure_file(db: MFDatabase, path: str | Path) -> Dict[str, Any]:
     systems = _read_ihm_systems(path, summary)
     if systems:
         _import_ihm_systems(db, systems, summary)
-    _import_chisurf_extensions(db, path, summary)
+    _import_extension_categories(db, path, summary)
     if not summary["samples"]:
         sample_id = _sample_id_from_path(path)
         db.add_sample(sample_id, description=path.stem, details=f"Imported from {path}")
@@ -191,8 +192,13 @@ def _import_ihm_analyses(db: MFDatabase, flr_data: Any, summary: Dict[str, Any])
         )
 
 
-def _import_chisurf_extensions(db: MFDatabase, path: Path, summary: Dict[str, Any]) -> None:
-    """Import ChiSurf extension categories such as spectra and properties."""
+def _import_extension_categories(db: MFDatabase, path: Path, summary: Dict[str, Any]) -> None:
+    """Import MMFDB's local extension categories such as spectra and properties.
+
+    Both the canonical ``_mmfdb_*`` spelling and the legacy ``_chisurf_*`` one
+    written before the de-branding are accepted; see
+    :func:`mmfdb.cif_writer.canonical_extension_category`.
+    """
     try:
         from pdbx.reader import PdbxReader
     except Exception as exc:
@@ -212,11 +218,12 @@ def _import_chisurf_extensions(db: MFDatabase, path: Path, summary: Dict[str, An
             category = block.get_object(name)
             rows = _pdbx_category_rows(category)
             category_name = name if name.startswith("_") else f"_{name}"
-            if category_name == "_chisurf_probe_property":
+            category_name = canonical_extension_category(category_name)
+            if category_name == "_mmfdb_probe_property":
                 _import_probe_properties(db, rows, summary)
-            elif category_name == "_chisurf_probe_spectrum":
+            elif category_name == "_mmfdb_probe_spectrum":
                 _import_probe_spectra(db, rows, summary)
-            elif category_name == "_chisurf_analysis_data":
+            elif category_name == "_mmfdb_analysis_data":
                 _import_analysis_data(db, rows, summary)
             elif category_name == "_struct_ref":
                 _import_struct_ref(db, rows, summary)

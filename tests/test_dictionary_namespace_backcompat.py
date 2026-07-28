@@ -1,17 +1,30 @@
-"""Back-compat for the vendor-neutral schema namespace rename (PRD-44).
+"""Back-compat for the vendor-neutral namespace rename (PRD-44).
 
-The local extension tags were renamed ``_chisurf_schema.*`` -> ``_mmfdb_schema.*``.
-The parser keeps a legacy-fallback branch so old ``.dic`` copies (and any
-third-party dictionaries) using the branded tag still parse. This guards that
-fallback: a fragment written with the *legacy* tags must populate the same
-``DictItem.schema_*`` fields as the new spelling.
+Two namespaces were de-branded from the consuming application to the store.
+
+* The dictionary's schema-mapping **tags**, ``_chisurf_schema.*`` ->
+  ``_mmfdb_schema.*``. The parser keeps a legacy-fallback branch so old ``.dic``
+  copies (and any third-party dictionaries) using the branded tag still parse.
+* The exporter's local extension **categories** in flrCIF output,
+  ``_chisurf_probe_spectrum`` and its four siblings -> ``_mmfdb_*``. The
+  importer accepts both, so files written before the rename still read.
+
+This guards both fallbacks, and pins that nothing writes the branded spelling
+any more.
 """
 
 from __future__ import annotations
 
+import ast
 import tempfile
 from pathlib import Path
 
+import mmfdb.repository as repository_module
+from mmfdb.cif_writer import (
+    EXTENSION_CATEGORIES,
+    EXTENSION_CATEGORY_ALIASES,
+    canonical_extension_category,
+)
 from mmfdb.schema.pdbx_metadata import MmcifDictionary
 
 _LEGACY_FRAGMENT = """\
@@ -72,3 +85,46 @@ def test_new_mmfdb_schema_tags_parse_identically() -> None:
     assert value.schema_table == "test_legacy_table"
     assert value.schema_column == "legacy_value"
     assert value.schema_status == "active"
+
+
+def test_extension_category_alias_table_is_a_pure_rebranding() -> None:
+    """Every alias differs from its canonical name only in the namespace."""
+    assert EXTENSION_CATEGORY_ALIASES, "the alias table must not be empty"
+    for legacy, canonical in EXTENSION_CATEGORY_ALIASES.items():
+        assert legacy.startswith("_chisurf_")
+        assert canonical.startswith("_mmfdb_")
+        assert legacy.removeprefix("_chisurf_") == canonical.removeprefix("_mmfdb_")
+    assert len(EXTENSION_CATEGORIES) == len(EXTENSION_CATEGORY_ALIASES)
+
+
+def test_legacy_extension_categories_map_onto_the_canonical_spelling() -> None:
+    assert canonical_extension_category("_chisurf_probe_spectrum") == "_mmfdb_probe_spectrum"
+    for legacy, canonical in EXTENSION_CATEGORY_ALIASES.items():
+        assert canonical_extension_category(legacy) == canonical
+        assert canonical_extension_category(canonical) == canonical
+
+
+def test_standard_categories_pass_through_untouched() -> None:
+    """Only the local extension namespace is rewritten, never a standard one."""
+    for name in ("_flr_sample", "_struct_ref", "_entity", "_flr_chisurf_parameter"):
+        assert canonical_extension_category(name) == name
+
+
+def _string_constants(path: Path) -> set[str]:
+    """Every string literal in *path*, so a rename guard ignores prose."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    return {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+
+
+def test_the_exporter_writes_no_branded_extension_category() -> None:
+    """The rename is only done if nothing emits the legacy spelling any more."""
+    branded = {
+        text
+        for text in _string_constants(Path(repository_module.__file__))
+        if text.startswith("_chisurf_")
+    }
+    assert not branded, f"exporter still writes branded categories: {sorted(branded)}"

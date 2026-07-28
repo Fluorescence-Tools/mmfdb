@@ -1112,13 +1112,13 @@ class MFDatabase(
 
             if include_extension:
                 with writer.loop(
-                    "_chisurf_analysis_metadata", ["analysis_id", "key", "value"]
+                    "_mmfdb_analysis_metadata", ["analysis_id", "key", "value"]
                 ) as loop:
                     for key, value in sorted(metadata.items()):
                         loop.write(analysis_id=analysis_id, key=key, value=value)
 
                 with writer.loop(
-                    "_chisurf_probe_property",
+                    "_mmfdb_probe_property",
                     ["probe_id", "property_name", "property_value", "unit", "details"],
                 ) as loop:
                     for prop in properties:
@@ -1136,7 +1136,7 @@ class MFDatabase(
                         )
 
                 with writer.loop(
-                    "_chisurf_probe_spectrum",
+                    "_mmfdb_probe_spectrum",
                     [
                         "probe_id",
                         "spectrum_type",
@@ -1159,7 +1159,7 @@ class MFDatabase(
                         )
 
                 with writer.loop(
-                    "_chisurf_photon_stream",
+                    "_mmfdb_photon_stream",
                     [
                         "stream_id",
                         "analysis_id",
@@ -1185,7 +1185,7 @@ class MFDatabase(
                         )
 
                 with writer.loop(
-                    "_chisurf_analysis_data",
+                    "_mmfdb_analysis_data",
                     [
                         "analysis_id",
                         "data_type",
