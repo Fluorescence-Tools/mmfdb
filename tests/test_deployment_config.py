@@ -207,8 +207,13 @@ client:
     assert load_client_config(allowed).allow_insecure_http is True
 
 
+# The parameter is *not* called ``base_url``: the pytest-base-url plugin (pulled
+# in by several browser-testing packages) defines a session-scoped fixture of
+# that name, and a same-named parametrize argument then fails to collect with
+# ScopeMismatch — so these three cases silently never ran wherever that plugin
+# is installed.
 @pytest.mark.parametrize(
-    "base_url",
+    "unsafe_url",
     [
         "https://user:secret@mmfdb.example.org",
         "https://mmfdb.example.org?token=secret",
@@ -216,11 +221,11 @@ client:
     ],
 )
 def test_client_base_url_rejects_embedded_secrets_and_suffixes(
-    tmp_path: Path, base_url: str
+    tmp_path: Path, unsafe_url: str
 ) -> None:
     path = _write_config(
         tmp_path / "unsafe-url.yaml",
-        f"version: 1\nclient:\n  mode: remote\n  base_url: {base_url}\n",
+        f"version: 1\nclient:\n  mode: remote\n  base_url: {unsafe_url}\n",
     )
     with pytest.raises(ConfigError, match="credentials|query string|fragment"):
         load_client_config(path)

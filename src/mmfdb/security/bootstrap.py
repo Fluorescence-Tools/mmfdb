@@ -110,8 +110,30 @@ def bootstrap_local_admin(
         )
     password_hash = hash_password(password)
     if existing:
+        # Only the *service* identity may be promoted. A configured secret must
+        # never be able to claim an identity that already exists — that is a
+        # deliberate property (test_admin_bootstrap_never_promotes_preexisting_
+        # non_service_identity), not an oversight.
+        #
+        # The way this is reached in practice is a configuration collision:
+        # ordinary work stamps its writes with ``mmfdb.default_user_id`` and
+        # auto-creates that row, so configuring it to the *same* name as the
+        # bootstrap administrator means the first write claims the name and the
+        # bootstrap can then never run. Say so, because the bare "already
+        # exists" sent readers looking for an attacker instead of a setting.
         if user_id != SERVICE_USER_ID or existing[0] or existing[1] or existing[2]:
-            raise ValueError(f"Bootstrap administrator {user_id!r} already exists")
+            hint = ""
+            if not (existing[0] or existing[1] or existing[2]):
+                hint = (
+                    f" — it exists as a plain user with no password, which is what "
+                    f"an ordinary write creates for the acting identity. If "
+                    f"mmfdb.default_user_id is also {user_id!r}, the two collide by "
+                    f"configuration: set them to different names (the default "
+                    f"acting identity is {SERVICE_USER_ID!r})"
+                )
+            raise ValueError(
+                f"Bootstrap administrator {user_id!r} already exists{hint}"
+            )
         conn.execute(
             "UPDATE flr_sample_users SET display_name = ?, active_branch_uuid = ?, "
             "is_admin = 1, password_hash = ?, allow_passwordless_login = 0 "
