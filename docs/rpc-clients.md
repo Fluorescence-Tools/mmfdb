@@ -60,7 +60,36 @@ signatures in `src/mmfdb/api.py`.
   (max 64 MiB). Optional metadata rides in a base64url `X-MMFDB-Metadata` header.
 - **Download:** `GET /objects/{uuid}` with the bearer token → the raw bytes.
 
-## Reference client (tested, standard library only)
+## Packaged client (`mmfdb.client`)
+
+If you can import `mmfdb`, do not write a transport at all — the package ships
+one. `mmfdb.client` depends on nothing beyond the standard library, so importing
+it costs neither the database nor the admin host:
+
+```python
+from mmfdb.client import HttpJsonRpcClient
+
+client = HttpJsonRpcClient("https://mmfdb.mylab.org", timeout_ms=5000)
+login = client.call("mmfdb.security.auth.login", {"user_id": "me", "password": "secret"})
+token = login["result"]["token"]
+
+client.call("mmfdb.status", {"auth": {"token": token}})         # bearer header
+with open("measurement.spc", "rb") as source:                   # streamed, bounded
+    stored = client.upload_object(
+        source, length=size, filename="measurement.spc",
+        mime_type=None, metadata={"kind": "raw"}, token=token,
+    )
+raw = client.download_object(stored["object"]["object_uuid"], token=token)
+```
+
+`validate_base_url()` decides the endpoint policy in one place: the URL must be
+absolute, credential-free and without a query or fragment, and plain HTTP is
+refused for a non-loopback host unless `allow_insecure_http=True` says so
+explicitly. Object bodies are streamed in 64 KiB chunks and bounded on both
+sides, so neither a hostile response nor a short source stream is silently
+truncated.
+
+## Reference client (copy-paste, no `mmfdb` install)
 
 ```{literalinclude} ../examples/external_tools/mmfdb_min_client.py
 :language: python
@@ -104,8 +133,9 @@ a running server also lists every method at `/rpc-explorer`.
   `examples/mmfdb_08_standalone_no_lockin.ipynb`).
 
 ```{note}
-A fuller client (`MMFDBClient`) with the same wire contract plus streaming and
-settings integration currently lives in a downstream consumer application;
-moving a standalone client into the `mmfdb` package is tracked as **INC-09**.
-Until then, copy the ~50-line reference above.
+The HTTP transport now ships in the package as `mmfdb.client` (**INC-09**); the
+copy-paste reference above stays for tools that cannot install `mmfdb` at all.
+What still lives in a downstream consumer application is the *ergonomic* layer
+on top — the ~90 named method wrappers, settings/credential-store integration
+and the alternative in-process and message-queue transports.
 ```
