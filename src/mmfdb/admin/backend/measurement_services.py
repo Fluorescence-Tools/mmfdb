@@ -1903,6 +1903,101 @@ def database_backup_handler(target_path: str) -> dict[str, Any]:
         return service_error(str(exc), error_code=OPERATION_FAILED, exception=exc)
 
 
+def _archive_member_name(filename: str, taken: set[str]) -> str:
+    """Reserve a unique ``external_data/`` member name derived from *filename*.
+
+    Two artifacts in different directories routinely share a basename. Naming
+    both bundle members after the basename alone would put two entries under one
+    name in the ZIP, so the manifest would point two nodes at whichever copy
+    happened to be extracted last.
+
+    Parameters
+    ----------
+    filename : str
+        Preferred file name for the bundled copy.
+    taken : set of str
+        Member names already reserved in this bundle; the returned name is added
+        to it.
+
+    Returns
+    -------
+    str
+        Archive-relative path below ``external_data/`` that no other member uses.
+    """
+    from pathlib import PurePosixPath
+
+    name = PurePosixPath(filename).name or "unnamed"
+    stem = PurePosixPath(name).stem
+    suffix = PurePosixPath(name).suffix
+    candidate = f"external_data/{name}"
+    index = 1
+    while candidate in taken:
+        candidate = f"external_data/{stem}_{index}{suffix}"
+        index += 1
+    taken.add(candidate)
+    return candidate
+
+
+def _bundle_payload_source(
+    db: Any, node: dict[str, Any], resolved_path: str | None
+) -> tuple[Any, str, str | None, str | None]:
+    """Locate the bytes to bundle for a provenance node.
+
+    The content-addressed object store is the authority: an artifact whose file
+    was ingested into it has a durable blob even when its recorded ``file_path``
+    is stale, was never on this machine, or has since been moved. Only when the
+    node carries no object does the recorded path apply.
+
+    Parameters
+    ----------
+    db : MFDatabase
+        Open repository used to resolve the object store blob.
+    node : dict
+        Provenance graph node (an ``mmfdb_artifact`` row for data nodes).
+    resolved_path : str or None
+        The node's ``file_path`` after ``base_path_map`` rewriting.
+
+    Returns
+    -------
+    tuple
+        ``(source_path, source_kind, dedup_key, unavailable_reason)``.
+        ``source_path`` is ``None`` when the payload cannot be reached, in which
+        case ``unavailable_reason`` says why.
+    """
+    import os
+
+    object_uuid = node.get("object_uuid")
+    if object_uuid:
+        try:
+            blob_path = db.get_object_path(object_uuid)
+        except Exception as exc:  # missing blob must not abort the whole export
+            return None, "object_store", None, f"object {object_uuid} unavailable: {exc}"
+        return blob_path, "object_store", f"object:{object_uuid}", None
+    if resolved_path and os.path.isfile(resolved_path):
+        return resolved_path, "file_path", f"path:{os.path.realpath(resolved_path)}", None
+    if resolved_path:
+        return None, "file_path", None, f"file not found: {resolved_path}"
+    return None, "none", None, "node has neither a stored object nor a file path"
+
+
+def _bundled_file_name(db: Any, node: dict[str, Any], orig_path: str | None) -> str:
+    """Choose the file name a bundled payload should carry inside the archive."""
+    import os
+
+    if orig_path:
+        name = os.path.basename(orig_path)
+        if name:
+            return name
+    object_uuid = node.get("object_uuid")
+    if object_uuid:
+        info = db.get_object_info(object_uuid) or {}
+        if info.get("original_filename"):
+            return str(info["original_filename"])
+    node_id = node.get("node_id") or "artifact"
+    data_format = (node.get("data_format") or "").lstrip(".")
+    return f"{node_id}.{data_format}" if data_format else str(node_id)
+
+
 def export_zip_archive_handler(
     target_zip_path: str,
     seed_node_type: str,
@@ -1958,31 +2053,55 @@ def export_zip_archive_handler(
                 if include_external_data:
                     os.makedirs(os.path.join(tmpdir, "external_data"), exist_ok=True)
 
+                taken_members: set[str] = set()
+                bundled_by_source: dict[str, str] = {}
+
                 for node in graph["nodes"]:
                     node_type = node.get("node_type")
                     orig_path = node.get("file_path") or node.get("path")
-                    if not orig_path:
+                    object_uuid = node.get("object_uuid")
+                    if not orig_path and not object_uuid:
                         continue
 
-                    resolved_path = resolve_path(orig_path)
+                    resolved_path = resolve_path(orig_path) if orig_path else None
                     checksum = node.get("checksum")
 
+                    node_id = (
+                        node.get("node_id")
+                        or node.get("artifact_id")
+                        or node.get("raw_data_id")
+                        or node.get("processed_data_id")
+                        or node.get("analysis_id")
+                    )
                     file_info = {
                         "node_type": node_type,
-                        "node_id": node.get("node_id") or node.get("artifact_id") or node.get("raw_data_id") or node.get("processed_data_id") or node.get("analysis_id"),
+                        "node_id": node_id,
                         "original_path": orig_path,
                         "resolved_path": resolved_path,
                         "checksum": checksum,
+                        "object_uuid": object_uuid,
                         "copied": False,
                     }
 
-                    if include_external_data and resolved_path and os.path.isfile(resolved_path):
-                        filename = os.path.basename(resolved_path)
-                        dest_rel = f"external_data/{filename}"
-                        dest_full = os.path.join(tmpdir, dest_rel)
-                        shutil.copy2(resolved_path, dest_full)
-                        file_info["relative_path"] = dest_rel
-                        file_info["copied"] = True
+                    if include_external_data:
+                        source_path, source_kind, dedup_key, reason = _bundle_payload_source(
+                            db, node, resolved_path
+                        )
+                        file_info["source"] = source_kind
+                        if source_path is None:
+                            file_info["unavailable_reason"] = reason
+                        elif dedup_key in bundled_by_source:
+                            # Two nodes sharing one blob or one file are bundled once.
+                            file_info["relative_path"] = bundled_by_source[dedup_key]
+                            file_info["copied"] = True
+                        else:
+                            dest_rel = _archive_member_name(
+                                _bundled_file_name(db, node, orig_path), taken_members
+                            )
+                            shutil.copy2(source_path, os.path.join(tmpdir, dest_rel))
+                            bundled_by_source[dedup_key] = dest_rel
+                            file_info["relative_path"] = dest_rel
+                            file_info["copied"] = True
 
                     manifest["files"].append(file_info)
 
@@ -1999,12 +2118,9 @@ def export_zip_archive_handler(
                     zf.write(db_snapshot_path, "database_snapshot.db")
                     zf.write(graph_json_path, "provenance_graph.json")
                     if include_external_data:
-                        for file_info in manifest["files"]:
-                            if file_info.get("copied"):
-                                zf.write(
-                                    os.path.join(tmpdir, file_info["relative_path"]),
-                                    file_info["relative_path"]
-                                )
+                        # Several nodes may point at one bundled member; write it once.
+                        for member in sorted(bundled_by_source.values()):
+                            zf.write(os.path.join(tmpdir, member), member)
 
                 db.add_audit_log(
                     action="archive",
