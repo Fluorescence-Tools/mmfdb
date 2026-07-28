@@ -416,14 +416,67 @@ def datasets_open_handler(
         return {"local_path": local_path}
 
 
-def _validate_mmfdb_methods_in_manifest(manifest_path: str | Path | None = None) -> list[str]:
+class _RecordingDispatcher:
+    """Collect the method names :func:`register_services` registers.
+
+    Stands in for a real ``ServiceDispatcher`` so the registered RPC surface can
+    be enumerated without a database, a transport, or a running host.
+    """
+
+    def __init__(self) -> None:
+        self.names: list[str] = []
+
+    def register(self, name: str, handler: Any = None, **_: Any) -> None:
+        """Record ``name`` instead of binding a handler."""
+        self.names.append(name)
+
+
+def registered_service_names() -> set[str]:
+    """Return every RPC method name :func:`register_services` registers.
+
+    The optional runners are stubbed, so the conditionally registered handlers
+    (burst-selection run, pipeline queries, fluorophore triage) are included:
+    the manifest declares the whole surface regardless of which host happens to
+    supply them.
+
+    Returns
+    -------
+    set of str
+        Fully qualified method names, ``mmfdb.*`` and ``mmfdb.v1.*`` alike.
+    """
+    def _unavailable(*_args: Any, **_kwargs: Any) -> Any:
+        raise NotImplementedError("stub runner used only for surface enumeration")
+
+    recorder = _RecordingDispatcher()
+    register_services(
+        recorder,
+        burst_selection_runner=_unavailable,
+        deterministic_checks=_unavailable,
+        pipeline_list=_unavailable,
+        pipeline_get=_unavailable,
+        pipeline_runs=_unavailable,
+    )
+    return set(recorder.names)
+
+
+def _declared_manifest_methods(manifest_path: str | Path) -> set[str]:
+    """Return the RPC method names declared by a host plugin manifest."""
+    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    return {
+        item.get("name")
+        for item in manifest.get("rpc_methods", [])
+        if isinstance(item, dict)
+    }
+
+
+def _validate_mmfdb_methods_in_manifest(manifest_path: str | Path) -> list[str]:
     """Return versioned MMFDB RPC methods missing from the plugin manifest.
 
     Parameters
     ----------
-    manifest_path : str or pathlib.Path, optional
-        Manifest path to validate. When omitted, the mmfdb-admin manifest next
-        to this package is used.
+    manifest_path : str or pathlib.Path
+        Manifest to validate. The manifest lives with the host application, not
+        in this package, so there is no default.
 
     Returns
     -------
@@ -435,23 +488,35 @@ def _validate_mmfdb_methods_in_manifest(manifest_path: str | Path | None = None)
     >>> _validate_mmfdb_methods_in_manifest(manifest_path)  # doctest: +SKIP
     []
     """
-    if manifest_path is None:
-        path = Path(__file__).parents[1] / "manifest.json"
-    else:
-        path = Path(manifest_path)
-    manifest = json.loads(path.read_text(encoding="utf-8"))
-    declared = {
-        item.get("name")
-        for item in manifest.get("rpc_methods", [])
-        if isinstance(item, dict)
-    }
     expected = {f"mmfdb.v1.{name}" for name in VERSIONED_MMFDB_METHODS}
-    return sorted(expected - declared)
+    return sorted(expected - _declared_manifest_methods(manifest_path))
 
 
-def _validate_fdb_methods_in_manifest(manifest_path: str | Path | None = None) -> list[str]:
-    """Backward-compatible alias for manifest validation."""
-    return _validate_mmfdb_methods_in_manifest(manifest_path)
+def validate_manifest_rpc_surface(manifest_path: str | Path) -> dict[str, list[str]]:
+    """Compare a host manifest's declared RPC surface with the registered one.
+
+    The manifest is what a client reads to build forms and documentation, so a
+    handler that is registered but undeclared is invisible to callers, and a
+    declared method with no handler is an advertised call that fails at runtime.
+    Neither drift is otherwise detectable.
+
+    Parameters
+    ----------
+    manifest_path : str or pathlib.Path
+        Manifest to validate.
+
+    Returns
+    -------
+    dict
+        ``undeclared`` — registered method names missing from the manifest;
+        ``unregistered`` — declared names that no handler backs. Both sorted.
+    """
+    registered = registered_service_names()
+    declared = _declared_manifest_methods(manifest_path)
+    return {
+        "undeclared": sorted(registered - declared),
+        "unregistered": sorted(declared - registered),
+    }
 
 
 def status_handler(auth: dict[str, Any] | None = None, **_: Any) -> dict[str, Any]:

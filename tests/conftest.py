@@ -45,6 +45,49 @@ def _hermetic_settings_dir():
     yield _HERMETIC_SETTINGS_DIR
 
 
+def _find_host_manifest() -> pathlib.Path | None:
+    """Locate the host application's mmfdb-admin plugin manifest, if present.
+
+    The RPC surface MMFDB registers is *declared* in the host's plugin manifest;
+    this package ships no copy of it. The manifest is only read, never imported,
+    so the "tests import only mmfdb" rule holds.
+
+    Resolution order: an explicit ``MMFDB_HOST_MANIFEST`` path, then a search up
+    the directory tree for a host checkout — either an ancestor that *is* the
+    host repository, or an ancestor holding it beside this one. Both the symlink
+    -resolved and unresolved paths are walked, because this package is commonly
+    symlinked into the host repository as a submodule directory.
+
+    Returns
+    -------
+    pathlib.Path or None
+        The manifest path, or ``None`` when no host checkout is reachable.
+    """
+    override = os.environ.get("MMFDB_HOST_MANIFEST")
+    if override:
+        path = pathlib.Path(override)
+        return path if path.is_file() else None
+
+    tail = pathlib.Path("chisurf") / "plugins" / "core" / "mmfdb_admin" / "manifest.json"
+    here = pathlib.Path(__file__).absolute()
+    for start in (here, here.resolve()):
+        for ancestor in start.parents:
+            for root in (ancestor, ancestor / "chisurf"):
+                candidate = root / tail
+                if candidate.is_file():
+                    return candidate
+    return None
+
+
+@pytest.fixture(scope="session")
+def host_manifest_path() -> pathlib.Path:
+    """Return the host mmfdb-admin manifest, skipping when it is unreachable."""
+    path = _find_host_manifest()
+    if path is None:
+        pytest.skip("host plugin manifest not present (standalone mmfdb checkout)")
+    return path
+
+
 @pytest.fixture(autouse=True)
 def _guard_real_user_db():
     """Fail loudly if a test resolves MMFDB state to the real ~/.chisurf."""

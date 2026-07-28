@@ -489,16 +489,12 @@ def test_fresh_database_uses_flr_sample_as_sample_source_of_truth(tmp_path: path
 
 # ── 4. Manifest consistency ──────────────────────────────────────────────
 
-def test_manifest_contains_all_fdb_methods() -> None:
-    # The mmfdb-admin RPC surface is declared in the ChiSurf plugin manifest; the
-    # standalone mmfdb.admin package does not ship its own copy. Locate the ChiSurf
-    # checkout relative to this package; skip when it is absent (package tested
-    # standalone, outside the ChiSurf repo).
-    repo_root = pathlib.Path(__file__).resolve().parents[3]
-    manifest_path = repo_root / "chisurf" / "plugins" / "core" / "mmfdb_admin" / "manifest.json"
-    if not manifest_path.is_file():
-        pytest.skip("ChiSurf plugin manifest not present (standalone mmfdb checkout)")
-    missing = _validate_mmfdb_methods_in_manifest(str(manifest_path))
+def test_manifest_contains_all_fdb_methods(host_manifest_path: pathlib.Path) -> None:
+    # The mmfdb-admin RPC surface is declared in the host plugin manifest; the
+    # standalone mmfdb.admin package does not ship its own copy. The
+    # ``host_manifest_path`` fixture locates it and skips when this package is
+    # tested outside a host checkout.
+    missing = _validate_mmfdb_methods_in_manifest(host_manifest_path)
     assert missing == [], f"Manifest is missing {len(missing)} method(s): {missing}"
 
 
