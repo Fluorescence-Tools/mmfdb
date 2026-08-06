@@ -136,6 +136,53 @@ def backup_database(db_path: str | Path) -> Path:
     return backup_path
 
 
+def reset_user_database_from_source() -> dict[str, object]:
+    """Replace the user database with the curated seed, keeping it loginable.
+
+    The seed ships no accounts, so a plain file copy leaves a database nobody
+    can authenticate against. The deployment's configured accounts (see
+    :func:`mmfdb.security.bootstrap.ensure_default_accounts`) are therefore
+    re-established after the copy; with none configured the reset database stays
+    locked, which is MMFDB's standalone default.
+
+    Returns
+    -------
+    dict
+        ``ok``, the ``backup_path`` of the replaced database (``None`` when there
+        was none), the restored ``admin_user`` (``None`` when unconfigured) and
+        the ordinary ``accounts`` that now exist.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the curated source database is missing.
+
+    """
+    from mmfdb.repository import MFDatabase
+    from mmfdb.security.bootstrap import ensure_default_accounts
+
+    user_path = user_database_path()
+    source_path = source_database_path()
+    if not source_path.exists():
+        raise FileNotFoundError(source_path)
+    backup_path = backup_database(user_path) if user_path.exists() else None
+    user_path.parent.mkdir(parents=True, exist_ok=True)
+    _copy_database(source_path, user_path)
+    # The replaced database's write-ahead log describes pages of a file that no
+    # longer exists; leaving it beside the seed replays foreign content into it.
+    for suffix in ("-wal", "-shm"):
+        sidecar = Path(f"{user_path}{suffix}")
+        if sidecar.exists():
+            sidecar.unlink()
+    with MFDatabase(user_path) as db:
+        accounts = ensure_default_accounts(db.conn)
+    return {
+        "ok": True,
+        "backup_path": str(backup_path) if backup_path else None,
+        **accounts,
+    }
+
+
 def backup_database_before_migration(db_path: Path, target_version: int) -> Path | None:
     """Back up a database before schema migration if migration is needed."""
     db_path = Path(db_path)

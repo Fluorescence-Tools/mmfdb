@@ -1,16 +1,19 @@
-"""Naming the acting identity like the bootstrap admin is a configuration trap.
+"""Which pre-existing row the one-shot administrator bootstrap may claim.
 
 MMFDB stamps every write with ``mmfdb.default_user_id`` and auto-creates that
-user as a plain row. The one-shot bootstrap then refuses to claim a name that
-already exists — deliberately, so a configured secret can never take over an
-existing identity (see
-``test_admin_bootstrap_never_promotes_preexisting_non_service_identity``).
+user as a plain row. The bootstrap refuses to claim a name that already exists,
+deliberately, so a configured secret can never take over somebody's identity.
 
-Configure both to the same name and those two rules meet: the first write claims
-the name, and the deployment can never obtain an administrator. The refusal is
-correct; what was missing is that it said nothing about *why* it was reached, so
-the failure read as an attack rather than as a setting. These pin the refusal,
-the one identity that may be promoted, and the message.
+The exception is the identity MMFDB creates *itself* for the acting user — the
+built-in service identity, or whatever ``mmfdb.default_user_id`` names. Nobody
+registered those, so claiming one takes nothing from anyone, and a deployment
+that legitimately runs as its own administrator (a single-user desktop) would
+otherwise be locked out permanently by its own first write.
+
+The exception is narrow: the row must still be a bare stub. A password, admin
+rights or passwordless login make it an account, and it is refused with a
+message naming the settings that collided — the bare "already exists" sent
+readers looking for an attacker instead of a setting.
 """
 
 from __future__ import annotations
@@ -59,6 +62,49 @@ def test_the_service_identity_is_the_one_that_may_be_promoted(db):
     assert created == SERVICE_USER_ID
     is_admin, password_hash, passwordless = tuple(_row(db.conn, SERVICE_USER_ID))
     assert (is_admin, bool(password_hash), passwordless) == (1, True, 0)
+
+
+def test_the_configured_acting_identity_may_also_be_promoted(db):
+    """A deployment whose acting identity *is* its administrator must still boot.
+
+    Naming both ``admin`` is what a single-user desktop does. The row an
+    ordinary write leaves behind under that name is created by the
+    configuration, not by a person, so it is claimable exactly like the
+    built-in service identity — otherwise the first write after a database
+    reset permanently locks the deployment out.
+    """
+    from mmfdb.config import configure_runtime, reset_runtime_config
+
+    _placeholder(db.conn, "admin")
+    try:
+        configure_runtime(default_user_id="admin")
+
+        assert bootstrap_local_admin(db.conn, user_id="admin", password=PASSWORD) == "admin"
+    finally:
+        reset_runtime_config()
+
+    is_admin, password_hash, passwordless = tuple(_row(db.conn, "admin"))
+    assert (is_admin, bool(password_hash), passwordless) == (1, True, 0)
+
+
+def test_a_configured_acting_identity_with_a_password_is_still_refused(db):
+    """Configuration claims a stub, never an account somebody set a password on."""
+    from mmfdb.config import configure_runtime, reset_runtime_config
+
+    db.conn.execute(
+        "INSERT INTO flr_sample_users (user_id, user_uuid, display_name, is_admin, "
+        " password_hash, allow_passwordless_login) VALUES (?, ?, ?, 0, 'existing-hash', 0)",
+        ("admin", str(uuid.uuid4()), "admin"),
+    )
+    try:
+        configure_runtime(default_user_id="admin")
+
+        with pytest.raises(ValueError, match="already exists"):
+            bootstrap_local_admin(db.conn, user_id="admin", password=PASSWORD)
+    finally:
+        reset_runtime_config()
+
+    assert _row(db.conn, "admin")[1] == "existing-hash", "the password is untouched"
 
 
 def test_a_placeholder_under_any_other_name_is_still_refused(db):

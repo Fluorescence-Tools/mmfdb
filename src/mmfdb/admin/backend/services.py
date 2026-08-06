@@ -8,7 +8,6 @@ import inspect
 import json
 import logging
 import os
-import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -62,6 +61,7 @@ from mmfdb.security.auth import (
 )
 from mmfdb.store.database_resolver import (
     backup_database,
+    reset_user_database_from_source,
     resolve_database_path,
     source_database_path,
     user_database_path,
@@ -2646,21 +2646,10 @@ def backup_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 
 def reset_from_source_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    user_path = user_database_path()
-    with MFDatabase(user_path) as db:
+    """Replace the user database with the curated seed and restore its admin."""
+    with MFDatabase(user_database_path()) as db:
         _require_admin(auth, db.conn)
-    source_path = source_database_path()
-    if not source_path.exists():
-        raise FileNotFoundError(source_path)
-    backup_path = backup_database(user_path) if user_path.exists() else None
-    tmp_path = user_path.with_suffix(user_path.suffix + ".tmp")
-    try:
-        shutil.copy2(source_path, tmp_path)
-        tmp_path.replace(user_path)
-    finally:
-        if tmp_path.exists():
-            tmp_path.unlink()
-    return {"ok": True, "backup_path": str(backup_path) if backup_path else None}
+    return dict(reset_user_database_from_source())
 
 
 def _setup_row_for_gui(row: dict[str, Any] | Any) -> dict[str, Any]:

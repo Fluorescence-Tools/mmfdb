@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
 from ipaddress import ip_address
 from pathlib import Path
@@ -115,6 +115,23 @@ class AdminBootstrapConfig:
     user: str | None = None
     password: str | None = field(default=None, repr=False)
     allow_weak_bootstrap: bool = False
+
+
+@dataclass(frozen=True)
+class LocalAccountConfig:
+    """An ordinary local account a deployment seeds into fresh databases.
+
+    Unlike :class:`AdminBootstrapConfig` this grants no privileges: it exists so
+    a single-user deployment has a non-administrative identity to work as. The
+    password is excluded from representations so config objects can be logged
+    without disclosing credentials.
+    """
+
+    user_id: str
+    password: str | None = field(default=None, repr=False)
+    display_name: str | None = None
+    allow_passwordless_login: bool = False
+    groups: tuple[str, ...] = ("users",)
 
 
 @dataclass(frozen=True)
@@ -421,6 +438,12 @@ def apply_deployment_config(config: DeploymentConfig) -> RuntimeConfig:
     if config.auth.ldap:
         auth_mapping["ldap"] = dict(config.auth.ldap)
     set_auth_config_resolver(lambda: auth_mapping)
+    if config.admin.user and config.admin.password is not None:
+        # A deployment that configured a bootstrap administrator keeps it
+        # available for later re-bootstraps (notably a database reset, which
+        # replaces the user database — and its accounts — with the seed).
+        admin_config = config.admin
+        set_admin_bootstrap_resolver(lambda: admin_config)
     return runtime
 
 
@@ -463,6 +486,100 @@ def set_auth_config_resolver(resolver: Callable[[], dict | None] | None) -> None
     """
     global _AUTH_CONFIG_RESOLVER
     _AUTH_CONFIG_RESOLVER = resolver
+
+
+# Optional host-supplied callable resolving the bootstrap administrator. A host
+# application (e.g. ChiSurf's embedded desktop server) that must always offer a
+# login registers this so every path that (re-)creates the database can restore a
+# login-capable account. MMFDB itself stays locked by default: with no resolver
+# and no environment credentials there is no implicit administrator.
+_ADMIN_BOOTSTRAP_RESOLVER: Callable[[], "AdminBootstrapConfig | None"] | None = None
+
+
+def set_admin_bootstrap_resolver(
+    resolver: Callable[[], "AdminBootstrapConfig | None"] | None,
+) -> None:
+    """Register (or clear) a live resolver for the bootstrap administrator.
+
+    Parameters
+    ----------
+    resolver : callable returning AdminBootstrapConfig or None, or None
+        Called by :func:`configured_admin_bootstrap` when a database has no
+        active administrator. Pass ``None`` to clear a previously registered
+        resolver.
+
+    """
+    global _ADMIN_BOOTSTRAP_RESOLVER
+    _ADMIN_BOOTSTRAP_RESOLVER = resolver
+
+
+def configured_admin_bootstrap() -> "AdminBootstrapConfig | None":
+    """Return the active bootstrap administrator: host resolver → env → ``None``.
+
+    ``None`` means no administrator may be created implicitly; the database
+    stays locked until one is bootstrapped explicitly.
+
+    Returns
+    -------
+    AdminBootstrapConfig or None
+        Credentials for the one-shot bootstrap, or ``None`` when unconfigured.
+
+    """
+    if _ADMIN_BOOTSTRAP_RESOLVER is not None:
+        try:
+            resolved = _ADMIN_BOOTSTRAP_RESOLVER()
+        except Exception:
+            resolved = None
+        if resolved is not None and resolved.user and resolved.password is not None:
+            return resolved
+    user = os.environ.get("MMFDB_BOOTSTRAP_ADMIN_USER")
+    password = os.environ.get("MMFDB_BOOTSTRAP_ADMIN_PASSWORD")
+    if user and password:
+        return AdminBootstrapConfig(user=user, password=password)
+    return None
+
+
+# Optional host-supplied callable resolving the ordinary accounts a deployment
+# seeds. Separate from the administrator resolver above because the two carry
+# different rules: the administrator is a privileged one-shot claim, these are
+# plain identities created only when absent.
+_DEFAULT_ACCOUNTS_RESOLVER: Callable[[], "Sequence[LocalAccountConfig] | None"] | None = None
+
+
+def set_default_accounts_resolver(
+    resolver: Callable[[], "Sequence[LocalAccountConfig] | None"] | None,
+) -> None:
+    """Register (or clear) a live resolver for the seeded ordinary accounts.
+
+    Parameters
+    ----------
+    resolver : callable returning a sequence of LocalAccountConfig, or None
+        Called by :func:`configured_default_accounts` whenever a database is
+        created or replaced. Pass ``None`` to clear a previously registered
+        resolver.
+
+    """
+    global _DEFAULT_ACCOUNTS_RESOLVER
+    _DEFAULT_ACCOUNTS_RESOLVER = resolver
+
+
+def configured_default_accounts() -> tuple["LocalAccountConfig", ...]:
+    """Return the ordinary accounts a host asked to seed into fresh databases.
+
+    Returns
+    -------
+    tuple of LocalAccountConfig
+        Empty when no host resolver is registered, which is MMFDB's standalone
+        default: no account is ever created implicitly.
+
+    """
+    if _DEFAULT_ACCOUNTS_RESOLVER is None:
+        return ()
+    try:
+        resolved = _DEFAULT_ACCOUNTS_RESOLVER()
+    except Exception:
+        return ()
+    return tuple(account for account in (resolved or ()) if account.user_id)
 
 
 def _ldap_env_config() -> dict:
@@ -560,10 +677,13 @@ def configure_runtime(**kwargs: object) -> RuntimeConfig:
 
 def reset_runtime_config() -> RuntimeConfig:
     """Reset process-local runtime configuration and host-supplied resolvers."""
-    global _AUTH_CONFIG_RESOLVER, _CONFIG, _DEFAULT_USER_ID_RESOLVER
+    global _ADMIN_BOOTSTRAP_RESOLVER, _AUTH_CONFIG_RESOLVER, _CONFIG
+    global _DEFAULT_ACCOUNTS_RESOLVER, _DEFAULT_USER_ID_RESOLVER
     _CONFIG = RuntimeConfig()
     _DEFAULT_USER_ID_RESOLVER = None
     _AUTH_CONFIG_RESOLVER = None
+    _ADMIN_BOOTSTRAP_RESOLVER = None
+    _DEFAULT_ACCOUNTS_RESOLVER = None
     return _CONFIG
 
 
