@@ -16,6 +16,7 @@ The parsed dictionary data is used for:
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import logging
 from dataclasses import dataclass, field
@@ -23,6 +24,69 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
+
+
+#: The locally authored extension. Its revision is what provenance rows and
+#: written containers cite, because it is where the terms they use are defined
+#: — the upstream dictionaries contribute no ``mmfdb_*`` or provenance term.
+EXTENSION_DICT = "mmfdb_flr_ext.dic"
+
+
+def extension_dictionary_version() -> str:
+    """Return the ``_dictionary.version`` of the MMFDB extension dictionary.
+
+    Returns
+    -------
+    str
+        The declared version, or ``""`` when the dictionary cannot be loaded.
+        Never raises: this is used to *stamp* a record, and failing to stamp
+        must not fail the write that carries it. A failure is logged, because
+        an unstamped row is a gap in exactly the audit trail this exists for.
+    """
+    try:
+        return MmcifDictionary.load_bundled().dictionary_version(EXTENSION_DICT)
+    except Exception:  # pragma: no cover - a broken install, not a code path
+        logger.warning("could not read %s version; provenance left unstamped", EXTENSION_DICT)
+        return ""
+
+
+def extension_dictionary_hash() -> str:
+    """Return the SHA-256 of the MMFDB extension dictionary as loaded.
+
+    Returns
+    -------
+    str
+        Lowercase hexadecimal digest, or ``""`` when it cannot be computed.
+        See :func:`extension_dictionary_version` for why this never raises.
+    """
+    try:
+        return MmcifDictionary.load_bundled().dictionary_hash(EXTENSION_DICT)
+    except Exception:  # pragma: no cover - a broken install, not a code path
+        logger.warning("could not hash %s; provenance left unstamped", EXTENSION_DICT)
+        return ""
+
+
+def _sha256_of_file(path: Path) -> str:
+    """Return the SHA-256 of a file's bytes, as lowercase hexadecimal.
+
+    Read in blocks so a large dictionary is never held whole.
+
+    Parameters
+    ----------
+    path : Path
+        File to digest. A ``.gz`` dictionary is digested **compressed**, i.e.
+        as the bytes on disk, because it is those bytes a lockfile pins.
+
+    Returns
+    -------
+    str
+        64 lowercase hexadecimal characters.
+    """
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 @dataclass
@@ -130,7 +194,7 @@ class MmcifDictionary:
 
     DATA_DIR = Path(__file__).resolve().parent.parent / "data"
     CACHE_PATH = DATA_DIR / "_dictionary_cache.json"
-    CACHE_VERSION = 4
+    CACHE_VERSION = 5
     _cached_dict: Optional["MmcifDictionary"] = None
     
     #: Dictionaries parsed by :meth:`load_bundled`. Every ``mmfdb_*`` category
@@ -167,11 +231,16 @@ class MmcifDictionary:
         self._categories: Dict[str, DictCategory] = {}
         self._items: Dict[str, DictItem] = {}
         self._file_timestamps: Dict[Path, float] = {}
-        
+        #: ``{filename: {"version": ..., "title": ..., "datablock_id": ...}}``
+        self._dictionary_meta: Dict[str, Dict[str, str]] = {}
+        #: ``{filename: sha256}`` of the bytes actually parsed.
+        self._file_hashes: Dict[str, str] = {}
+
         for path in dic_paths:
             if path.exists():
                 self._parse_file(path)
                 self._file_timestamps[path] = path.stat().st_mtime
+                self._file_hashes[path.name] = _sha256_of_file(path)
 
     def _parse_file(self, path: Path) -> None:
         """Parse a single .dic file."""
@@ -235,8 +304,19 @@ class MmcifDictionary:
                     continue
                 
                 if not current_save:
+                    # `_dictionary.*` sits in the data block, outside every
+                    # save frame. It used to be skipped here, which is why a
+                    # dictionary revision could change the vocabulary under a
+                    # reader with nothing to compare against.
+                    if stripped.startswith("_dictionary."):
+                        tag = stripped.split(None, 1)[0]
+                        attr = tag.split(".", 1)[1]
+                        if attr in ("version", "title", "datablock_id"):
+                            self._dictionary_meta.setdefault(path.name, {})[attr] = (
+                                self._extract_value(stripped)
+                            )
                     continue
-                
+
                 if not current_save.startswith("_"):
                     if stripped.startswith("_category_key.name"):
                         category_key = self._extract_value(stripped)
@@ -510,20 +590,26 @@ class MmcifDictionary:
         """Load from cache if valid."""
         if not cls.CACHE_PATH.exists():
             return None
-        
-        cache_mtime = cls.CACHE_PATH.stat().st_mtime
-        for fname in cls.BUNDLED_DICTS:
-            dic_path = cls._resolve_dic(fname)
-            if dic_path.exists() and dic_path.stat().st_mtime > cache_mtime:
-                return None
-        
+
         try:
             with open(cls.CACHE_PATH, "r", encoding="utf-8") as f:
                 cache_data = json.load(f)
 
             if cache_data.get("version") != cls.CACHE_VERSION:
                 return None
-            
+
+            # Invalidate on **content**, not on mtime. A dictionary
+            # re-downloaded with a preserved timestamp used to leave a stale
+            # cache in place, which is the quietest possible way for the
+            # vocabulary to disagree with the file that defines it.
+            cached_hashes = cache_data.get("hashes", {})
+            for fname in cls.BUNDLED_DICTS:
+                dic_path = cls._resolve_dic(fname)
+                if not dic_path.exists():
+                    continue
+                if cached_hashes.get(dic_path.name) != _sha256_of_file(dic_path):
+                    return None
+
             dic = cls()
             for cat_name, cat_data in cache_data.get("categories", {}).items():
                 dic._categories[cat_name] = DictCategory.from_dict(cat_data)
@@ -531,6 +617,8 @@ class MmcifDictionary:
                 dic._items[item_name] = DictItem.from_dict(item_data)
             for fname, mtime in cache_data.get("timestamps", {}).items():
                 dic._file_timestamps[cls.DATA_DIR / fname] = mtime
+            dic._dictionary_meta = dict(cache_data.get("dictionary_meta", {}))
+            dic._file_hashes = dict(cached_hashes)
             return dic
         except (json.JSONDecodeError, OSError):
             return None
@@ -549,6 +637,8 @@ class MmcifDictionary:
             "categories": {name: cat.to_dict() for name, cat in self._categories.items()},
             "items": {name: item.to_dict() for name, item in self._items.items()},
             "timestamps": {str(k): v for k, v in self._file_timestamps.items()},
+            "hashes": dict(self._file_hashes),
+            "dictionary_meta": dict(self._dictionary_meta),
         }
         try:
             with open(path, "w", encoding="utf-8") as f:
@@ -598,6 +688,65 @@ class MmcifDictionary:
 
     def get_item(self, full_name: str) -> Optional[DictItem]:
         return self._items.get(full_name)
+
+    def dictionary_version(self, filename: str) -> str:
+        """Return the ``_dictionary.version`` one dictionary declares.
+
+        Parameters
+        ----------
+        filename : str
+            Base name of a bundled dictionary, e.g. ``"mmfdb_flr_ext.dic"``.
+
+        Returns
+        -------
+        str
+            The declared version, or ``""`` when the file declares none.
+            Upstream wwPDB dictionaries all declare one; the empty string is
+            therefore itself a finding rather than a normal case.
+        """
+        return self._dictionary_meta.get(filename, {}).get("version", "")
+
+    def dictionary_hash(self, filename: str) -> str:
+        """Return the SHA-256 of one dictionary's bytes.
+
+        Parameters
+        ----------
+        filename : str
+            Base name of a bundled dictionary.
+
+        Returns
+        -------
+        str
+            Lowercase hexadecimal digest, or ``""`` if the file was not parsed.
+        """
+        return self._file_hashes.get(filename, "")
+
+    def provenance(self) -> Dict[str, Dict[str, str]]:
+        """Return what every parsed dictionary declares about itself.
+
+        This is what a written artifact records so that a later reader can tell
+        whether the vocabulary it was tagged with is the vocabulary now
+        loaded — the difference between detecting drift and mis-binding a
+        renamed item in silence.
+
+        Returns
+        -------
+        dict
+            ``{filename: {"version": ..., "sha256": ..., "title": ...}}``,
+            ordered as :data:`BUNDLED_DICTS`.
+        """
+        out: Dict[str, Dict[str, str]] = {}
+        for name in self.BUNDLED_DICTS:
+            meta = self._dictionary_meta.get(name, {})
+            digest = self._file_hashes.get(name, "")
+            if not meta and not digest:
+                continue
+            out[name] = {
+                "version": meta.get("version", ""),
+                "sha256": digest,
+                "title": meta.get("title", ""),
+            }
+        return out
 
     def get_enumerations(self, full_name: str) -> List[str]:
         item = self.get_item(full_name)

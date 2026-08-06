@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 47
+SCHEMA_VERSION = 48
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -2066,6 +2066,28 @@ def _migrate_v47_reconcile_missing_tables(conn: sqlite3.Connection) -> None:
 
 
 MIGRATIONS[47] = _migrate_v47_reconcile_missing_tables
+
+
+def _migrate_v48_dictionary_provenance(conn: sqlite3.Connection) -> None:
+    """Record which dictionary revision an operation's terms came from.
+
+    Two things land together because they have the same cause — the dictionary
+    grew, and a database stamped at the previous version cannot see it:
+
+    * ``mmfdb_operation`` gains ``dictionary_version`` / ``dictionary_hash``,
+      added by reconciliation from the newly declared items, so a row can say
+      which vocabulary defined the terms it was tagged with;
+    * the vocabulary table is re-seeded, because ``bootstrap_vocabulary`` runs
+      on a fresh database only. ``artifact_kind`` is validated under the
+      *closed* policy, so without this an existing database rejects every term
+      added to the dictionary since it was created — which is how v45 had to
+      seed ``external_tool``.
+    """
+    reconcile_current_schema(conn)
+    bootstrap_vocabulary(conn)
+
+
+MIGRATIONS[48] = _migrate_v48_dictionary_provenance
 
 
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:

@@ -1,3 +1,27 @@
+##############################################################################
+# mmfdb_flr_ext.dic — the MMFDB extension to the PDB-IHM FLR dictionary.
+#
+# Two kinds of thing live here, and they are not the same kind of thing:
+#
+#   * overlays on upstream flr_* categories, which bind an existing community
+#     item to a live column or add an item upstream lacks;
+#   * the mmfdb_* provenance and LIMS categories, which upstream has no
+#     equivalent of at all, and which ARE database-backed — a category here
+#     with _mmfdb_schema.* items becomes a table via reconcile_schema.
+#
+# Consumers cite this version.  A file written against one revision and read
+# under another must be able to say so rather than silently mis-bind a renamed
+# item, so the version below is not decoration: it is the drift signal.  Bump
+# the minor version when terms are added (readers of an older revision stay
+# valid), the major version when a term changes meaning or is withdrawn.
+##############################################################################
+
+data_mmfdb_flr_ext.dic
+
+    _dictionary.title            mmfdb_flr_ext.dic
+    _dictionary.datablock_id     mmfdb_flr_ext.dic
+    _dictionary.version          1.3
+
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
    _category.description
@@ -3035,6 +3059,16 @@ save__mmfdb_artifact.artifact_kind
       derived_product
       gmm_summary
       clustering_labels
+      pixel_map
+      velocity_field
+      correlation_carpet
+      track_table
+      drift_trajectory
+      resolution_curve
+      localization_table
+      dwell_table
+      state_trajectory
+      row_mapping
 
 save__mmfdb_artifact.data_format
    _item.name                "_mmfdb_artifact.data_format"
@@ -3062,7 +3096,145 @@ save__mmfdb_artifact.data_format
       directory
       bin
       msgpack
+      pto
+      dstore
+      tiff
+      npy
       unknown
+
+save__mmfdb_artifact.row_grain
+   _item.name                "_mmfdb_artifact.row_grain"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name row_grain
+   _item_description.description
+;     What one row of a tabular artifact IS.
+;
+;     Two tables can only be joined once it is known what their rows count.  A
+;     burst table and a dwell table are both "results of the same analysis" and
+;     are not the same shape: a dwell subdivides a burst, so a dwell table is
+;     finer, and a table of fused bursts is coarser than the bursts it fused.
+;     Formats that cannot state this force every result onto one grid, and the
+;     relations that do not fit that grid are then carried outside the format
+;     or lost.  Stating the grain is what lets an artifact-to-artifact edge
+;     (see _mmfdb_edge.source_row_column) be resolved to rows.
+    loop_
+    _item_enumeration.value
+      photon
+      burst
+      dwell
+      segment
+      pixel
+      voxel
+      frame
+      line
+      molecule
+      track
+      spot
+      curve_point
+      state
+      species
+      channel
+      pair
+      file
+
+save__mmfdb_artifact.storage_mode
+   _item.name                "_mmfdb_artifact.storage_mode"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name storage_mode
+   _item_description.description
+;     Where the bytes actually are.  The column has existed since the table
+;     was first written by hand; declaring it here is what lets a reader
+;     resolve the term rather than guess at it.
+    loop_
+    _item_enumeration.value
+      local_file
+      local_directory
+      url
+      managed_archive
+      embedded_json
+      embedded_blob
+      local
+      remote
+      embedded
+      folder
+
+save__mmfdb_artifact.file_path
+   _item.name                "_mmfdb_artifact.file_path"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name file_path
+   _item_description.description
+;     Path to the artifact when it is held by reference rather than copied
+;     into the object store.  A container object names its member here, in
+;     the "<container>|<member>" form the reader understands.
+
+save__mmfdb_artifact.mime_type
+   _item.name                "_mmfdb_artifact.mime_type"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name mime_type
+   _item_description.description
+;     RFC 6838 media type of the payload.
+
+save__mmfdb_artifact.size_bytes
+   _item.name                "_mmfdb_artifact.size_bytes"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name size_bytes
+   _item_description.description
+;     Size of the payload in octets.
+
+save__mmfdb_artifact.row_count
+   _item.name                "_mmfdb_artifact.row_count"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name row_count
+   _item_description.description
+;     Rows or events in a tabular payload, recorded so that a listing can
+;     report the size of a table without decoding it.  Advisory.
+
+save__mmfdb_artifact.checksum
+   _item.name                "_mmfdb_artifact.checksum"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name checksum
+   _item_description.description
+;     Digest of the payload, lowercase hexadecimal, in the algorithm named
+;     by _mmfdb_artifact.checksum_algorithm.  This is what makes an artifact
+;     held by reference, or embedded in a container, restorable with a
+;     guarantee rather than merely restorable.
+
+save__mmfdb_artifact.checksum_algorithm
+   _item.name                "_mmfdb_artifact.checksum_algorithm"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_default.value       sha256
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name checksum_algorithm
+   _item_description.description
+;     Which digest _mmfdb_artifact.checksum holds.  The object store
+;     addresses blobs by md5 and verifies them by sha256, so both occur.
+    loop_
+    _item_enumeration.value
+      sha256
+      md5
 
 save__mmfdb_artifact.created_by_user_id
    _item.name                "_mmfdb_artifact.created_by_user_id"
@@ -3199,6 +3371,23 @@ save__mmfdb_operation.operation_type
       project
       analysis_run
       external_tool
+      burst_fusion
+      burst_variance_analysis
+      burst_2cde
+      burst_lifetime_fitting
+      burst_correlation
+      photon_hmm
+      pixel_lifetime_fitting
+      molecule_localization
+      phasor_analysis
+      number_and_brightness
+      image_correlation_spectroscopy
+      flow_field_estimation
+      resolution_estimation
+      drift_correction
+      particle_tracking
+      colocalization
+      psf_determination
 
 save__mmfdb_operation.status
    _item.name                "_mmfdb_operation.status"
@@ -3257,6 +3446,197 @@ save__mmfdb_operation.exit_code
 ;     non-zero on failure, negative on POSIX signal termination.  Distinct from
 ;     ``status``, which is the recorded provenance lifecycle state.  Null for
 ;     in-process operations.
+;
+
+save__mmfdb_operation.settings_json
+   _item.name                "_mmfdb_operation.settings_json"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name settings_json
+   _item_description.description
+;     The operation's parameters, as JSON.  Typed parameters are also written
+;     as mmfdb_parameter rows; this is the verbatim bag, so a parameter with no
+;     declared schema is still recorded rather than dropped.
+;
+
+save__mmfdb_operation.settings_hash
+   _item.name                "_mmfdb_operation.settings_hash"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name settings_hash
+   _item_description.description
+;     Digest of the canonicalised settings, and therefore the identity of a
+;     run.  Two operations of the same type with the same hash are the same
+;     computation, which is what lets a recomputation replace a result instead
+;     of accumulating beside it.
+;
+
+save__mmfdb_operation.experiment_id
+   _item.name                "_mmfdb_operation.experiment_id"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name experiment_id
+   _item_description.description
+;     The flr_experiment this operation belongs to, if any.
+;
+
+save__mmfdb_operation.setup_id
+   _item.name                "_mmfdb_operation.setup_id"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name setup_id
+   _item_description.description
+;     The instrument setup in force, if any.
+;
+
+save__mmfdb_operation.operator_user_id
+   _item.name                "_mmfdb_operation.operator_user_id"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name operator_user_id
+   _item_description.description
+;     Who ran it.
+;
+
+save__mmfdb_operation.software_package
+   _item.name                "_mmfdb_operation.software_package"
+   _item.category_id         mmfdb_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name software_package
+   _item_description.description
+;     The program that performed the operation.  Deliberately not defaulted to
+;     any one application: the provenance model is tool-agnostic, and a default
+;     attribution would quietly make it not so.
+;
+
+save__mmfdb_operation.software_module
+   _item.name                "_mmfdb_operation.software_module"
+   _item.category_id         mmfdb_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name software_module
+   _item_description.description
+;     The module or subcommand within that program.
+;
+
+save__mmfdb_operation.software_version
+   _item.name                "_mmfdb_operation.software_version"
+   _item.category_id         mmfdb_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name software_version
+   _item_description.description
+;     Its version, so a result can be traced to what produced it.
+;
+
+save__mmfdb_operation.runtime_environment_json
+   _item.name                "_mmfdb_operation.runtime_environment_json"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name runtime_environment_json
+   _item_description.description
+;     Interpreter, platform and library versions at the time of the run.
+;
+
+save__mmfdb_operation.started_at
+   _item.name                "_mmfdb_operation.started_at"
+   _item.category_id         mmfdb_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name started_at
+   _item_description.description
+;     When the operation began, ISO-8601 UTC.
+;
+
+save__mmfdb_operation.ended_at
+   _item.name                "_mmfdb_operation.ended_at"
+   _item.category_id         mmfdb_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name ended_at
+   _item_description.description
+;     When it finished, ISO-8601 UTC.  Null while it is still running.
+;
+
+save__mmfdb_operation.error_message
+   _item.name                "_mmfdb_operation.error_message"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name error_message
+   _item_description.description
+;     Why it failed.  A failed operation is still provenance: it records that
+;     something was attempted, which a missing row does not.
+;
+
+save__mmfdb_operation.traceback_summary
+   _item.name                "_mmfdb_operation.traceback_summary"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name traceback_summary
+   _item_description.description
+;     An abbreviated traceback for a failed operation.
+;
+
+save__mmfdb_operation.metadata_json
+   _item.name                "_mmfdb_operation.metadata_json"
+   _item.category_id         mmfdb_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name metadata_json
+   _item_description.description
+;     Anything else the caller attached, as JSON.
+;
+
+save__mmfdb_operation.dictionary_version
+   _item.name                "_mmfdb_operation.dictionary_version"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name dictionary_version
+   _item_description.description
+;     The ``_dictionary.version`` of mmfdb_flr_ext.dic in force when this
+;     operation was recorded.  An operation is tagged with controlled terms,
+;     and a term can be renamed or withdrawn by a later revision; without this
+;     the row cannot say which vocabulary it meant, and a reader has no way to
+;     tell drift from a typo.
+;
+
+save__mmfdb_operation.dictionary_hash
+   _item.name                "_mmfdb_operation.dictionary_hash"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name dictionary_hash
+   _item_description.description
+;     SHA-256 of the bytes of mmfdb_flr_ext.dic in force when this operation
+;     was recorded, lowercase hexadecimal.  A version is what an author
+;     declares; this is what was actually loaded, and the two disagree exactly
+;     when someone edited a dictionary without bumping it.
 ;
 
 save_mmfdb_operation_artifact
@@ -3324,6 +3704,38 @@ save__mmfdb_edge.relationship_type
       grouped_in
       measured_sample
       calibrated_by
+      maps_rows_of
+
+save__mmfdb_edge.source_row_column
+   _item.name                "_mmfdb_edge.source_row_column"
+   _item.category_id         mmfdb_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name source_row_column
+   _item_description.description
+;     Column of the source table holding the key this edge joins on.
+;
+;     An edge between two artifacts says the tables are related.  It does not
+;     say which rows correspond, and a great deal of information has been lost
+;     historically by leaving that to positional alignment: two tables merged
+;     by counting rows agree only while both have the same rows in the same
+;     order, and disagree silently the moment one of them does not.  Naming the
+;     key column makes the join declared data rather than a convention a reader
+;     has to already know.
+;
+
+save__mmfdb_edge.target_row_column
+   _item.name                "_mmfdb_edge.target_row_column"
+   _item.category_id         mmfdb_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name target_row_column
+   _item_description.description
+;     Column of the target table holding the key this edge joins on.  See
+;     _mmfdb_edge.source_row_column.
+;
 
 save_mmfdb_parameter
    _category.id              mmfdb_parameter

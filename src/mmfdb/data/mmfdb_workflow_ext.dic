@@ -405,3 +405,88 @@ save__mmfdb_bundle_document.content
    _item.category_id         mmfdb_bundle_document
    _item_type.code           text
    _item.mandatory_code      yes
+
+#############
+## CATEGORY: mmfdb_container
+#############
+
+save_mmfdb_container
+   _category.id              mmfdb_container
+   _category.description
+;     What a serialised container is, written into the container itself.
+;
+;     A photon container (see the PTO.MFDB profile) carries results tagged with
+;     terms from this dictionary family.  Four things can drift independently --
+;     the container format, the profile that constrains it, the dictionary the
+;     terms come from, and the application that wrote it -- so a file that
+;     records only one of them cannot be diagnosed when it disagrees with a
+;     reader.  These items are the stamp.
+;
+;     Like the rest of this dictionary they describe a SERIALIZATION and are not
+;     database-backed: there is no mmfdb_container table, and this file is
+;     deliberately absent from MmcifDictionary.BUNDLED_DICTS so that schema
+;     reconciliation does not materialise one.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_container.profile"
+
+save__mmfdb_container.profile
+   _item.name                "_mmfdb_container.profile"
+   _item.category_id         mmfdb_container
+   _item_type.code           line
+   _item.mandatory_code      yes
+   _item_description.description
+;     Name of the profile the file conforms to, e.g. ``PTO.MFDB``.
+
+save__mmfdb_container.profile_version
+   _item.name                "_mmfdb_container.profile_version"
+   _item.category_id         mmfdb_container
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _item_description.description
+;     Version of the profile that wrote the file.  A reader accepts a higher
+;     one and skips what it does not know.
+
+save__mmfdb_container.profile_read_version
+   _item.name                "_mmfdb_container.profile_read_version"
+   _item.category_id         mmfdb_container
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _item_description.description
+;     Minimum profile version required to read the file correctly.  A reader
+;     implementing less than this must refuse it rather than misread it.
+
+save__mmfdb_container.format
+   _item.name                "_mmfdb_container.format"
+   _item.category_id         mmfdb_container
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     The container format underneath the profile, e.g. ``pto``.
+
+save__mmfdb_container.format_version
+   _item.name                "_mmfdb_container.format_version"
+   _item.category_id         mmfdb_container
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     Version of that container format.
+
+save__mmfdb_container.dictionary_version
+   _item.name                "_mmfdb_container.dictionary_version"
+   _item.category_id         mmfdb_container
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     ``_dictionary.version`` of the MMFDB extension dictionary whose terms the
+;     file is tagged with.
+
+save__mmfdb_container.dictionary_hash
+   _item.name                "_mmfdb_container.dictionary_hash"
+   _item.category_id         mmfdb_container
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     SHA-256 of that dictionary as loaded, lowercase hexadecimal.  A version is
+;     what an author declares; this is what was actually used, and the two
+;     disagree exactly when someone edited a dictionary without bumping it.

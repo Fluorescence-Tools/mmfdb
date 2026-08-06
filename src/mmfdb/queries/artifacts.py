@@ -25,6 +25,10 @@ from mmfdb.models import (
 )
 from mmfdb.provenance.graph import map_legacy_node_type
 from mmfdb.schema._sqlutil import _exists, _json_dumps, _json_hash, _utc_now, _validate_checksum
+from mmfdb.schema.pdbx_metadata import (
+    extension_dictionary_hash as _extension_dictionary_hash,
+    extension_dictionary_version as _extension_dictionary_version,
+)
 
 #: Reference URI in a metadata value that materializes a provenance edge to
 #: another MMFDB node — ``mmfdb://<node_type>/<node_id>`` (see
@@ -900,8 +904,9 @@ class ArtifactOpsMixin:
                     error_message, traceback_summary, command_line, exit_code,
                     metadata_json,
                     protocol_id, protocol_version,
+                    dictionary_version, dictionary_hash,
                     created_at, updated_at, deleted_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(operation_id) DO UPDATE SET
                     operation_type=excluded.operation_type,
                     experiment_id=excluded.experiment_id,
@@ -923,6 +928,8 @@ class ArtifactOpsMixin:
                     metadata_json=excluded.metadata_json,
                     protocol_id=excluded.protocol_id,
                     protocol_version=excluded.protocol_version,
+                    dictionary_version=excluded.dictionary_version,
+                    dictionary_hash=excluded.dictionary_hash,
                     updated_at=excluded.updated_at,
                     deleted_at=excluded.deleted_at""",
                 (
@@ -947,6 +954,8 @@ class ArtifactOpsMixin:
                     _json_dumps(metadata),
                     protocol_id,
                     protocol_version,
+                    _extension_dictionary_version(),
+                    _extension_dictionary_hash(),
                     now,
                     now,
                     None,

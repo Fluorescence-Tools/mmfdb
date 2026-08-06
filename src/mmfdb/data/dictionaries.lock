@@ -1,0 +1,9 @@
+# Upstream mmCIF dictionaries this tree is pinned to.
+# Written by update_dictionaries.sh --accept. Columns: name version sha256
+mmcif_pdbx_v50.dic 5.415 6f30d8969232565c2c367dd03ef9a3a65b273428e9990625cafbe910c5c17cfc
+mmcif_pdbx_v5_next.dic 5.423 4e4934a9d1b54c604a70a459978a58f1332b6a87e8d9ab1e0ddfb212d3659ea8
+mmcif_std.dic 2.0.11 761f5c6cdacd9f729fa761f8ee904153fbf7a688ff69d97f4d67131650c022ce
+mmcif_ddl.dic 2.3.3 fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768
+mmcif_ihm_ext.dic 1.28 9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55
+mmcif_ihm_flr_ext.dic 0.03 92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2
+mmcif_ma.dic 1.4.9 aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844
