@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.5
+    _dictionary.version          1.7
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -3079,6 +3079,8 @@ save__mmfdb_artifact.artifact_kind
       dwell_table
       state_trajectory
       row_mapping
+      readme
+      sample_metadata
 
 save__mmfdb_artifact.data_format
    _item.name                "_mmfdb_artifact.data_format"
@@ -3110,6 +3112,8 @@ save__mmfdb_artifact.data_format
       dstore
       tiff
       npy
+      cif
+      text
       unknown
 
 save__mmfdb_artifact.row_grain
@@ -3715,6 +3719,44 @@ save__mmfdb_edge.relationship_type
       measured_sample
       calibrated_by
       maps_rows_of
+
+save__mmfdb_edge.source_node_id
+   _item.name                "_mmfdb_edge.source_node_id"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name source_node_id
+   _item_description.description
+;     What this edge points AT -- the artifact the derived one came from.
+;
+;     The column has existed in the hand-written DDL since the table was first
+;     created; declaring it here is what lets a reader resolve it rather than
+;     guess.  Leaving it undeclared had a concrete cost: a writer with nowhere
+;     to put the parent reference put it in `relationship_type` instead, so
+;     asking a file for the relationship between two artifacts returned an
+;     integer where a term was expected -- and the *relation* itself, the thing
+;     that says HOW the derived data relates to the primary, was never recorded
+;     at all.
+;
+;     In a serialised container this is an object UID.  In the database it is
+;     an artifact or operation id; `source_node_type` says which.
+     save_
+
+save__mmfdb_edge.target_node_id
+   _item.name                "_mmfdb_edge.target_node_id"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name target_node_id
+   _item_description.description
+;     What this edge points FROM -- the derived artifact.
+;
+;     Implicit in a container, where an edge is a tag on the derived object and
+;     the target is therefore the object carrying the tag.  Declared because the
+;     database stores edges as free-standing rows, where it is not implicit.
+     save_
 
 save__mmfdb_edge.source_row_column
    _item.name                "_mmfdb_edge.source_row_column"
