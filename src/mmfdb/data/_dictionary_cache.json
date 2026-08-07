@@ -357320,7 +357320,7 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1786047276.5517266
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1786078971.1919706
   },
   "hashes": {
     "mmcif_ddl.dic": "fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768",
@@ -357330,7 +357330,7 @@
     "mmcif_ma.dic": "aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844",
     "mmcif_ihm_ext.dic": "9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55",
     "mmcif_ihm_flr_ext.dic": "92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2",
-    "mmfdb_flr_ext.dic": "5437b7a3dc404821ef93828912e9b174b2dea817696306f82e4c6026838fe0d7"
+    "mmfdb_flr_ext.dic": "706cc70dd0809c490e52b9bcf4c7ad54f6706c555a67c032834ff6d25e717cdb"
   },
   "dictionary_meta": {
     "mmcif_ddl.dic": {
@@ -357371,7 +357371,7 @@
     "mmfdb_flr_ext.dic": {
       "title": "mmfdb_flr_ext.dic",
       "datablock_id": "mmfdb_flr_ext.dic",
-      "version": "1.3"
+      "version": "1.4"
     }
   }
 }

@@ -530,11 +530,11 @@ save__mmfdb_column.units
 ;     The physical unit of the column's values.
 ;
 ;     Spellings follow mmCIF's ITEM_UNITS_LIST wherever it has the unit, so
-;     "seconds" and "microseconds" are the community's words.  It stops at
-;     microseconds and has no rate or count unit, which leaves out most of what
-;     a fluorescence table holds -- a lifetime in nanoseconds, a TAC channel in
-;     picoseconds, a burst duration in milliseconds, a count rate in kilohertz.
-;     Those are added here rather than invented at each call site.
+;     "seconds", "nanoseconds", "hertz" and "counts" are the community's words --
+;     15 of the 28 here are already its own.  Its 78 codes have an odd gap: it
+;     carries nanoseconds and femtoseconds but neither milliseconds nor
+;     picoseconds, and no concentration, rate multiple or count-of-photons.
+;     Those 13 are added here rather than invented at each call site.
 ;
 ;     "dimensionless" is for a ratio that genuinely has no unit -- an efficiency,
 ;     an anisotropy -- and is not the same as saying nothing, which means the
@@ -586,3 +586,105 @@ save__mmfdb_column.description
    _item.mandatory_code      no
    _item_description.description
 ;     Prose about the column, for a reader who has only the file.
+
+#############
+## CATEGORY: mmfdb_units
+#############
+
+save_mmfdb_units
+   _category.id              mmfdb_units
+   _category.description
+;     One row per unit: its code, how it is written for a person, and what it
+;     is in SI.
+;
+;     mmCIF's ITEM_UNITS_LIST gives codes and prose and nothing else, so every
+;     consumer that wanted to *show* a unit invented its own abbreviation and
+;     every consumer that wanted to *convert* one invented its own factor.  In
+;     ChiSurf alone that produced three in-band conventions for saying the same
+;     thing -- "Duration (ms)" in a burst table, "Name | unit" in an expression
+;     column header, and bare dictionaries of factors in the DEER and FCS
+;     readers -- none of which agreed on spelling.
+;
+;     This is the one table.  A display layer reads `symbol`; a converter reads
+;     `si_factor` and `si_unit`; nothing parses a unit back out of a name.
+;
+;     Serialization vocabulary, like the rest of this dictionary: no table is
+;     materialised for it.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_units.code"
+
+save__mmfdb_units.code
+   _item.name                "_mmfdb_units.code"
+   _item.category_id         mmfdb_units
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _item_description.description
+;     The canonical code, as used by _mmfdb_column.units and _item_units.code.
+;     Follows ITEM_UNITS_LIST where that has the unit.
+
+save__mmfdb_units.symbol
+   _item.name                "_mmfdb_units.symbol"
+   _item.category_id         mmfdb_units
+   _item_type.code           line
+   _item.mandatory_code      yes
+   _item_description.description
+;     How the unit is written for a person: "ns", "kHz", "ms".  This is what an
+;     axis label or a table header shows, and having it here is what stops each
+;     display inventing its own.
+
+save__mmfdb_units.si_factor
+   _item.name                "_mmfdb_units.si_factor"
+   _item.category_id         mmfdb_units
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Multiply a value in this unit by this to get _mmfdb_units.si_unit.
+;     Absent for a unit that is not a scaled SI quantity.
+
+save__mmfdb_units.si_unit
+   _item.name                "_mmfdb_units.si_unit"
+   _item.category_id         mmfdb_units
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     The SI (or SI-derived) unit _mmfdb_units.si_factor converts to.
+
+save_
+
+# The table itself. A data-block-level loop, not a definition -- the same shape
+# mmCIF's own ITEM_UNITS_LIST uses, so a reader that can walk one walks both.
+
+    loop_
+    _mmfdb_units.code
+    _mmfdb_units.symbol
+    _mmfdb_units.si_factor
+    _mmfdb_units.si_unit
+      hours              h        3600.0     seconds
+      minutes            min      60.0       seconds
+      seconds            s        1.0        seconds
+      milliseconds       ms       1e-3       seconds
+      microseconds       us       1e-6       seconds
+      nanoseconds        ns       1e-9       seconds
+      picoseconds        ps       1e-12      seconds
+      femtoseconds       fs       1e-15      seconds
+      hertz              Hz       1.0        hertz
+      kilohertz          kHz      1e3        hertz
+      megahertz          MHz      1e6        hertz
+      counts             counts   .          .
+      counts_per_second  cps      1.0        hertz
+      photons            photons  .          .
+      nanometres         nm       1e-9       metres
+      micrometres        um       1e-6       metres
+      angstroms          A        1e-10      metres
+      pixels             px       .          .
+      degrees            deg      .          .
+      radians            rad      .          .
+      celsius            C        .          .
+      kelvins            K        1.0        kelvins
+      molar              M        1.0        molar
+      millimolar         mM       1e-3       molar
+      micromolar         uM       1e-6       molar
+      nanomolar          nM       1e-9       molar
+      picomolar          pM       1e-12      molar
+      dimensionless      .        1.0        .

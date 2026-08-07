@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.3
+    _dictionary.version          1.4
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -2517,7 +2517,7 @@ save__mmfdb_setup.macro_time_resolution
    _item.category_id         mmfdb_setup
    _item_type.code           float
    _item.mandatory_code      no
-   _item_units.code          ns
+   _item_units.code          nanoseconds
    _mmfdb_schema.table_name  mmfdb_setup
    _mmfdb_schema.column_name macro_time_resolution
 
@@ -2526,7 +2526,7 @@ save__mmfdb_setup.micro_time_resolution
    _item.category_id         mmfdb_setup
    _item_type.code           float
    _item.mandatory_code      no
-   _item_units.code          ps
+   _item_units.code          picoseconds
    _mmfdb_schema.table_name  mmfdb_setup
    _mmfdb_schema.column_name micro_time_resolution
 

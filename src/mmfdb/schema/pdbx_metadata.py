@@ -235,6 +235,10 @@ class MmcifDictionary:
         self._dictionary_meta: Dict[str, Dict[str, str]] = {}
         #: ``{filename: sha256}`` of the bytes actually parsed.
         self._file_hashes: Dict[str, str] = {}
+        #: ``{category: [row, ...]}`` for data-block-level ``loop_`` tables.
+        #: mmCIF carries real data this way -- ITEM_UNITS_LIST is one -- and it
+        #: is not a save frame, so nothing here saw it before.
+        self._category_rows: Dict[str, List[Dict[str, str]]] = {}
 
         for path in dic_paths:
             if path.exists():
@@ -254,6 +258,9 @@ class MmcifDictionary:
         category_mandatory: bool = False
         category_key: Optional[str] = None
         pending_description: Optional[str] = None
+        in_block_loop = False
+        block_loop_tags: List[str] = []
+        block_loop_rows: List[List[str]] = []
         
         # Bundled dictionaries may ship gzip-compressed (.dic.gz) to save disk;
         # gzip.open transparently decompresses, plain .dic is read directly.
@@ -304,6 +311,40 @@ class MmcifDictionary:
                     continue
                 
                 if not current_save:
+                    # A `loop_` out here is a data table, not a definition:
+                    # ITEM_UNITS_LIST is one, and so is the unit table MMFDB
+                    # adds. Collected rather than skipped, so a caller can read
+                    # the rows instead of hard-coding them somewhere else.
+                    if stripped == "loop_":
+                        block_loop_tags = []
+                        block_loop_rows = []
+                        in_block_loop = True
+                        continue
+                    if in_block_loop:
+                        if stripped.startswith("_"):
+                            block_loop_tags.append(stripped.split()[0])
+                            continue
+                        if stripped.startswith(("save_", "data_", "#")):
+                            in_block_loop = False
+                        else:
+                            values = self._split_row(stripped)
+                            # Only a fully qualified `_category.attribute` loop
+                            # is a data table. mmCIF also carries bare-tag loops
+                            # that are not, and a row of those has no category.
+                            qualified = all("." in t for t in block_loop_tags)
+                            if (
+                                block_loop_tags
+                                and qualified
+                                and len(values) == len(block_loop_tags)
+                            ):
+                                cat = block_loop_tags[0].split(".", 1)[0].lstrip("_")
+                                row = {
+                                    tag.split(".", 1)[1]: val
+                                    for tag, val in zip(block_loop_tags, values)
+                                }
+                                self._category_rows.setdefault(cat, []).append(row)
+                            continue
+
                     # `_dictionary.*` sits in the data block, outside every
                     # save frame. It used to be skipped here, which is why a
                     # dictionary revision could change the vocabulary under a
@@ -688,6 +729,52 @@ class MmcifDictionary:
 
     def get_item(self, full_name: str) -> Optional[DictItem]:
         return self._items.get(full_name)
+
+    @staticmethod
+    def _split_row(line: str) -> List[str]:
+        """Split one loop row, honouring single and double quotes.
+
+        A unit's prose detail contains spaces, so a bare ``split()`` would turn
+        one row into several fields and silently drop the table.
+        """
+        out: List[str] = []
+        token = ""
+        quote = ""
+        for ch in line:
+            if quote:
+                if ch == quote:
+                    out.append(token)
+                    token, quote = "", ""
+                else:
+                    token += ch
+            elif ch in "'\"":
+                quote = ch
+            elif ch.isspace():
+                if token:
+                    out.append(token)
+                    token = ""
+            else:
+                token += ch
+        if token:
+            out.append(token)
+        return out
+
+    def category_rows(self, category: str) -> List[Dict[str, str]]:
+        """Return the rows of a data-block-level ``loop_`` table.
+
+        Parameters
+        ----------
+        category : str
+            Category name without the leading underscore, e.g.
+            ``"mmfdb_units"`` or ``"item_units_list"``.
+
+        Returns
+        -------
+        list of dict
+            ``{attribute: value}`` per row, in file order. Empty when the
+            dictionaries carry no such table.
+        """
+        return list(self._category_rows.get(category, []))
 
     def dictionary_version(self, filename: str) -> str:
         """Return the ``_dictionary.version`` one dictionary declares.
