@@ -170963,12 +170963,12 @@
           "name": "_flr_fret_forster_radius.forster_radius",
           "category": "flr_fret_forster_radius",
           "attribute": "forster_radius",
-          "description": "     The Forster radius corresponding to the FRET probe pair.",
+          "description": " The Forster radius of the probe pair, in angstroms. ",
           "type_code": "float",
           "mandatory": true,
           "enumerations": [],
           "enum_details": {},
-          "default_value": "5.0",
+          "default_value": "50.0",
           "parent": null,
           "child": null,
           "schema_table": "flr_fret_forster_radius",
@@ -346129,12 +346129,12 @@
       "name": "_flr_fret_forster_radius.forster_radius",
       "category": "flr_fret_forster_radius",
       "attribute": "forster_radius",
-      "description": "     The Forster radius corresponding to the FRET probe pair.",
+      "description": " The Forster radius of the probe pair, in angstroms. ",
       "type_code": "float",
       "mandatory": true,
       "enumerations": [],
       "enum_details": {},
-      "default_value": "5.0",
+      "default_value": "50.0",
       "parent": null,
       "child": null,
       "schema_table": "flr_fret_forster_radius",
@@ -357320,7 +357320,7 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1786078971.1919706
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1786085004.067606
   },
   "hashes": {
     "mmcif_ddl.dic": "fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768",
@@ -357330,7 +357330,7 @@
     "mmcif_ma.dic": "aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844",
     "mmcif_ihm_ext.dic": "9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55",
     "mmcif_ihm_flr_ext.dic": "92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2",
-    "mmfdb_flr_ext.dic": "706cc70dd0809c490e52b9bcf4c7ad54f6706c555a67c032834ff6d25e717cdb"
+    "mmfdb_flr_ext.dic": "4ddaabfd9eca02a26d5d53840c910ff7943e04a14d453e00f51ea5f7fe5d70bc"
   },
   "dictionary_meta": {
     "mmcif_ddl.dic": {
@@ -357371,7 +357371,7 @@
     "mmfdb_flr_ext.dic": {
       "title": "mmfdb_flr_ext.dic",
       "datablock_id": "mmfdb_flr_ext.dic",
-      "version": "1.4"
+      "version": "1.5"
     }
   }
 }

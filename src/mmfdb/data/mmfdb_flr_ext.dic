@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.4
+    _dictionary.version          1.5
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -74,9 +74,17 @@ save__flr_fret_forster_radius.forster_radius
    _item.category_id         flr_fret_forster_radius
    _item.mandatory_code      yes
    _item_type.code           float
-   _item_default.value       5.0
+   _item_units.code          angstroms
+   _item_default.value       50.0
    _mmfdb_schema.table_name  flr_fret_forster_radius
    _mmfdb_schema.column_name forster_radius
+   _item_description.description
+;     The Forster radius of the probe pair, in angstroms.
+;
+;     Upstream flrCIF declares no unit for this item, and the default here was
+;     5.0 -- a nanometre value in a field every consumer reads as angstroms,
+;     where a Forster radius is 40-70.  Declared and corrected to the same
+;     physical quantity, 50 angstroms.
 
 save_flr_sample
    _category.id              flr_sample
@@ -516,6 +524,7 @@ save__flr_chisurf_parameter.R0
    _item.name                "_flr_chisurf_parameter.R0"
    _item.category_id         flr_chisurf_parameter
    _item_type.code           float
+   _item_units.code          angstroms
    _mmfdb_schema.table_name  flr_chisurf_parameter
    _mmfdb_schema.column_name r0
    _item_description.description
@@ -1740,6 +1749,7 @@ save__flr_chisurf_parameter.r0
    _item.name                "_flr_chisurf_parameter.r0"
    _item.category_id         flr_chisurf_parameter
    _item_type.code           float
+   _item_units.code          angstroms
    _mmfdb_schema.table_name  flr_chisurf_parameter
    _mmfdb_schema.column_name r0
    _item_description.description
