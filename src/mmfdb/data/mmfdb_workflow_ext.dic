@@ -490,3 +490,99 @@ save__mmfdb_container.dictionary_hash
 ;     SHA-256 of that dictionary as loaded, lowercase hexadecimal.  A version is
 ;     what an author declares; this is what was actually used, and the two
 ;     disagree exactly when someone edited a dictionary without bumping it.
+
+#############
+## CATEGORY: mmfdb_column
+#############
+
+save_mmfdb_column
+   _category.id              mmfdb_column
+   _category.description
+;     What one column of a serialised table is.
+;
+;     A column carries a name and a dtype, which is enough to read it and not
+;     enough to understand it: a burst duration is milliseconds, a lifetime is
+;     nanoseconds, and historically that was recorded only in the column name,
+;     when whoever wrote it remembered -- "Duration (ms)" and "Tau" sit in the
+;     same table.  These are the attributes a column description carries so it
+;     is written down instead.
+;
+;     Like the rest of this dictionary these describe a SERIALIZATION and are
+;     not database-backed: there is no mmfdb_column table.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_column.name"
+
+save__mmfdb_column.name
+   _item.name                "_mmfdb_column.name"
+   _item.category_id         mmfdb_column
+   _item_type.code           line
+   _item.mandatory_code      yes
+   _item_description.description
+;     The column's name, and the key it is looked up by.
+
+save__mmfdb_column.units
+   _item.name                "_mmfdb_column.units"
+   _item.category_id         mmfdb_column
+   _item_type.code           code
+   _item.mandatory_code      no
+   _item_description.description
+;     The physical unit of the column's values.
+;
+;     Spellings follow mmCIF's ITEM_UNITS_LIST wherever it has the unit, so
+;     "seconds" and "microseconds" are the community's words.  It stops at
+;     microseconds and has no rate or count unit, which leaves out most of what
+;     a fluorescence table holds -- a lifetime in nanoseconds, a TAC channel in
+;     picoseconds, a burst duration in milliseconds, a count rate in kilohertz.
+;     Those are added here rather than invented at each call site.
+;
+;     "dimensionless" is for a ratio that genuinely has no unit -- an efficiency,
+;     an anisotropy -- and is not the same as saying nothing, which means the
+;     unit is unknown.
+    loop_
+    _item_enumeration.value
+      hours
+      minutes
+      seconds
+      milliseconds
+      microseconds
+      nanoseconds
+      picoseconds
+      femtoseconds
+      hertz
+      kilohertz
+      megahertz
+      counts
+      counts_per_second
+      photons
+      nanometres
+      micrometres
+      angstroms
+      pixels
+      degrees
+      radians
+      celsius
+      kelvins
+      molar
+      millimolar
+      micromolar
+      nanomolar
+      picomolar
+      dimensionless
+
+save__mmfdb_column.item
+   _item.name                "_mmfdb_column.item"
+   _item.category_id         mmfdb_column
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     The mmCIF item this column corresponds to, when there is one, so a table
+;     can be projected onto the dictionary rather than matched by name.
+
+save__mmfdb_column.description
+   _item.name                "_mmfdb_column.description"
+   _item.category_id         mmfdb_column
+   _item_type.code           text
+   _item.mandatory_code      no
+   _item_description.description
+;     Prose about the column, for a reader who has only the file.
