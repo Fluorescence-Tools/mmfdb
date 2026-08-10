@@ -688,3 +688,1335 @@ save_
       nanomolar          nM       1e-9       molar
       picomolar          pM       1e-12      molar
       dimensionless      .        1.0        .
+
+#
+###########################################################################
+#  Burst-analysis column naming
+#
+#  Migrated 2026-08-10 from tttrlib's okf/nomenclature/mmfdb.dic, which had
+#  been a second dictionary: it defined these three categories, which no
+#  mmfdb dictionary had, alongside copies of _mmfdb_artifact, _mmfdb_edge and
+#  _mmfdb_operation, which mmfdb owns. A copy of a vocabulary drifts from it --
+#  that one had, by eighteen terms -- so the copy is gone and the part that was
+#  genuinely new lives here, where the vocabulary lives.
+#
+#  These name the COLUMNS of a burst table: what `Duration (green) (ms)` is,
+#  which constant `gG_gR` denotes, and how a derived quantity like FRET
+#  efficiency is computed from them. They are the naming half of the burst
+#  format, and every writer of one -- tttrlib's CLI, ChiSurf's plugins, ndX --
+#  reads them from here.
+###########################################################################
+#
+save_mmfdb_burst_column
+   _category.description
+;              Data items describing a column in a burst-analysis artifact
+               (.bur, .bg4, .br4, .bv4, .2c4, .td4). These are the input
+               columns the ndx equation engine reads.
+;
+
+   _category.id              mmfdb_burst_column
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_burst_column.column"
+#
+save_
+save__mmfdb_burst_column.first_photon
+   _item_description.description
+;              Index of the first photon in the burst within the TTTR event
+               stream.
+;
+   _item.name            "_mmfdb_burst_column.first_photon"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       int
+   #
+   _mmfdb_burst_column.column   "First Photon"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    index
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.last_photon
+   _item_description.description
+;              Index of the last photon in the burst (inclusive).
+;
+   _item.name            "_mmfdb_burst_column.last_photon"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       int
+   #
+   _mmfdb_burst_column.column   "Last Photon"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    index
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.duration_ms
+   _item_description.description
+;              Macro-time span of the entire burst, t_last - t_first, in
+               milliseconds.
+;
+   _item.name            "_mmfdb_burst_column.duration_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Duration (ms)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.duration_green_ms
+   _item_description.description
+;              Macro-time span of the green-detector photons within the burst.
+               t_last(green) - t_first(green). Sentinel -1.0 when the burst
+               has no green photons. This is the Tg in the ndx equation
+               Tg-Tr(ms) = Duration(green) - Duration(red). It is a macro-time
+               (burst) duration, NOT a TCSPC micro-time difference.
+;
+   _item.name            "_mmfdb_burst_column.duration_green_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Duration (green) (ms)"
+   _mmfdb_burst_column.symbol   Tg
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.duration_red_ms
+   _item_description.description
+;              Macro-time span of the red-detector photons within the burst.
+               t_last(red) - t_first(red). Sentinel -1.0 when the burst has
+               no red photons. This is the Tr in Tg-Tr(ms).
+;
+   _item.name            "_mmfdb_burst_column.duration_red_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Duration (red) (ms)"
+   _mmfdb_burst_column.symbol   Tr
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.mean_macro_time_ms
+   _item_description.description
+;              Midpoint of the burst's first and last photon macro times,
+               (t_first + t_last) / 2, in ms. Despite the name this is a
+               midpoint, not a photon-weighted mean.
+;
+   _item.name            "_mmfdb_burst_column.mean_macro_time_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Mean Macro Time (ms)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.n_photons
+   _item_description.description
+;              Total photon count in the burst across all detectors.
+;
+   _item.name            "_mmfdb_burst_column.n_photons"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       int
+   #
+   _mmfdb_burst_column.column   "Number of Photons"
+   _mmfdb_burst_column.symbol   N
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.n_photons_green
+   _item_description.description
+;              Photon count in the burst on the green-detector routing channels.
+;
+   _item.name            "_mmfdb_burst_column.n_photons_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   #
+   _mmfdb_burst_column.column   "Number of Photons (green)"
+   _mmfdb_burst_column.symbol   Ng
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.n_photons_red
+   _item_description.description
+;              Photon count in the burst on the red-detector routing channels.
+;
+   _item.name            "_mmfdb_burst_column.n_photons_red"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   #
+   _mmfdb_burst_column.column   "Number of Photons (red)"
+   _mmfdb_burst_column.symbol   Nr
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.count_rate_khz
+   _item_description.description
+;              Total burst count rate, N / Duration, in kHz.
+;
+   _item.name            "_mmfdb_burst_column.count_rate_khz"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Count Rate (KHz)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.green_count_rate_khz
+   _item_description.description
+;              Green-detector count rate within the burst. Primary input to
+               the ndx Sg equation and all downstream intensity-FRET derivations.
+;
+   _item.name            "_mmfdb_burst_column.green_count_rate_khz"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Green Count Rate (KHz)"
+   _mmfdb_burst_column.symbol   Sg
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.red_count_rate_khz
+   _item_description.description
+;              Red-detector count rate within the burst. Primary input to
+               the ndx Sr equation.
+;
+   _item.name            "_mmfdb_burst_column.red_count_rate_khz"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Red Count Rate (KHz)"
+   _mmfdb_burst_column.symbol   Sr
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.mean_microtime_green_ns
+   _item_description.description
+;              Mean TCSPC micro-time of the green-detector photons, converted
+               to nanoseconds via micro_time_resolution. Sentinel -1.0 when
+               no green photons or unknown resolution.
+;
+   _item.name            "_mmfdb_burst_column.mean_microtime_green_ns"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Mean Microtime (green) (ns)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ns
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.mean_microtime_red_ns
+   _item_description.description
+;              Mean TCSPC micro-time of the red-detector photons, in nanoseconds.
+               Sentinel -1.0 when no red photons or unknown resolution.
+;
+   _item.name            "_mmfdb_burst_column.mean_microtime_red_ns"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Mean Microtime (red) (ns)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ns
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.proximity_ratio
+   _item_description.description
+;              Raw proximity ratio Nr / (Ng + Nr), uncorrected for background,
+               leakage, or gamma. Distinct from the ndx-derived 'Proximity ratio'
+               equation (which uses Sr and Sg).
+;
+   _item.name            "_mmfdb_burst_column.proximity_ratio"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Proximity Ratio"
+   _mmfdb_burst_column.symbol   PR
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+   #
+save_
+save__mmfdb_burst_column.tau_green
+   _item_description.description
+;              Fluorescence-weighted donor (green) lifetime from burst-wise
+               Fit2x MLE. Primary lifetime input to ndx Var_tauD(A)), E_tau,
+               and the FRET-line equations.
+;
+   _item.name            "_mmfdb_burst_column.tau_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "Tau (green)"
+   _mmfdb_burst_column.symbol   "<tauD(A)>F"
+   _mmfdb_burst_column.units    ns
+   _mmfdb_burst_column.source   .bg4
+   #
+save_
+save__mmfdb_burst_column.two_istar_green
+   _item_description.description
+;              Corrected intensity 2I* from the Fit2x fit -- the
+               quality-of-fit likelihood ratio metric.
+;
+   _item.name            "_mmfdb_burst_column.two_istar_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "2I*  (green)"
+   _mmfdb_burst_column.symbol   "2I*"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+   #
+save_
+save__mmfdb_burst_column.gamma_green
+   _item_description.description
+;              Detection-efficiency correction factor gamma from the Fit2x fit.
+;
+   _item.name            "_mmfdb_burst_column.gamma_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "gamma (green)"
+   _mmfdb_burst_column.symbol   gamma
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+   #
+save_
+save__mmfdb_burst_column.r0_green
+   _item_description.description "Fundamental anisotropy r0 from the Fit2x fit."
+   _item.name            "_mmfdb_burst_column.r0_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "r0 (green)"
+   _mmfdb_burst_column.symbol   r0
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+   #
+save_
+save__mmfdb_burst_column.rho_green
+   _item_description.description "Rotational correlation time rho from the Fit2x fit."
+   _item.name            "_mmfdb_burst_column.rho_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_burst_column.column   "rho (green)"
+   _mmfdb_burst_column.symbol   rho
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+   #
+save_
+save__mmfdb_burst_column.mean_macro_time_green_ms
+   _item_description.description "Midpoint of green-detector photon macro-time span within burst."
+   _item.name            "_mmfdb_burst_column.mean_macro_time_green_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "Mean Macro Time (green) (ms)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.mean_macro_time_red_ms
+   _item_description.description "Midpoint of red-detector photon macro-time span within burst."
+   _item.name            "_mmfdb_burst_column.mean_macro_time_red_ms"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "Mean Macro Time (red) (ms)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.s_prompt_green
+   _item_description.description "Green-detector rate in prompt micro-time window. Input to ndx Sg(PIE)."
+   _item.name            "_mmfdb_burst_column.s_prompt_green"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "S prompt green (kHz)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.s_prompt_red
+   _item_description.description "Red-detector rate in prompt micro-time window. Input to ndx Sr(PIE)."
+   _item.name            "_mmfdb_burst_column.s_prompt_red"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "S prompt red (kHz)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.s_delayed_yellow
+   _item_description.description "Red-detector rate in delayed micro-time window. Input to ndx Sy(PIE)."
+   _item.name            "_mmfdb_burst_column.s_delayed_yellow"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "S delayed yellow (kHz)"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    kHz
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.f_dexc_dem
+   _item_description.description "Donor-excitation donor-emission integrated counts (ALEX)."
+   _item.name            "_mmfdb_burst_column.f_dexc_dem"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   _mmfdb_burst_column.column   "F_Dexc_Dem"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.f_dexc_aem
+   _item_description.description "Donor-excitation acceptor-emission integrated counts (ALEX)."
+   _item.name            "_mmfdb_burst_column.f_dexc_aem"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   _mmfdb_burst_column.column   "F_Dexc_Aem"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.f_aexc_aem
+   _item_description.description "Acceptor-excitation acceptor-emission integrated counts (ALEX)."
+   _item.name            "_mmfdb_burst_column.f_aexc_aem"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   _mmfdb_burst_column.column   "F_Aexc_Aem"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.f_aexc_dem
+   _item_description.description "Acceptor-excitation donor-emission integrated counts (ALEX)."
+   _item.name            "_mmfdb_burst_column.f_aexc_dem"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       int
+   _mmfdb_burst_column.column   "F_Aexc_Dem"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.tau
+   _item_description.description "Burst mean lifetime used as time base for ALEX rate equations."
+   _item.name            "_mmfdb_burst_column.tau"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "Tau"
+   _mmfdb_burst_column.symbol   .
+   _mmfdb_burst_column.units    ns
+   _mmfdb_burst_column.source   .bur
+#
+save_
+save__mmfdb_burst_column.rda
+   _item_description.description "Dye-to-dye distance from Fit2x MLE fit. Input to ndx Rapp and kFRET."
+   _item.name            "_mmfdb_burst_column.rda"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "RDA"
+   _mmfdb_burst_column.symbol   RDA
+   _mmfdb_burst_column.units    Angstrom
+   _mmfdb_burst_column.source   .bg4
+#
+save_
+save__mmfdb_burst_column.td_mean
+   _item_description.description "Mean diffusion time from FCS/td4 companion analysis."
+   _item.name            "_mmfdb_burst_column.td_mean"
+   _item.category_id     mmfdb_burst_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_burst_column.column   "td_mean"
+   _mmfdb_burst_column.symbol   "tauD"
+   _mmfdb_burst_column.units    ms
+   _mmfdb_burst_column.source   .td4
+#
+save_
+save__mmfdb_burst_column.mle_fitted_green
+   _item_description.description
+;              1 if the Fit2x MLE fit converged for this burst on the green
+               channel, 0 if it was skipped or failed. Failed fits write NaN
+               in every numeric result column; this flag distinguishes
+               "not attempted" from "attempted and produced a number".
+;
+   _item.name            "_mmfdb_burst_column.mle_fitted_green"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       int
+   _mmfdb_burst_column.column   "MLE Fitted (green)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+#
+save_
+save__mmfdb_burst_column.mle_fitted_red
+   _item_description.description "1 if the Fit2x fit converged for red, 0 otherwise."
+   _item.name            "_mmfdb_burst_column.mle_fitted_red"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       int
+   _mmfdb_burst_column.column   "MLE Fitted (red)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .br4
+#
+save_
+save__mmfdb_burst_column.r_scatter_green
+   _item_description.description "Scatter-reference anisotropy for the green channel from Fit2x."
+   _item.name            "_mmfdb_burst_column.r_scatter_green"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "r Scatter (green)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+#
+save_
+save__mmfdb_burst_column.r_scatter_red
+   _item_description.description "Scatter-reference anisotropy for the red channel from Fit2x."
+   _item.name            "_mmfdb_burst_column.r_scatter_red"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "r Scatter (red)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .br4
+#
+save_
+save__mmfdb_burst_column.r_experimental_green
+   _item_description.description "Experimental steady-state anisotropy of the green channel from Fit2x."
+   _item.name            "_mmfdb_burst_column.r_experimental_green"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "r Experimental (green)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .bg4
+#
+save_
+save__mmfdb_burst_column.r_experimental_red
+   _item_description.description "Experimental steady-state anisotropy of the red channel from Fit2x."
+   _item.name            "_mmfdb_burst_column.r_experimental_red"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "r Experimental (red)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .br4
+#
+save_
+save_mmfdb_constant
+   _category.description
+;              Scalar calibration constants used by the ndx equation engine
+               (gG/gR, alpha, beta, PhiA, PhiD, forster_radius, ...).
+               Mirrors ndx mfd.constants.json.
+;
+
+   _category.id              mmfdb_constant
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_constant.name"
+#
+save_
+save__mmfdb_constant.gG_gR
+   _item_description.description "Green-to-red detection-efficiency ratio (gamma-factor ratio)."
+   _item.name            "_mmfdb_constant.gG_gR"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "gG/gR"
+   _mmfdb_constant.symbol  "gG/gR"
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.Bg
+   _item_description.description "Green-channel background count rate."
+   _item.name            "_mmfdb_constant.Bg"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "Bg"
+   _mmfdb_constant.symbol  Bg
+   _mmfdb_constant.units   kHz
+   #
+save_
+save__mmfdb_constant.Br
+   _item_description.description "Red-channel background count rate."
+   _item.name            "_mmfdb_constant.Br"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "Br"
+   _mmfdb_constant.symbol  Br
+   _mmfdb_constant.units   kHz
+   #
+save_
+save__mmfdb_constant.PhiA
+   _item_description.description "Acceptor fluorescence quantum yield."
+   _item.name            "_mmfdb_constant.PhiA"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "PhiA"
+   _mmfdb_constant.symbol  "PhiA"
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.PhiD
+   _item_description.description "Donor fluorescence quantum yield."
+   _item.name            "_mmfdb_constant.PhiD"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "PhiD"
+   _mmfdb_constant.symbol  "PhiD"
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.alpha
+   _item_description.description "Donor-leakage (spectral crosstalk) coefficient."
+   _item.name            "_mmfdb_constant.alpha"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "alpha"
+   _mmfdb_constant.symbol  alpha
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.tauD0
+   _item_description.description "Donor-only lifetime (lifetime in the absence of FRET)."
+   _item.name            "_mmfdb_constant.tauD0"
+   _item.category_id     mmfdb_constant
+   _item_mandatory_code   yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "tauD0"
+   _mmfdb_constant.symbol  "tauD(0)"
+   _mmfdb_constant.units   ns
+   #
+save_
+save__mmfdb_constant.beta
+   _item_description.description "Direct acceptor excitation coefficient at donor wavelength."
+   _item.name            "_mmfdb_constant.beta"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "beta"
+   _mmfdb_constant.symbol  beta
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.r
+   _item_description.description "Stoichiometry scaling factor (1/beta_Hellenkamp)."
+   _item.name            "_mmfdb_constant.r"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "r"
+   _mmfdb_constant.symbol  r
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.forster_radius
+   _item_description.description "Forster radius for the donor-acceptor pair."
+   _item.name            "_mmfdb_constant.forster_radius"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  yes
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "forster_radius"
+   _mmfdb_constant.symbol  "R0"
+   _mmfdb_constant.units   Angstrom
+   #
+save_
+save__mmfdb_constant.By
+   _item_description.description "Yellow (acceptor-excitation acceptor-emission) background."
+   _item.name            "_mmfdb_constant.By"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_constant.name    "By"
+   _mmfdb_constant.symbol  By
+   _mmfdb_constant.units   kHz
+#
+save_
+save__mmfdb_constant.omega_r_um
+   _item_description.description "Radial beam waist (1/e^2) of the confocal volume."
+   _item.name            "_mmfdb_constant.omega_r_um"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_constant.name    "omega_r_um"
+   _mmfdb_constant.symbol  "omega_r"
+   _mmfdb_constant.units   um
+#
+save_
+save__mmfdb_constant.T_K
+   _item_description.description "Sample temperature in Kelvin."
+   _item.name            "_mmfdb_constant.T_K"
+   _item.category_id     mmfdb_constant
+   _item_mandatory_code   no
+   _item_type.code       float
+   _mmfdb_constant.name    "T_K"
+   _mmfdb_constant.symbol  T
+   _mmfdb_constant.units   K
+#
+save_
+save__mmfdb_constant.eta_Pa_s
+   _item_description.description "Solvent viscosity."
+   _item.name            "_mmfdb_constant.eta_Pa_s"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_constant.name    "eta_Pa_s"
+   _mmfdb_constant.symbol  eta
+   _mmfdb_constant.units   "Pa*s"
+#
+save_
+save__mmfdb_constant.KB
+   _item_description.description "Boltzmann constant."
+   _item.name            "_mmfdb_constant.KB"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_constant.name    "KB"
+   _mmfdb_constant.symbol  kB
+   _mmfdb_constant.units   "J/K"
+#
+save_
+save__mmfdb_constant.kappa2
+   _item_description.description "Dipole-orientation factor (default 2/3 for dynamic averaging)."
+   _item.name            "_mmfdb_constant.kappa2"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   _mmfdb_constant.name    "kappa2"
+   _mmfdb_constant.symbol  "kappa2"
+   _mmfdb_constant.units   .
+#
+save_
+save_mmfdb_derived_column
+   _category.description
+;              Output columns computed by the ndx equation engine from input
+               columns and constants. Every equation output key in
+               mfd.equations.yaml must appear here.
+;
+
+   _category.id              mmfdb_derived_column
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_derived_column.column"
+#
+save_
+save__mmfdb_derived_column.tg_tr_ms
+   _item_description.description
+;              Duration(green) - Duration(red). Burst macro-time duration
+               difference between green and red detectors. NOT a micro-time
+               difference.
+;
+   _item.name            "_mmfdb_derived_column.tg_tr_ms"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "Tg-Tr(ms)"
+   _mmfdb_derived_column.symbol   "Tg-Tr"
+   _mmfdb_derived_column.units    ms
+   #
+save_
+save__mmfdb_derived_column.fret_efficiency
+   _item_description.description
+;              (1 + Fd/Fa * PhiA/PhiD)^(-1). Intensity-based FRET efficiency.
+;
+   _item.name            "_mmfdb_derived_column.fret_efficiency"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "FRET efficiency"
+   _mmfdb_derived_column.symbol   E
+   _mmfdb_derived_column.units    .
+   #
+save_
+save__mmfdb_derived_column.r_fret
+   _item_description.description "R0 * (1/E - 1)^(1/6). Distance from FRET efficiency."
+   _item.name            "_mmfdb_derived_column.r_fret"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "R_FRET"
+   _mmfdb_derived_column.symbol   "R_FRET"
+   _mmfdb_derived_column.units    Angstrom
+   #
+save_
+save__mmfdb_derived_column.proximity_ratio_derived
+   _item_description.description "Sr / (Sg + Sr). Corrected proximity ratio from ndx equations."
+   _item.name            "_mmfdb_derived_column.proximity_ratio_derived"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "Proximity ratio"
+   _mmfdb_derived_column.symbol   PR
+   _mmfdb_derived_column.units    .
+   #
+save_
+save__mmfdb_derived_column.fg
+   _item_description.description "Sg - Bg. Background-corrected green signal."
+   _item.name            "_mmfdb_derived_column.fg"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "Fg"
+   _mmfdb_derived_column.symbol   Fg
+   _mmfdb_derived_column.units    kHz
+   #
+save_
+save__mmfdb_derived_column.fr
+   _item_description.description "Sr - Br - alpha*Sg. Corrected red signal."
+   _item.name            "_mmfdb_derived_column.fr"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "Fr"
+   _mmfdb_derived_column.symbol   Fr
+   _mmfdb_derived_column.units    kHz
+   #
+save_
+save__mmfdb_derived_column.e_tau
+   _item_description.description "1 - Tau(green) / tauD0. Lifetime-based FRET efficiency."
+   _item.name            "_mmfdb_derived_column.e_tau"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "E_tau"
+   _mmfdb_derived_column.symbol   "E_tau"
+   _mmfdb_derived_column.units    .
+   #
+save_
+save__mmfdb_derived_column.var_e
+   _item_description.description "Var_tauD(A)) / tauD0^2. FRET-efficiency variance."
+   _item.name            "_mmfdb_derived_column.var_e"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "Var(E)"
+   _mmfdb_derived_column.symbol   "Var(E)"
+   _mmfdb_derived_column.units    .
+   #
+save_
+save__mmfdb_derived_column.sigma_e
+   _item_description.description "|Var(E)|^(1/2). Standard deviation of E."
+   _item.name            "_mmfdb_derived_column.sigma_e"
+   _item.category_id     mmfdb_derived_column
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_derived_column.column   "sigma_E"
+   _mmfdb_derived_column.symbol   "sigma_E"
+   _mmfdb_derived_column.units    .
+   #
+save_
+save__mmfdb_derived_column.sg
+   _item_description.description "Alias for Green Count Rate (KHz). ndx equation."
+   _item.name            "_mmfdb_derived_column.sg"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg"
+   _mmfdb_derived_column.symbol   Sg
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sr
+   _item_description.description "Alias for Red Count Rate (KHz). ndx equation."
+   _item.name            "_mmfdb_derived_column.sr"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sr"
+   _mmfdb_derived_column.symbol   Sr
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sg_sr
+   _item_description.description "Sg / Sr."
+   _item.name            "_mmfdb_derived_column.sg_sr"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg/Sr"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.fg_fr
+   _item_description.description "Fg / Fr."
+   _item.name            "_mmfdb_derived_column.fg_fr"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fg/Fr"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.fd_fa
+   _item_description.description "(Fg/Fr) / (gG/gR). Donor-to-acceptor intensity ratio."
+   _item.name            "_mmfdb_derived_column.fd_fa"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fd/Fa"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.tauDA_x
+   _item_description.description "(1 - E) * tauD(0). Species-weighted donor lifetime."
+   _item.name            "_mmfdb_derived_column.tauDA_x"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "<tauD(A)>x"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.var_tauDA
+   _item_description.description "Tau(green) * <tauD(A)>x - <tauD(A)>x^2. Lifetime variance."
+   _item.name            "_mmfdb_derived_column.var_tauDA"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Var_tauD(A))"
+   _mmfdb_derived_column.units    "ns^2"
+#
+save_
+save__mmfdb_derived_column.total_rate
+   _item_description.description "Green Count Rate + Red Count Rate."
+   _item.name            "_mmfdb_derived_column.total_rate"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Total count rate green + red"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.inv_sensitivity
+   _item_description.description "1 / (1 - E * (1 - gG/gR * PhiD/PhiA))."
+   _item.name            "_mmfdb_derived_column.inv_sensitivity"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "1/Sensitivity"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.one_minus_e_e_tau
+   _item_description.description "(1 - E) * E_tau. Moment-difference representation."
+   _item.name            "_mmfdb_derived_column.one_minus_e_e_tau"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "(1-E)*E_tau"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.one_minus_e_e
+   _item_description.description "(1 - E) * E. Static reference parabola in moment plot."
+   _item.name            "_mmfdb_derived_column.one_minus_e_e"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "(1-E)*E"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sg_pie
+   _item_description.description "Alias for S prompt green (kHz). PIE donor-excitation green signal."
+   _item.name            "_mmfdb_derived_column.sg_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fg_pie
+   _item_description.description "Sg(PIE) - Bg."
+   _item.name            "_mmfdb_derived_column.fg_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fg(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sr_pie
+   _item_description.description "Alias for S prompt red (kHz). PIE donor-excitation red signal."
+   _item.name            "_mmfdb_derived_column.sr_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sr(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fr_pie
+   _item_description.description "Sr(PIE) - Br - alpha*Sg(PIE)."
+   _item.name            "_mmfdb_derived_column.fr_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fr(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sy_pie
+   _item_description.description "Alias for S delayed yellow (kHz). PIE acceptor-excitation signal."
+   _item.name            "_mmfdb_derived_column.sy_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sy(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fy_pie
+   _item_description.description "Sy(PIE) - By."
+   _item.name            "_mmfdb_derived_column.fy_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fy(PIE)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fg_fr_pie
+   _item_description.description "Fg(PIE) / Fr(PIE)."
+   _item.name            "_mmfdb_derived_column.fg_fr_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fg/Fr(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sg_sr_pie
+   _item_description.description "Sg(PIE) / Sr(PIE)."
+   _item.name            "_mmfdb_derived_column.sg_sr_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg/Sr(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.fd_fa_pie
+   _item_description.description "(Fg/Fr(PIE)) / (gG/gR). PIE donor-to-acceptor ratio."
+   _item.name            "_mmfdb_derived_column.fd_fa_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fd/Fa(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.pr_pie
+   _item_description.description "Sr(PIE) / (Sr(PIE) + Sg(PIE)). PIE proximity ratio."
+   _item.name            "_mmfdb_derived_column.pr_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Proximity ratio(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.e_pie
+   _item_description.description "(1 + Fd/Fa(PIE) * PhiA/PhiD)^(-1). PIE FRET efficiency."
+   _item.name            "_mmfdb_derived_column.e_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "FRET efficiency(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.r_fret_pie
+   _item_description.description "R0 * (1/E(PIE) - 1)^(1/6). PIE distance."
+   _item.name            "_mmfdb_derived_column.r_fret_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "R_FRET(PIE)"
+   _mmfdb_derived_column.units    Angstrom
+#
+save_
+save__mmfdb_derived_column.ratioA_pie
+   _item_description.description "Fr(PIE) / Fy(PIE). Acceptor ratio."
+   _item.name            "_mmfdb_derived_column.ratioA_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "ratioA(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.e_aa_pie
+   _item_description.description "ratioA(PIE) / r. Acceptor-side FRET efficiency."
+   _item.name            "_mmfdb_derived_column.e_aa_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "FRET efficiency_AA(PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.r_fret_aa_pie
+   _item_description.description "R0 * (1/E_AA(PIE) - 1)^(1/6)."
+   _item.name            "_mmfdb_derived_column.r_fret_aa_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "R_FRET,AA(PIE)"
+   _mmfdb_derived_column.units    Angstrom
+#
+save_
+save__mmfdb_derived_column.sapp_pie_s
+   _item_description.description "Signal-based apparent stoichiometry from PIE channels."
+   _item.name            "_mmfdb_derived_column.sapp_pie_s"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sapp(PIE,S)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sapp_pie_f
+   _item_description.description "Flux-based apparent stoichiometry from PIE channels."
+   _item.name            "_mmfdb_derived_column.sapp_pie_f"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sapp(PIE,F)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.stoich_pie
+   _item_description.description "Full PIE stoichiometry ratio from corrected PIE fluxes."
+   _item.name            "_mmfdb_derived_column.stoich_pie"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Stoichiometry (PIE)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sg_alex
+   _item_description.description "F_Dexc_Dem / Tau / 1e3. ALEX donor-excitation donor-emission rate."
+   _item.name            "_mmfdb_derived_column.sg_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sr_alex
+   _item_description.description "F_Dexc_Aem / Tau / 1e3."
+   _item.name            "_mmfdb_derived_column.sr_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sr(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sy_alex
+   _item_description.description "F_Aexc_Aem / Tau / 1e3."
+   _item.name            "_mmfdb_derived_column.sy_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sy(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.sx_alex
+   _item_description.description "F_Aexc_Dem / Tau / 1e3."
+   _item.name            "_mmfdb_derived_column.sx_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sx(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fg_alex
+   _item_description.description "Sg(ALEX) - Bg."
+   _item.name            "_mmfdb_derived_column.fg_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fg(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fr_alex
+   _item_description.description "Sr(ALEX) - Br - alpha*Sg(ALEX)."
+   _item.name            "_mmfdb_derived_column.fr_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fr(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fy_alex
+   _item_description.description "Sy(ALEX) - By."
+   _item.name            "_mmfdb_derived_column.fy_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fy(ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.fg_fr_alex
+   _item_description.description "Fg(ALEX) / Fr(ALEX)."
+   _item.name            "_mmfdb_derived_column.fg_fr_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fg/Fr(ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sg_sr_alex
+   _item_description.description "Sg(ALEX) / Sr(ALEX)."
+   _item.name            "_mmfdb_derived_column.sg_sr_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sg/Sr(ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.fd_fa_alex
+   _item_description.description "(Fg/Fr(ALEX)) / (gG/gR). ALEX donor-to-acceptor ratio."
+   _item.name            "_mmfdb_derived_column.fd_fa_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Fd/Fa(ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.pr_alex
+   _item_description.description "Sr(ALEX) / (Sr(ALEX) + Sg(ALEX))."
+   _item.name            "_mmfdb_derived_column.pr_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Proximity ratio(ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.e_alex
+   _item_description.description "(1 + Fd/Fa(ALEX) * PhiA/PhiD)^(-1)."
+   _item.name            "_mmfdb_derived_column.e_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "FRET efficiency(ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sapp_alex_s
+   _item_description.description "Signal-based apparent stoichiometry from ALEX channels."
+   _item.name            "_mmfdb_derived_column.sapp_alex_s"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sapp(ALEX,S)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.sapp_alex_f
+   _item_description.description "Flux-based apparent stoichiometry from ALEX channels."
+   _item.name            "_mmfdb_derived_column.sapp_alex_f"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Sapp(ALEX,F)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.stoich_alex
+   _item_description.description "Full ALEX stoichiometry from corrected fluxes."
+   _item.name            "_mmfdb_derived_column.stoich_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Stoichiometry (ALEX)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.total_rate_alex
+   _item_description.description "Sg(ALEX) + Sr(ALEX)."
+   _item.name            "_mmfdb_derived_column.total_rate_alex"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Total count rate (ALEX)"
+   _mmfdb_derived_column.units    kHz
+#
+save_
+save__mmfdb_derived_column.rapp
+   _item_description.description "(3/2) / kappa^2 * RDA. Apparent distance."
+   _item.name            "_mmfdb_derived_column.rapp"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Rapp"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.kfret
+   _item_description.description "(1/tauD0)*(3/2)*kappa^2*(R0/RDA)^6. FRET rate constant."
+   _item.name            "_mmfdb_derived_column.kfret"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "kFRET"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.td_
+   _item_description.description "Alias for td_mean."
+   _item.name            "_mmfdb_derived_column.td_"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "td_"
+   _mmfdb_derived_column.units    ms
+#
+save_
+save__mmfdb_derived_column.d_um2_s
+   _item_description.description "250 * omega_r^2 / tauD. Diffusion coefficient."
+   _item.name            "_mmfdb_derived_column.d_um2_s"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "D_um2_s_from_td"
+   _mmfdb_derived_column.units    "um^2/s"
+#
+save_
+save__mmfdb_derived_column.rh_nm
+   _item_description.description "kB*T / (6*pi*eta*D). Hydrodynamic radius via Stokes-Einstein."
+   _item.name            "_mmfdb_derived_column.rh_nm"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "Rh_nm_from_D"
+   _mmfdb_derived_column.units    nm
+#
+save_

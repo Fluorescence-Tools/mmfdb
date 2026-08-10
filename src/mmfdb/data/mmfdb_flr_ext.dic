@@ -1825,8 +1825,7 @@ save__flr_chisurf_parameter.ics_alpha
    _mmfdb_schema.table_name  flr_chisurf_parameter
    _mmfdb_schema.column_name ics_alpha
    _item_description.description
-;     Anomalous diffusion exponent alpha in MSD(tau) = 4*D*tau^alpha. 1 is
-;     normal diffusion; below 1 subdiffusion, above 1 directed transport.
+;     Anomalous diffusion exponent alpha in MSD(tau) = 4*D*tau^alpha. 1 is normal diffusion; below 1 is subdiffusion (crowding, transient binding), above 1 is directed transport. Releasing it turns an image-correlation fit into the anomalous/iMSD case.
 ;
 save__flr_chisurf_parameter.rics_frame_dur
    _item.name                "_flr_chisurf_parameter.rics_frame_dur"
@@ -1835,8 +1834,7 @@ save__flr_chisurf_parameter.rics_frame_dur
    _mmfdb_schema.table_name  flr_chisurf_parameter
    _mmfdb_schema.column_name rics_frame_dur
    _item_description.description
-;     Frame time t_frame in ms of a raster scan. Converts a frame lag into a
-;     lag time, so it scales every diffusion coefficient fitted from frame lags.
+;     Frame time t_frame in ms. Converts a frame lag Delta into a lag time via tau = |xi*t_pixel + psi*t_line + Delta*t_frame|, so it scales every diffusion coefficient derived from frame lags (STICS/TICS/iMSD).
 ;
 save__flr_chisurf_parameter.rics_D
    _item.name                "_flr_chisurf_parameter.rics_D"
@@ -2988,6 +2986,218 @@ save__mmfdb_setup_calibration.created_by_user_id
    _item_description.description
 ;     User who created this calibration snapshot.  NULL for migrated defaults.
 
+save_mmfdb_label_score
+   _category.id              mmfdb_label_score
+   _category.description
+;     A per-position score of how suitable a site is for attaching a
+;     fluorescent label.
+;
+;     Label-site selection is a scored decision -- is this residue conserved, is
+;     it buried, does a tryptophan sit close enough to quench, would a cysteine
+;     here be one of several -- and each of those is a named quantity computed
+;     by a named method. They had nowhere to live: the tool that computes them
+;     writes them into the PDB B-factor column, a field that means "isotropic
+;     displacement parameter, in Angstrom squared" and is here carrying a
+;     dimensionless suitability score. A reader that believes the file is wrong;
+;     a reader that wants the score has to know the convention out of band; and
+;     WHICH score is in there is not written down at all, because one column can
+;     hold one at a time.
+;
+;     One row is one score at one position. The position is given the way mmCIF
+;     gives a position -- asym_id and seq_id -- so a score joins to the
+;     structure and to _flr_poly_probe_position without a private convention.
+;
+;     ABSENT MEANS NOT COMPUTED. Do not write a sentinel: the tool this was
+;     modelled on uses -1 for "excluded" and 0 for "no contribution" in the same
+;     column, so a consumer cannot tell an excluded residue from a genuinely
+;     zero score, and neither from a real value that happens to be zero. Use
+;     _mmfdb_label_score.status to say why a position has no value.
+;
+;     For readers coming from Labelizer, whose parameters are named by two-letter
+;     file tags: cs -> conservation, se -> solvent_exposure,
+;     ss -> secondary_structure, ce -> charge_environment,
+;     tp -> tryptophan_proximity, cr -> cysteine_resemblance,
+;     me -> methionine_exclusion, FRET -> fret_sensitivity. Those tags are that
+;     program's private naming and are recorded here only so the correspondence
+;     is written down somewhere; they are not values of any item.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_label_score.label_score_id"
+
+save__mmfdb_label_score.label_score_id
+   _item.name                "_mmfdb_label_score.label_score_id"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name label_score_id
+
+save__mmfdb_label_score.artifact_id
+   _item.name                "_mmfdb_label_score.artifact_id"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name artifact_id
+   _item_description.description
+;     The artifact these scores belong to, so a table of them is provenance-
+;     tracked like any other result.
+;
+
+save__mmfdb_label_score.score_type
+   _item.name                "_mmfdb_label_score.score_type"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           ucode
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name score_type
+   _item_description.description
+;     WHAT is being scored. Deliberately coarse, because it is the join key:
+;     every tryptophan-proximity score is `tryptophan_proximity` whoever
+;     computed it and however, so they can be compared, pooled or plotted
+;     against each other without knowing the implementation.
+;
+;     Which implementation produced a particular value is
+;     _mmfdb_label_score.definition, and the two answer different questions --
+;     the same split as _mmfdb_operation.operation_type and .algorithm.
+;
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      conservation           "evolutionary conservation of the position; a conserved residue is a poor site"
+      solvent_exposure       "solvent accessibility; a buried position cannot be reached by a label"
+      secondary_structure    "the local secondary structure the position sits in"
+      charge_environment     "net charge of the surrounding environment, which perturbs a charged dye"
+      tryptophan_proximity   "distance to nearby tryptophans, which quench many dyes"
+      cysteine_resemblance   "how much the position already resembles a cysteine, for cysteine chemistry"
+      methionine_exclusion   "exclusion of methionines, for methionine-directed chemistry"
+      fret_sensitivity       "how informative the position would be about a FRET distance"
+      measurement            "agreement with, or support from, an existing measurement"
+      combined               "a weighted combination of the scores above -- say which, in the settings"
+
+save__mmfdb_label_score.definition
+   _item.name                "_mmfdb_label_score.definition"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name definition
+   _item_description.description
+;     WHOSE definition of the score_type this value follows -- the program or
+;     published method that defines the number, not a code for it.
+;
+;     Two programs may both report a "tryptophan proximity score" and not mean
+;     the same number: one may count tryptophans inside a radius and another
+;     weight them by distance, and the two are not comparable even though the
+;     score_type is. Recording the definition is what lets a reader pool the
+;     values that may be pooled and separate the ones that may not, without
+;     parsing settings whose keys differ per implementation.
+;
+;     Read it with score_type, which already says what is being scored: the pair
+;     (`tryptophan_proximity`, `labelizer`) is "tryptophan proximity, as
+;     Labelizer defines it". The value here therefore names only the *source*,
+;     and does not repeat the quantity.
+;
+;     A name here is a name, not an abbreviation. An implementation's internal
+;     tag for a score -- Labelizer calls its tryptophan-proximity parameter
+;     `tp` and its charge environment `ce` -- is private to that program and
+;     means nothing to a reader of this dictionary. If one program grows two
+;     incompatible definitions of the same score_type, add a second value that
+;     says so in words.
+;
+;     Absent means the definition was not recorded -- never "the usual one".
+;
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      labelizer  "the Labelizer package's own definition, for the scores it computes itself: conservation, charge environment, tryptophan proximity, cysteine resemblance, methionine exclusion, FRET sensitivity, measurement agreement, and their weighted combination"
+      consurf    "ConSurf evolutionary conservation grades"
+      dssp       "DSSP secondary-structure assignment"
+      msms       "MSMS solvent-accessible surface"
+
+save__mmfdb_label_score.asym_id
+   _item.name                "_mmfdb_label_score.asym_id"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name asym_id
+   _item_description.description
+;     Chain the scored position is in, as mmCIF names a chain.
+;
+
+save__mmfdb_label_score.seq_id
+   _item.name                "_mmfdb_label_score.seq_id"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name seq_id
+   _item_description.description
+;     Sequence position scored. With asym_id this locates the residue, and is
+;     what joins a score to _flr_poly_probe_position -- so "which sites did we
+;     score, and which did we label" is one query rather than two files.
+;
+
+save__mmfdb_label_score.comp_id
+   _item.name                "_mmfdb_label_score.comp_id"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name comp_id
+   _item_description.description
+;     Residue type at that position, carried so a table of scores is readable
+;     without the structure beside it.
+;
+
+save__mmfdb_label_score.value
+   _item.name                "_mmfdb_label_score.value"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name value
+   _item_description.description
+;     The score. Absent when it was not computed -- see status. Never a
+;     sentinel: a magic -1 in a float column is indistinguishable from a
+;     measurement to everything except the code that wrote it.
+;
+
+save__mmfdb_label_score.units
+   _item.name                "_mmfdb_label_score.units"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name units
+   _item_description.description
+;     An _mmfdb_units code. Most of these scores are `dimensionless`, which is a
+;     claim worth making explicitly rather than by omission -- a solvent
+;     exposure reported as an area is `angstroms` squared and a proximity as
+;     `angstroms`, and which one a definition uses is not guessable.
+;
+
+save__mmfdb_label_score.status
+   _item.name                "_mmfdb_label_score.status"
+   _item.category_id         mmfdb_label_score
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_label_score
+   _mmfdb_schema.column_name status
+   _item_description.description
+;     Why a position has no value, when it has none. This exists so that
+;     "excluded on purpose" and "could not be computed" are different facts,
+;     which is exactly what an in-band sentinel destroys.
+;
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      scored       "a value is present"
+      excluded     "the position was deliberately excluded, e.g. a methionine under methionine chemistry"
+      unresolved   "the position is not resolved in the structure"
+      unavailable  "an input the score needs was missing, e.g. no alignment for conservation"
+
 save_mmfdb_artifact
    _category.id              mmfdb_artifact
    _category.description
@@ -3164,6 +3374,7 @@ save__mmfdb_artifact.row_grain
       channel
       pair
       file
+      histogram_bin
 
 save__mmfdb_artifact.storage_mode
    _item.name                "_mmfdb_artifact.storage_mode"
@@ -3273,6 +3484,34 @@ save__mmfdb_artifact.created_by_user_id
 ;     User who created/registered this artifact.  NULL for builtin/shared
 ;     artifacts.  Used for dataset-browser scoping (own vs public).
 
+save__mmfdb_artifact.is_sidecar
+   _item.name                "_mmfdb_artifact.is_sidecar"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name is_sidecar
+   _item_description.description
+;     Whether this artifact is a file that only exists BESIDE another one and
+;     cannot be read alone.
+;
+;     A Becker & Hickl `.spc` keeps half its header in a `.set` next to it: hand
+;     a reader the `.spc` on its own and it decodes with the wrong resolution
+;     and no error. The `.set` is therefore not a second measurement and not a
+;     derived result -- the two categories a container otherwise has -- and
+;     listing it as either misleads. It is a part of its primary, and the
+;     primary is named by _mmfdb_edge.source_node_id on the sidecar.
+;
+;     A reader extracting the measurement must extract the sidecars with it; a
+;     reader enumerating what a container holds should not count them as
+;     measurements. 1 for a sidecar, 0 or absent otherwise.
+;
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      0  "a file that stands on its own"
+      1  "a sidecar; unreadable without the artifact it accompanies"
+
 save__mmfdb_artifact.is_public
    _item.name                "_mmfdb_artifact.is_public"
    _item.category_id         mmfdb_artifact
@@ -3331,6 +3570,74 @@ save__mmfdb_artifact_owner.role
    _item_description.description
 ;     Ownership role, e.g. ``owner`` (default) or ``contributor``.
 ;
+
+save_mmfdb_artifact_member
+   _category.id              mmfdb_artifact_member
+   _category.description
+;     File-group membership: lists the individual files that belong to a
+;     multi-file dataset artifact (e.g. a multi-channel TTTR run or a
+;     burst folder with co-located photon sources). Each member is
+;     content-addressed (dedup per file via mmfdb_object), and the group
+;     artifact carries one row per member.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_artifact_member.id"
+
+save__mmfdb_artifact_member.id
+   _item.name                "_mmfdb_artifact_member.id"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name id
+
+save__mmfdb_artifact_member.artifact_id
+   _item.name                "_mmfdb_artifact_member.artifact_id"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name artifact_id
+   _mmfdb_schema.foreign_key  mmfdb_artifact(artifact_id) ON DELETE CASCADE
+
+save__mmfdb_artifact_member.object_uuid
+   _item.name                "_mmfdb_artifact_member.object_uuid"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name object_uuid
+   _mmfdb_schema.foreign_key  mmfdb_object(object_uuid)
+
+save__mmfdb_artifact_member.filename
+   _item.name                "_mmfdb_artifact_member.filename"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name filename
+   _item_description.description
+;     Member filename within the group.
+;
+
+save__mmfdb_artifact_member.role
+   _item.name                "_mmfdb_artifact_member.role"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name role
+   _item_description.description
+;     Member role, e.g. ``primary``, ``sidecar``, ``channel``.
+;
+
+save__mmfdb_artifact_member.ordinal
+   _item.name                "_mmfdb_artifact_member.ordinal"
+   _item.category_id         mmfdb_artifact_member
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact_member
+   _mmfdb_schema.column_name ordinal
 
 # ======================================================================
 # Vocabulary enumerations — Phase 1: Vocab from .dic
@@ -3414,6 +3721,60 @@ save__mmfdb_operation.operation_type
       colocalization
       psf_determination
       region_detection
+      pda_burst_likelihood
+
+save__mmfdb_operation.algorithm
+   _item.name                "_mmfdb_operation.algorithm"
+   _item.category_id         mmfdb_operation
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation
+   _mmfdb_schema.column_name algorithm
+   _item_description.description
+;     WHICH algorithm carried out this _mmfdb_operation.operation_type.
+;
+;     `operation_type` says what was done and is deliberately coarse, because
+;     it is the join key: everything that produces a per-burst lifetime is
+;     `burst_lifetime_fitting`, so a reader can find them all without knowing
+;     how any of them worked.  That coarseness is a problem for the reader who
+;     does care -- a maximum-likelihood lifetime, a phasor lifetime and a
+;     moment-derived lifetime are not the same estimator, do not have the same
+;     bias, and must not be pooled into one histogram.  Recording the estimator
+;     is what lets them be told apart without parsing settings_json, whose keys
+;     differ per implementation and are not a controlled vocabulary.
+;
+;     Two operations of the same type and different algorithm are different
+;     analyses, and a reader may keep both.  Two of the same type AND the same
+;     algorithm differing only in settings are re-runs, distinguished by
+;     _mmfdb_operation.settings_hash.
+;
+;     Absent means unrecorded, not "the usual one".  A writer that knows its
+;     estimator says so; nothing infers one.
+;
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      mle                "maximum likelihood, the burst-wise TCSPC estimator (fit23 and its family)"
+      least_squares      "chi-square minimisation against a convolved model"
+      maximum_entropy    "maximum-entropy lifetime distribution"
+      phasor             "frequency-domain phasor transform; no fit"
+      moments            "moment-derived, e.g. a mean micro time as a lifetime proxy"
+      bayesian           "posterior sampling or MAP with priors"
+      sliding_window     "fixed-rate threshold over a sliding photon window"
+      cusum_sprt         "cumulative-sum / sequential probability ratio change detection"
+      maxtree            "max-tree / component-tree over the rate signal"
+      bayesian_blocks    "Bayesian blocks segmentation"
+      kalman             "Kalman-filtered rate with a threshold"
+      bocpd              "Bayesian online change-point detection"
+      coincident         "coincidence between two or more channels"
+      multi_tau          "multi-tau (logarithmic lag) correlation"
+      direct_correlation "direct pairwise correlation over a linear lag axis"
+      baum_welch         "expectation-maximisation for a hidden Markov model"
+      viterbi            "most-likely state path"
+      variational        "variational Bayes"
+      neural_surrogate   "amortised neural estimator trained on simulation"
+      kernel_density     "kernel-density estimate over photon arrival times"
+      variance           "variance of a sub-burst statistic (e.g. BVA)"
 
 save__mmfdb_operation.status
    _item.name                "_mmfdb_operation.status"
@@ -5646,3 +6007,399 @@ save__mmfdb_reagent_usage.role
    _mmfdb_schema.column_name role
 
 # End of vocabulary enumerations
+save__mmfdb_object.content_md5
+   _item.name                "_mmfdb_object.content_md5"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name content_md5
+
+save__mmfdb_object.content_sha256
+   _item.name                "_mmfdb_object.content_sha256"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name content_sha256
+
+save__mmfdb_object.original_filename
+   _item.name                "_mmfdb_object.original_filename"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name original_filename
+
+save__mmfdb_object.size_bytes
+   _item.name                "_mmfdb_object.size_bytes"
+   _item.category_id         mmfdb_object
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name size_bytes
+
+save__mmfdb_object.mime_type
+   _item.name                "_mmfdb_object.mime_type"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name mime_type
+
+save__mmfdb_object.storage_path
+   _item.name                "_mmfdb_object.storage_path"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name storage_path
+
+save__mmfdb_object.refcount
+   _item.name                "_mmfdb_object.refcount"
+   _item.category_id         mmfdb_object
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name refcount
+   _item_default.value       1
+
+save__mmfdb_object.metadata_json
+   _item.name                "_mmfdb_object.metadata_json"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name metadata_json
+
+save__mmfdb_object.created_by_user_uuid
+   _item.name                "_mmfdb_object.created_by_user_uuid"
+   _item.category_id         mmfdb_object
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_object
+   _mmfdb_schema.column_name created_by_user_uuid
+   _mmfdb_schema.foreign_key  flr_sample_users(user_uuid)
+
+save__mmfdb_artifact.experiment_id
+   _item.name                "_mmfdb_artifact.experiment_id"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name experiment_id
+   _mmfdb_schema.foreign_key  flr_experiment(experiment_id) ON DELETE SET NULL
+
+save__mmfdb_artifact.url
+   _item.name                "_mmfdb_artifact.url"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name url
+
+save__mmfdb_artifact.folder_path
+   _item.name                "_mmfdb_artifact.folder_path"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name folder_path
+
+save__mmfdb_artifact.validation_status
+   _item.name                "_mmfdb_artifact.validation_status"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name validation_status
+   _item_default.value       'unvalidated'
+
+save__mmfdb_artifact.validation_message
+   _item.name                "_mmfdb_artifact.validation_message"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name validation_message
+
+save__mmfdb_artifact.metadata_json
+   _item.name                "_mmfdb_artifact.metadata_json"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name metadata_json
+
+save__mmfdb_artifact.data_json
+   _item.name                "_mmfdb_artifact.data_json"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name data_json
+
+save__mmfdb_artifact.data_blob
+   _item.name                "_mmfdb_artifact.data_blob"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name data_blob
+
+save__mmfdb_artifact.object_uuid
+   _item.name                "_mmfdb_artifact.object_uuid"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name object_uuid
+   _mmfdb_schema.foreign_key  mmfdb_object(object_uuid)
+
+save__mmfdb_operation_artifact.operation_id
+   _item.name                "_mmfdb_operation_artifact.operation_id"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name operation_id
+   _mmfdb_schema.foreign_key  mmfdb_operation(operation_id) ON DELETE CASCADE
+
+save__mmfdb_operation_artifact.artifact_id
+   _item.name                "_mmfdb_operation_artifact.artifact_id"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name artifact_id
+   _mmfdb_schema.foreign_key  mmfdb_artifact(artifact_id) ON DELETE CASCADE
+
+save__mmfdb_operation_artifact.role
+   _item.name                "_mmfdb_operation_artifact.role"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name role
+   _item_default.value       'generic'
+
+save__mmfdb_operation_artifact.ordinal
+   _item.name                "_mmfdb_operation_artifact.ordinal"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name ordinal
+   _item_default.value       0
+
+save__mmfdb_operation_artifact.checksum_snapshot
+   _item.name                "_mmfdb_operation_artifact.checksum_snapshot"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name checksum_snapshot
+
+save__mmfdb_operation_artifact.metadata_json
+   _item.name                "_mmfdb_operation_artifact.metadata_json"
+   _item.category_id         mmfdb_operation_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_operation_artifact
+   _mmfdb_schema.column_name metadata_json
+
+save__mmfdb_edge.source_node_type
+   _item.name                "_mmfdb_edge.source_node_type"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name source_node_type
+
+save__mmfdb_edge.target_node_type
+   _item.name                "_mmfdb_edge.target_node_type"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name target_node_type
+
+save__mmfdb_edge.operation_id
+   _item.name                "_mmfdb_edge.operation_id"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name operation_id
+   _mmfdb_schema.foreign_key  mmfdb_operation(operation_id) ON DELETE SET NULL
+
+save__mmfdb_edge.settings_hash
+   _item.name                "_mmfdb_edge.settings_hash"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name settings_hash
+
+save__mmfdb_edge.timestamp
+   _item.name                "_mmfdb_edge.timestamp"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name timestamp
+   _item_default.value       CURRENT_TIMESTAMP
+
+save__mmfdb_edge.software_version
+   _item.name                "_mmfdb_edge.software_version"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name software_version
+
+save__mmfdb_edge.checksum_snapshot_json
+   _item.name                "_mmfdb_edge.checksum_snapshot_json"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name checksum_snapshot_json
+
+save__mmfdb_edge.metadata_json
+   _item.name                "_mmfdb_edge.metadata_json"
+   _item.category_id         mmfdb_edge
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_edge
+   _mmfdb_schema.column_name metadata_json
+
+save__mmfdb_parameter.parameter_uuid
+   _item.name                "_mmfdb_parameter.parameter_uuid"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name parameter_uuid
+
+save__mmfdb_parameter.operation_id
+   _item.name                "_mmfdb_parameter.operation_id"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name operation_id
+   _mmfdb_schema.foreign_key  mmfdb_operation(operation_id) ON DELETE CASCADE
+
+save__mmfdb_parameter.name
+   _item.name                "_mmfdb_parameter.name"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name name
+
+save__mmfdb_parameter.value
+   _item.name                "_mmfdb_parameter.value"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name value
+
+save__mmfdb_parameter.standard_error
+   _item.name                "_mmfdb_parameter.standard_error"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name standard_error
+
+save__mmfdb_parameter.confidence_interval_low
+   _item.name                "_mmfdb_parameter.confidence_interval_low"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name confidence_interval_low
+
+save__mmfdb_parameter.confidence_interval_high
+   _item.name                "_mmfdb_parameter.confidence_interval_high"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name confidence_interval_high
+
+save__mmfdb_parameter.initial_value
+   _item.name                "_mmfdb_parameter.initial_value"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name initial_value
+
+save__mmfdb_parameter.lower_bound
+   _item.name                "_mmfdb_parameter.lower_bound"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name lower_bound
+
+save__mmfdb_parameter.upper_bound
+   _item.name                "_mmfdb_parameter.upper_bound"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name upper_bound
+
+save__mmfdb_parameter.bounds_on
+   _item.name                "_mmfdb_parameter.bounds_on"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           int
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name bounds_on
+   _item_default.value       0
+
+save__mmfdb_parameter.units
+   _item.name                "_mmfdb_parameter.units"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name units
+
+save__mmfdb_parameter.expression
+   _item.name                "_mmfdb_parameter.expression"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name expression
+
+save__mmfdb_parameter.prior_json
+   _item.name                "_mmfdb_parameter.prior_json"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name prior_json
+
+save__mmfdb_parameter.mapping_json
+   _item.name                "_mmfdb_parameter.mapping_json"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name mapping_json
+
+save__mmfdb_parameter.metadata_json
+   _item.name                "_mmfdb_parameter.metadata_json"
+   _item.category_id         mmfdb_parameter
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_parameter
+   _mmfdb_schema.column_name metadata_json
