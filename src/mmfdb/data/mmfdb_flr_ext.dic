@@ -3775,6 +3775,10 @@ save__mmfdb_operation.algorithm
       neural_surrogate   "amortised neural estimator trained on simulation"
       kernel_density     "kernel-density estimate over photon arrival times"
       variance           "variance of a sub-burst statistic (e.g. BVA)"
+      gaussian_prompt_fit    "instrument response taken as a Gaussian fitted to the measured prompt, using the rising edge only -- the falling edge is fluorescence, not response"
+      skew_normal_prompt_fit "as gaussian_prompt_fit, with a skew-normal, which follows the tail a real prompt carries"
+      measured_prompt        "the measured prompt used directly, baseline-subtracted and not fitted"
+      recurrence_probability "same-molecule probability from the inter-burst lag distribution, thresholded (burst fusion)"
 
 save__mmfdb_operation.status
    _item.name                "_mmfdb_operation.status"
