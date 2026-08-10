@@ -3076,6 +3076,7 @@ save__mmfdb_artifact.artifact_kind
       drift_trajectory
       resolution_curve
       localization_table
+      region_table
       dwell_table
       state_trajectory
       row_mapping
@@ -3134,6 +3135,15 @@ save__mmfdb_artifact.row_grain
 ;     relations that do not fit that grid are then carried outside the format
 ;     or lost.  Stating the grain is what lets an artifact-to-artifact edge
 ;     (see _mmfdb_edge.source_row_column) be resolved to rows.
+;
+;     `spot` and `region` are not synonyms and the difference is not pedantry.
+;     A spot is a point-like detection -- a localisation, with a position and
+;     at most a width.  A region is an arbitrary connected set of pixels that
+;     owns its own pixel list: a cell nucleus, a hand-drawn area, a watershed
+;     basin.  A table of nuclei declared at `spot` grain is a false statement
+;     about its rows, of the same kind as calling a file of binned traces a
+;     photon stream, and it is false in the one field a reader consults to
+;     decide what may be joined to it.
     loop_
     _item_enumeration.value
       photon
@@ -3147,6 +3157,7 @@ save__mmfdb_artifact.row_grain
       molecule
       track
       spot
+      region
       curve_point
       state
       species
@@ -3402,6 +3413,7 @@ save__mmfdb_operation.operation_type
       particle_tracking
       colocalization
       psf_determination
+      region_detection
 
 save__mmfdb_operation.status
    _item.name                "_mmfdb_operation.status"
