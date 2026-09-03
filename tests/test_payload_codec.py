@@ -106,13 +106,13 @@ def test_anisotropy_curve_roundtrip_with_l1_l2():
 
 def test_payload_schema_exposes_flrcif_item_ids_for_matched_fields():
     aniso_schema = get_payload_schema("anisotropy_curve")
-    assert aniso_schema["fields"]["l1"]["flrcif_item_id"] == "_flr_chisurf_parameter.l1"
-    assert aniso_schema["fields"]["l2"]["flrcif_item_id"] == "_flr_chisurf_parameter.l2"
-    assert aniso_schema["fields"]["g_factor"]["flrcif_item_id"] == "_flr_chisurf_parameter.g"
+    assert aniso_schema["fields"]["l1"]["flrcif_item_id"] == "_flr_fit_parameter.l1"
+    assert aniso_schema["fields"]["l2"]["flrcif_item_id"] == "_flr_fit_parameter.l2"
+    assert aniso_schema["fields"]["g_factor"]["flrcif_item_id"] == "_flr_fit_parameter.g"
 
     tcspc_schema = get_payload_schema("tcspc_decay")
-    assert tcspc_schema["fields"]["adc_resolution_ns"]["flrcif_item_id"] == "_flr_chisurf_parameter.dtTAC[ns]"
-    assert tcspc_schema["fields"]["micro_time_resolution_ns"]["flrcif_item_id"] == "_flr_chisurf_parameter.dtMT[ns]"
+    assert tcspc_schema["fields"]["adc_resolution_ns"]["flrcif_item_id"] == "_flr_fit_parameter.dtTAC[ns]"
+    assert tcspc_schema["fields"]["micro_time_resolution_ns"]["flrcif_item_id"] == "_flr_fit_parameter.dtMT[ns]"
 
 
 def test_payload_flrcif_item_ids_exist_in_bundled_dictionary():
@@ -131,11 +131,11 @@ def test_payload_flrcif_item_ids_use_existing_parameter_translation():
     from mmfdb.adapters.chinet import _lookup_flrcif_name
 
     expected = {
-        "l1": "_flr_chisurf_parameter.l1",
-        "l2": "_flr_chisurf_parameter.l2",
-        "g": "_flr_chisurf_parameter.g",
-        "dtTAC[ns]": "_flr_chisurf_parameter.dtTAC[ns]",
-        "dtMT[ns]": "_flr_chisurf_parameter.dtMT[ns]",
+        "l1": "_flr_fit_parameter.l1",
+        "l2": "_flr_fit_parameter.l2",
+        "g": "_flr_fit_parameter.g",
+        "dtTAC[ns]": "_flr_fit_parameter.dtTAC[ns]",
+        "dtMT[ns]": "_flr_fit_parameter.dtMT[ns]",
     }
     resolver = expected.get
 

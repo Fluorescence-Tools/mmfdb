@@ -78,8 +78,8 @@ class TcspcDecay:
     SCHEMA_VERSION: ClassVar[int] = 1
     KIND: ClassVar[str] = "tcspc_decay"
     FLRCIF_ITEMS: ClassVar[dict[str, str]] = {
-        "adc_resolution_ns": "_flr_chisurf_parameter.dtTAC[ns]",
-        "micro_time_resolution_ns": "_flr_chisurf_parameter.dtMT[ns]",
+        "adc_resolution_ns": "_flr_fit_parameter.dtTAC[ns]",
+        "micro_time_resolution_ns": "_flr_fit_parameter.dtMT[ns]",
     }
     FIELDS: ClassVar[dict[str, FieldSpec]] = {
         "time": ("f8[]", True, "ns"),
@@ -105,9 +105,9 @@ class AnisotropyCurve:
     SCHEMA_VERSION: ClassVar[int] = 1
     KIND: ClassVar[str] = "anisotropy_curve"
     FLRCIF_ITEMS: ClassVar[dict[str, str]] = {
-        "l1": "_flr_chisurf_parameter.l1",
-        "l2": "_flr_chisurf_parameter.l2",
-        "g_factor": "_flr_chisurf_parameter.g",
+        "l1": "_flr_fit_parameter.l1",
+        "l2": "_flr_fit_parameter.l2",
+        "g_factor": "_flr_fit_parameter.g",
     }
     FIELDS: ClassVar[dict[str, FieldSpec]] = {
         "time": ("f8[]", True, "ns"),

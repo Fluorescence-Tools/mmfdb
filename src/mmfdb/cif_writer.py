@@ -25,6 +25,9 @@ EXTENSION_CATEGORY_ALIASES: dict[str, str] = {
     "_chisurf_probe_spectrum": "_mmfdb_probe_spectrum",
     "_chisurf_photon_stream": "_mmfdb_photon_stream",
     "_chisurf_analysis_data": "_mmfdb_analysis_data",
+    # The fitted-parameter category missed by PRD-44's pass, de-branded
+    # 2026-09-03 (dictionary keywords are software-agnostic, by rule).
+    "_flr_chisurf_parameter": "_flr_fit_parameter",
 }
 
 #: The canonical extension categories an MMFDB export writes.

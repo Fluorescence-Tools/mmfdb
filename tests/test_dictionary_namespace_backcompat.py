@@ -87,13 +87,19 @@ def test_new_mmfdb_schema_tags_parse_identically() -> None:
     assert value.schema_status == "active"
 
 
-def test_extension_category_alias_table_is_a_pure_rebranding() -> None:
-    """Every alias differs from its canonical name only in the namespace."""
+def test_extension_category_alias_table_is_a_pure_debranding() -> None:
+    """Every alias removes a program name and only that.
+
+    The original five were ``_chisurf_*`` -> ``_mmfdb_*`` prefix swaps;
+    ``_flr_chisurf_parameter`` -> ``_flr_fit_parameter`` (2026-09-03)
+    de-brands inside the flr namespace instead. The invariant both share:
+    the legacy spelling names a program, the canonical one does not.
+    """
     assert EXTENSION_CATEGORY_ALIASES, "the alias table must not be empty"
     for legacy, canonical in EXTENSION_CATEGORY_ALIASES.items():
-        assert legacy.startswith("_chisurf_")
-        assert canonical.startswith("_mmfdb_")
-        assert legacy.removeprefix("_chisurf_") == canonical.removeprefix("_mmfdb_")
+        assert "chisurf" in legacy, legacy
+        assert "chisurf" not in canonical, canonical
+        assert canonical.startswith(("_mmfdb_", "_flr_")), canonical
     assert len(EXTENSION_CATEGORIES) == len(EXTENSION_CATEGORY_ALIASES)
 
 
@@ -106,7 +112,7 @@ def test_legacy_extension_categories_map_onto_the_canonical_spelling() -> None:
 
 def test_standard_categories_pass_through_untouched() -> None:
     """Only the local extension namespace is rewritten, never a standard one."""
-    for name in ("_flr_sample", "_struct_ref", "_entity", "_flr_chisurf_parameter"):
+    for name in ("_flr_sample", "_struct_ref", "_entity", "_flr_fret_forster_radius"):
         assert canonical_extension_category(name) == name
 
 
