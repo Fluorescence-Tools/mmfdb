@@ -2485,6 +2485,86 @@ save__flr_chisurf_parameter.brightness
 ;     Background-corrected molecular brightness, mean count rate per particle (kilohertz).
 ;
 
+save__flr_chisurf_parameter.tau
+   _item.name                "_flr_chisurf_parameter.tau"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name tau
+   _item_description.description
+;     Fluorescence lifetime, the primary fitted lifetime of a burst- or pixel-wise MLE (fit23 family), nanoseconds.
+;
+
+save__flr_chisurf_parameter.gamma
+   _item.name                "_flr_chisurf_parameter.gamma"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name gamma
+   _item_description.description
+;     Scatter fraction of the fit23-family MLE: fraction of the signal attributed to scattered light.
+;
+
+save__flr_chisurf_parameter.rho
+   _item.name                "_flr_chisurf_parameter.rho"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name rho
+   _item_description.description
+;     Rotational correlation time fitted by the fit23-family MLE, nanoseconds.
+;
+
+save__flr_chisurf_parameter.twoIstar
+   _item.name                "_flr_chisurf_parameter.twoIstar"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name twoistar
+   _item_description.description
+;     2I* goodness-of-fit of a photon-count MLE, twice the log-likelihood-ratio deviance per degree of freedom.
+;
+
+save__flr_chisurf_parameter.r_scatter
+   _item.name                "_flr_chisurf_parameter.r_scatter"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name r_scatter
+   _item_description.description
+;     Scatter-corrected steady-state anisotropy derived from a polarised MLE (rS of the BIFL export).
+;
+
+save__flr_chisurf_parameter.r_experimental
+   _item.name                "_flr_chisurf_parameter.r_experimental"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name r_experimental
+   _item_description.description
+;     Uncorrected experimental steady-state anisotropy from the raw parallel/perpendicular counts (rE of the BIFL export).
+;
+
+save__flr_chisurf_parameter.soft_bifl_scatter
+   _item.name                "_flr_chisurf_parameter.soft_bifl_scatter"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name soft_bifl_scatter
+   _item_description.description
+;     fit23-family MLE setting: whether the scatter fraction was fitted softly (1) or held (0); echoed per row in BIFL-style exports.
+;
+
+save__flr_chisurf_parameter.p2s_twoIstar
+   _item.name                "_flr_chisurf_parameter.p2s_twoIstar"
+   _item.category_id         flr_chisurf_parameter
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_chisurf_parameter
+   _mmfdb_schema.column_name p2s_twoistar
+   _item_description.description
+;     fit23-family MLE setting: whether 2I* was computed on the parallel+2*perpendicular sum (1) or per channel (0); echoed per row in BIFL-style exports.
+;
+
 save_mmfdb_setup
    _category.id              mmfdb_setup
    _category.description
@@ -6407,3 +6487,251 @@ save__mmfdb_parameter.metadata_json
    _item.mandatory_code      no
    _mmfdb_schema.table_name  mmfdb_parameter
    _mmfdb_schema.column_name metadata_json
+
+save_flr_analysis_feature
+   _category.id              flr_analysis_feature
+   _category.description
+;     Computed per-event observables of an analysis -- the feature vocabulary
+;     behind burst summaries (.bur columns), per-pixel and per-region MLE
+;     tables and related exports. Distinct from flr_chisurf_parameter, which
+;     holds *fitted model parameters*: an analysis feature is measured or
+;     derived per burst / pixel / region, not optimised.
+;
+;     This category is the central drift point the general rule demands:
+;     an analysis declaration file (e.g. chisurf burst_features.yaml,
+;     result_columns.yaml) may only use terms defined here or in
+;     flr_chisurf_parameter, so a new feature is created HERE first and the
+;     declarations reference it. Where flrCIF/PDBx defines an equivalent
+;     item, prefer that definition; these are the terms it does not carry.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_flr_analysis_feature.id"
+
+save__flr_analysis_feature.id
+   _item.name                "_flr_analysis_feature.id"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name id
+
+save__flr_analysis_feature.first_photon
+   _item.name                "_flr_analysis_feature.first_photon"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name first_photon
+   _item_description.description
+;     Index of the event's first photon in the measurement's photon stream (per detector: first photon of that detector within the event; -1 when the detector saw none).
+;
+
+save__flr_analysis_feature.last_photon
+   _item.name                "_flr_analysis_feature.last_photon"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name last_photon
+   _item_description.description
+;     Index of the event's last photon, inclusive (-1 when the selection is empty).
+;
+
+save__flr_analysis_feature.duration_ms
+   _item.name                "_flr_analysis_feature.duration_ms"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name duration_ms
+   _item_description.description
+;     Time between the event's first and last selected photon, milliseconds (-1.0 for an empty selection).
+;
+
+save__flr_analysis_feature.mean_macro_time_ms
+   _item.name                "_flr_analysis_feature.mean_macro_time_ms"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name mean_macro_time_ms
+   _item_description.description
+;     Midpoint of the first and last selected photon's macro times, milliseconds. A midpoint, not a photon-weighted mean -- inherited from the reference .bur format.
+;
+
+save__flr_analysis_feature.n_photons
+   _item.name                "_flr_analysis_feature.n_photons"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name n_photons
+   _item_description.description
+;     Number of selected photons in the event (0 for an empty selection).
+;
+
+save__flr_analysis_feature.count_rate_khz
+   _item.name                "_flr_analysis_feature.count_rate_khz"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name count_rate_khz
+   _item_description.description
+;     Selected photons per duration, kilohertz (-1.0 for an empty selection).
+;
+
+save__flr_analysis_feature.confidence_sigma
+   _item.name                "_flr_analysis_feature.confidence_sigma"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name confidence_sigma
+   _item_description.description
+;     Significance of the event's photon excess over the locally measured background, in standard deviations (0 when the engine does not provide it).
+;
+
+save__flr_analysis_feature.mean_micro_time_ns
+   _item.name                "_flr_analysis_feature.mean_micro_time_ns"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name mean_micro_time_ns
+   _item_description.description
+;     Mean TCSPC micro time of the selected photons, nanoseconds (-1.0 when empty or the micro-time resolution is unknown).
+;
+
+save__flr_analysis_feature.file_name
+   _item.name                "_flr_analysis_feature.file_name"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           line
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name file_name
+   _item_description.description
+;     Name of the measurement file the event's photons belong to.
+;
+
+save__flr_analysis_feature.region_label
+   _item.name                "_flr_analysis_feature.region_label"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name region_label
+   _item_description.description
+;     Integer label of a segmented region in a label image.
+;
+
+save__flr_analysis_feature.centroid_row
+   _item.name                "_flr_analysis_feature.centroid_row"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name centroid_row
+   _item_description.description
+;     Row coordinate of a region's centroid, pixels.
+;
+
+save__flr_analysis_feature.centroid_col
+   _item.name                "_flr_analysis_feature.centroid_col"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name centroid_col
+   _item_description.description
+;     Column coordinate of a region's centroid, pixels.
+;
+
+save__flr_analysis_feature.area
+   _item.name                "_flr_analysis_feature.area"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name area
+   _item_description.description
+;     Region area, pixels.
+;
+
+save__flr_analysis_feature.perimeter
+   _item.name                "_flr_analysis_feature.perimeter"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name perimeter
+   _item_description.description
+;     Region perimeter, pixels.
+;
+
+save__flr_analysis_feature.circularity
+   _item.name                "_flr_analysis_feature.circularity"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name circularity
+   _item_description.description
+;     4*pi*area/perimeter^2 of a region; 1 for a disc.
+;
+
+save__flr_analysis_feature.eccentricity
+   _item.name                "_flr_analysis_feature.eccentricity"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name eccentricity
+   _item_description.description
+;     Eccentricity of the ellipse with the region's second moments; 0 for a disc.
+;
+
+save__flr_analysis_feature.solidity
+   _item.name                "_flr_analysis_feature.solidity"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name solidity
+   _item_description.description
+;     Region area divided by its convex-hull area.
+;
+
+save__flr_analysis_feature.intensity_mean
+   _item.name                "_flr_analysis_feature.intensity_mean"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name intensity_mean
+   _item_description.description
+;     Mean intensity of the region in the underlying intensity image, counts.
+;
+
+save__flr_analysis_feature.intensity_max
+   _item.name                "_flr_analysis_feature.intensity_max"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name intensity_max
+   _item_description.description
+;     Maximum intensity of the region in the underlying intensity image, counts.
+;
+
+save__flr_analysis_feature.pixel_row
+   _item.name                "_flr_analysis_feature.pixel_row"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name pixel_row
+   _item_description.description
+;     Row (line) index of a pixel in an image analysis.
+;
+
+save__flr_analysis_feature.pixel_col
+   _item.name                "_flr_analysis_feature.pixel_col"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name pixel_col
+   _item_description.description
+;     Column index of a pixel in an image analysis.
+;
+
+save__flr_analysis_feature.pixel_number
+   _item.name                "_flr_analysis_feature.pixel_number"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           int
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name pixel_number
+   _item_description.description
+;     Flattened pixel index, row * line_length + column.
+;
+
