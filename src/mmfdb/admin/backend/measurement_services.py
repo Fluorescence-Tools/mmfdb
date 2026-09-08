@@ -119,7 +119,14 @@ def register_raw_data_handler(
         payload = _fill_location_metadata(payload)
         with MFDatabase(resolve_database_path()) as db:
             raw_data_id = db.add_raw_data_reference(
-                experiment_id=str(payload.get("experiment_id") or ""),
+                # None, not "": raw_data.experiment_id is a foreign key, and an
+                # empty string is a *value* that satisfies no row, so every
+                # registration without an experiment was rejected with
+                # "FOREIGN KEY constraint failed". The repository already
+                # declares the parameter optional; registering a file before it
+                # belongs to an experiment is the normal case when a tool
+                # imports what the user just dropped.
+                experiment_id=payload.get("experiment_id") or None,
                 data_type=str(payload.get("data_type") or payload.get("file_type") or "TTTR"),
                 storage_mode=str(payload.get("storage_mode") or _storage_mode_for(payload)),
                 raw_data_id=payload.get("raw_data_id") or None,
