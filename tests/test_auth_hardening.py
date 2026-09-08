@@ -74,6 +74,78 @@ def test_throttle_persists_across_rpc_logins(tmp_path: Path, monkeypatch) -> Non
         db.close()
 
 
+# ---- what may and may not throttle an account ----
+
+def _seed_local_user(db, user_id: str = "worker", password: str = "s3cret!pass") -> None:
+    """Create an ordinary, password-protected local account."""
+    db.conn.execute(
+        "INSERT INTO flr_sample_users "
+        "(user_id, user_uuid, display_name, active_branch_uuid, is_admin, "
+        " password_hash, allow_passwordless_login, auth_provider) "
+        "VALUES (?, ?, ?, ?, 0, ?, 0, 'local')",
+        (user_id, user_id, user_id, login_mod._MAIN_BRANCH_UUID, hash_password(password)),
+    )
+    db.conn.commit()
+
+
+def test_passwordless_probe_never_throttles(tmp_path: Path) -> None:
+    """A login offering no password is a probe, not a guess.
+
+    ChiSurf's startup asks every account whether it is passwordless. The account
+    that has a password answers "no", and counting those answers as brute-force
+    failures locked the desktop user out of their own database after five
+    starts — while the correct password sat in the dialog.
+    """
+    with _db(tmp_path, "probe.db") as db:
+        _seed_local_user(db)
+        for _ in range(MAX_FAILED_ATTEMPTS + 2):
+            with pytest.raises(AuthError, match="Invalid credentials"):
+                login_mod.login(db.conn, user_id="worker", password="")
+        assert not is_throttled(db.conn, "worker")
+        # Still audited, just not counted.
+        recorded = db.conn.execute(
+            "SELECT COUNT(*) FROM mmfdb_auth_attempt WHERE user_id = 'worker' AND success = 0"
+        ).fetchone()[0]
+        assert recorded == MAX_FAILED_ATTEMPTS + 2
+        assert login_mod.login(db.conn, user_id="worker", password="s3cret!pass")["ok"]
+
+
+def test_wrong_password_still_throttles(tmp_path: Path) -> None:
+    """The probe exemption must not weaken brute-force protection."""
+    with _db(tmp_path, "guess.db") as db:
+        _seed_local_user(db)
+        for _ in range(MAX_FAILED_ATTEMPTS):
+            with pytest.raises(AuthError, match="Invalid credentials"):
+                login_mod.login(db.conn, user_id="worker", password="wrong")
+        assert is_throttled(db.conn, "worker")
+        with pytest.raises(AuthError, match="Too many failed"):
+            login_mod.login(db.conn, user_id="worker", password="s3cret!pass")
+
+
+def test_successful_login_clears_the_lockout(tmp_path: Path) -> None:
+    """Proving you hold the credential resets the counter.
+
+    Without this a stale burst of failures keeps refusing the right password for
+    the rest of the window, with nothing the user can do about it.
+    """
+    with _db(tmp_path, "clear.db") as db:
+        _seed_local_user(db)
+        for _ in range(MAX_FAILED_ATTEMPTS - 1):
+            with pytest.raises(AuthError, match="Invalid credentials"):
+                login_mod.login(db.conn, user_id="worker", password="wrong")
+        assert login_mod.login(db.conn, user_id="worker", password="s3cret!pass")["ok"]
+        # Earlier failures no longer count; it takes a full run to lock again.
+        for _ in range(MAX_FAILED_ATTEMPTS - 1):
+            with pytest.raises(AuthError, match="Invalid credentials"):
+                login_mod.login(db.conn, user_id="worker", password="wrong")
+        assert not is_throttled(db.conn, "worker")
+        # ... and a full run still locks, even though every attempt here shares
+        # the success's one-second timestamp.
+        with pytest.raises(AuthError, match="Invalid credentials"):
+            login_mod.login(db.conn, user_id="worker", password="wrong")
+        assert is_throttled(db.conn, "worker")
+
+
 # ---- directory-authoritative attribute + group reconciliation ----
 
 def _stub_resolver(state):

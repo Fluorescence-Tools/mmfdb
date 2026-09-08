@@ -15,6 +15,15 @@ SESSION_DURATION_HOURS = 12
 MAX_FAILED_ATTEMPTS = 5
 THROTTLE_WINDOW_MINUTES = 15
 
+#: Reason stamped on a failed *capability probe* rather than a credential guess.
+#: A client that offers no password is asking whether the account is
+#: passwordless, and only an account explicitly marked
+#: ``allow_passwordless_login`` can ever answer yes — no provider authenticates
+#: an empty password otherwise. Such a failure therefore carries no
+#: brute-force signal, and :func:`is_throttled` ignores it. It is still
+#: recorded, so the audit trail keeps every attempt.
+PROBE_REASON = "no_password_offered"
+
 
 class AuthError(Exception):
     """Base auth exception — generic message to avoid leaking existence."""
@@ -721,31 +730,57 @@ def is_throttled(
     user_id: str | None,
     client_host: str | None = None,
 ) -> bool:
-    """Check if the user or host is throttled due to repeated failures."""
+    """Check if the user or host is throttled due to repeated failures.
+
+    Two kinds of failure are deliberately not counted, because counting them
+    locks out the legitimate holder without slowing an attacker down:
+
+    * a *probe* that offered no password (:data:`PROBE_REASON`) — it can only
+      ever succeed against a passwordless account, so it guesses nothing;
+    * anything that happened **before the last successful sign-in**, which
+      proves the credential is now held.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        Open connection to the MMFDB database.
+    user_id : str or None
+        Account to check, or ``None`` to check the host only.
+    client_host : str or None, optional
+        Host to check in addition to the account.
+
+    Returns
+    -------
+    bool
+        Whether further attempts must be refused.
+
+    """
     from datetime import datetime, timedelta, timezone
 
     cutoff = (
         datetime.now(timezone.utc) - timedelta(minutes=THROTTLE_WINDOW_MINUTES)
     ).strftime("%Y-%m-%d %H:%M:%S")
 
-    if user_id:
+    for column, value in (("user_id", user_id), ("client_host", client_host)):
+        if not value:
+            continue
+        # The last success is located by ``attempt_id``, not by its timestamp:
+        # ``attempted_at`` has one-second resolution, and several attempts land
+        # inside the same second, which would silently drop the failures that
+        # followed the success.
         row = conn.execute(
-            """SELECT COUNT(*) FROM mmfdb_auth_attempt
-               WHERE user_id = ? AND success = 0 AND attempted_at > ?""",
-            (user_id, cutoff),
+            f"""SELECT MAX(attempt_id) FROM mmfdb_auth_attempt
+                WHERE {column} = ? AND success = 1""",  # noqa: S608 - column is a literal
+            (value,),
         ).fetchone()
-        count = row[0]
-        if count >= MAX_FAILED_ATTEMPTS:
-            return True
-
-    if client_host:
+        last_success = row[0] if row and row[0] is not None else 0
         row = conn.execute(
-            """SELECT COUNT(*) FROM mmfdb_auth_attempt
-               WHERE client_host = ? AND success = 0 AND attempted_at > ?""",
-            (client_host, cutoff),
+            f"""SELECT COUNT(*) FROM mmfdb_auth_attempt
+                WHERE {column} = ? AND success = 0 AND attempted_at > ?
+                  AND attempt_id > ? AND (reason IS NULL OR reason != ?)""",  # noqa: S608
+            (value, cutoff, last_success, PROBE_REASON),
         ).fetchone()
-        count = row[0]
-        if count >= MAX_FAILED_ATTEMPTS:
+        if row[0] >= MAX_FAILED_ATTEMPTS:
             return True
 
     return False

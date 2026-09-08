@@ -18,6 +18,7 @@ import uuid as _uuid
 from typing import Any
 
 from mmfdb.security.auth import (
+    PROBE_REASON,
     AuthError,
     _dao,
     create_session,
@@ -208,14 +209,38 @@ def sync_identity(conn: sqlite3.Connection, user_id: str, identity: AuthIdentity
         _remove_group_member(conn, group_id, user_id)
 
 
-def _record_failure(conn: sqlite3.Connection, user_id: str, reason: str) -> None:
+def _record_failure(
+    conn: sqlite3.Connection,
+    user_id: str,
+    reason: str,
+    *,
+    password: str = "",
+) -> None:
     """Record a failed auth attempt and **commit** it.
 
     The RPC login path opens a fresh connection per call, so without this commit
     the attempt would roll back when the caller raises — leaving brute-force
     throttling (``is_throttled``) unable to accumulate across attempts.
+
+    An attempt that offered *no password* is stamped :data:`PROBE_REASON`
+    instead: it is a client asking whether the account is passwordless, not a
+    guess, so it stays in the audit trail without counting toward the lockout.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        Open connection; the attempt is committed on it.
+    user_id : str
+        Account the attempt was made against.
+    reason : str
+        Why it failed, used when a password was actually offered.
+    password : str, optional
+        The password the client sent, to tell a probe from a guess.
+
     """
-    record_auth_attempt(conn, user_id, False, reason=reason)
+    record_auth_attempt(
+        conn, user_id, False, reason=PROBE_REASON if not password else reason
+    )
     conn.commit()
 
 
@@ -248,13 +273,13 @@ def login(
         # out local accounts. An explicit provider still runs first.
         identity = LocalAuthProvider(conn).authenticate(user_id=user_id, password=password)
     if identity is None:
-        _record_failure(conn, user_id, "invalid_credentials")
+        _record_failure(conn, user_id, "invalid_credentials", password=password)
         raise AuthError("Invalid credentials")
 
     jit_enabled = _jit_enabled(config) if jit is None else jit
     mmfdb_user_id = resolve_or_provision_user(conn, identity, jit=jit_enabled)
     if mmfdb_user_id is None:
-        _record_failure(conn, user_id, "unmatched_external_user")
+        _record_failure(conn, user_id, "unmatched_external_user", password=password)
         raise AuthError("Invalid credentials")
 
     # Directory-authoritative attribute + group reconciliation (no-op for local).
