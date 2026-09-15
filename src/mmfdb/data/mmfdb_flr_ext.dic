@@ -4633,11 +4633,14 @@ save__mmfdb_event_log.action_type
       model.normalize_amplitudes      .
       model.remove_component          .
       model.remove_local_fit          .
+      model.set_background_curve      .
       model.set_correction            .
+      model.set_dataset               .
       model.set_linearization         .
       model.unload_background_curve   .
       model.unload_irf                .
       model.unload_lintable           .
+      model.unset_dataset             .
       model.update                    .
       parameter.adaptive_scan         .
       parameter.bounds.on             .
