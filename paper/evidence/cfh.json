@@ -1,0 +1,3530 @@
+{
+    "8ZZ1": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz1/structures/8zz1.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz1/validation_reports/8zz1_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz1/validation_reports/8zz1_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ2": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz2/structures/8zz2.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz2/validation_reports/8zz2_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz2/validation_reports/8zz2_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ3": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz3/structures/8zz3.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz3/validation_reports/8zz3_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz3/validation_reports/8zz3_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ4": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz4/structures/8zz4.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz4/validation_reports/8zz4_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz4/validation_reports/8zz4_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ5": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz5/structures/8zz5.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz5/validation_reports/8zz5_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz5/validation_reports/8zz5_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ6": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz6/structures/8zz6.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz6/validation_reports/8zz6_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz6/validation_reports/8zz6_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ7": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz7/structures/8zz7.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz7/validation_reports/8zz7_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz7/validation_reports/8zz7_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ8": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz8/structures/8zz8.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz8/validation_reports/8zz8_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz8/validation_reports/8zz8_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZ9": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zz9/structures/8zz9.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zz9/validation_reports/8zz9_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zz9/validation_reports/8zz9_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZA": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zza/structures/8zza.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zza/validation_reports/8zza_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zza/validation_reports/8zza_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZB": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzb/structures/8zzb.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzb/validation_reports/8zzb_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzb/validation_reports/8zzb_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZC": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzc/structures/8zzc.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzc/validation_reports/8zzc_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzc/validation_reports/8zzc_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZD": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzd/structures/8zzd.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzd/validation_reports/8zzd_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzd/validation_reports/8zzd_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZE": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zze/structures/8zze.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zze/validation_reports/8zze_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zze/validation_reports/8zze_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZF": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzf/structures/8zzf.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzf/validation_reports/8zzf_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzf/validation_reports/8zzf_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZG": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzg/structures/8zzg.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzg/validation_reports/8zzg_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzg/validation_reports/8zzg_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZH": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzh/structures/8zzh.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzh/validation_reports/8zzh_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzh/validation_reports/8zzh_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZI": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzi/structures/8zzi.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzi/validation_reports/8zzi_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzi/validation_reports/8zzi_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZJ": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzj/structures/8zzj.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzj/validation_reports/8zzj_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzj/validation_reports/8zzj_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZK": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzk/structures/8zzk.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzk/validation_reports/8zzk_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzk/validation_reports/8zzk_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZL": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzl/structures/8zzl.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzl/validation_reports/8zzl_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzl/validation_reports/8zzl_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZM": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzm/structures/8zzm.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzm/validation_reports/8zzm_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzm/validation_reports/8zzm_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZN": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzn/structures/8zzn.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzn/validation_reports/8zzn_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzn/validation_reports/8zzn_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZO": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzo/structures/8zzo.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzo/validation_reports/8zzo_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzo/validation_reports/8zzo_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZP": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzp/structures/8zzp.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzp/validation_reports/8zzp_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzp/validation_reports/8zzp_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZQ": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzq/structures/8zzq.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzq/validation_reports/8zzq_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzq/validation_reports/8zzq_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZR": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzr/structures/8zzr.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzr/validation_reports/8zzr_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzr/validation_reports/8zzr_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZS": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzs/structures/8zzs.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzs/validation_reports/8zzs_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzs/validation_reports/8zzs_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZT": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzt/structures/8zzt.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzt/validation_reports/8zzt_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzt/validation_reports/8zzt_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZU": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzu/structures/8zzu.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzu/validation_reports/8zzu_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzu/validation_reports/8zzu_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZV": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzv/structures/8zzv.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzv/validation_reports/8zzv_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzv/validation_reports/8zzv_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZW": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzw/structures/8zzw.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzw/validation_reports/8zzw_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzw/validation_reports/8zzw_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZX": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzx/structures/8zzx.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzx/validation_reports/8zzx_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzx/validation_reports/8zzx_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZY": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzy/structures/8zzy.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzy/validation_reports/8zzy_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzy/validation_reports/8zzy_summary_validation.pdf.gz"
+        ]
+    },
+    "8ZZZ": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/zz/8zzz/structures/8zzz.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/zz/8zzz/validation_reports/8zzz_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/zz/8zzz/validation_reports/8zzz_summary_validation.pdf.gz"
+        ]
+    },
+    "9A00": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a00/structures/9a00.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a00/validation_reports/9a00_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a00/validation_reports/9a00_summary_validation.pdf.gz"
+        ]
+    },
+    "9A01": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a01/structures/9a01.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a01/validation_reports/9a01_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a01/validation_reports/9a01_summary_validation.pdf.gz"
+        ]
+    },
+    "9A02": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a02/structures/9a02.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a02/validation_reports/9a02_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a02/validation_reports/9a02_summary_validation.pdf.gz"
+        ]
+    },
+    "9A03": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a03/structures/9a03.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a03/validation_reports/9a03_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a03/validation_reports/9a03_summary_validation.pdf.gz"
+        ]
+    },
+    "9A04": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a04/structures/9a04.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a04/validation_reports/9a04_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a04/validation_reports/9a04_summary_validation.pdf.gz"
+        ]
+    },
+    "9A05": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a05/structures/9a05.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a05/validation_reports/9a05_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a05/validation_reports/9a05_summary_validation.pdf.gz"
+        ]
+    },
+    "9A06": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a06/structures/9a06.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a06/validation_reports/9a06_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a06/validation_reports/9a06_summary_validation.pdf.gz"
+        ]
+    },
+    "9A07": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a07/structures/9a07.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a07/validation_reports/9a07_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a07/validation_reports/9a07_summary_validation.pdf.gz"
+        ]
+    },
+    "9A08": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a08/structures/9a08.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a08/validation_reports/9a08_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a08/validation_reports/9a08_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0a/structures/9a0a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0a/validation_reports/9a0a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0a/validation_reports/9a0a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0b/structures/9a0b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0b/validation_reports/9a0b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0b/validation_reports/9a0b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0c/structures/9a0c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0c/validation_reports/9a0c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0c/validation_reports/9a0c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0d/structures/9a0d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0d/validation_reports/9a0d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0d/validation_reports/9a0d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0e/structures/9a0e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0e/validation_reports/9a0e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0e/validation_reports/9a0e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0f/structures/9a0f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0f/validation_reports/9a0f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0f/validation_reports/9a0f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0g/structures/9a0g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0g/validation_reports/9a0g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0g/validation_reports/9a0g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0h/structures/9a0h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0h/validation_reports/9a0h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0h/validation_reports/9a0h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0i/structures/9a0i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0i/validation_reports/9a0i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0i/validation_reports/9a0i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0j/structures/9a0j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0j/validation_reports/9a0j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0j/validation_reports/9a0j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0k/structures/9a0k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0k/validation_reports/9a0k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0k/validation_reports/9a0k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0l/structures/9a0l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0l/validation_reports/9a0l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0l/validation_reports/9a0l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0m/structures/9a0m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0m/validation_reports/9a0m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0m/validation_reports/9a0m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0n/structures/9a0n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0n/validation_reports/9a0n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0n/validation_reports/9a0n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0o/structures/9a0o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0o/validation_reports/9a0o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0o/validation_reports/9a0o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0p/structures/9a0p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0p/validation_reports/9a0p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0p/validation_reports/9a0p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0q/structures/9a0q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0q/validation_reports/9a0q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0q/validation_reports/9a0q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0r/structures/9a0r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0r/validation_reports/9a0r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0r/validation_reports/9a0r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0t/structures/9a0t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0t/validation_reports/9a0t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0t/validation_reports/9a0t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0u/structures/9a0u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0u/validation_reports/9a0u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0u/validation_reports/9a0u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0v/structures/9a0v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0v/validation_reports/9a0v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0v/validation_reports/9a0v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0w/structures/9a0w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0w/validation_reports/9a0w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0w/validation_reports/9a0w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0x/structures/9a0x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0x/validation_reports/9a0x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0x/validation_reports/9a0x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0y/structures/9a0y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0y/validation_reports/9a0y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0y/validation_reports/9a0y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A0Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a0/9a0z/structures/9a0z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a0/9a0z/validation_reports/9a0z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a0/9a0z/validation_reports/9a0z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A10": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a10/structures/9a10.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a10/validation_reports/9a10_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a10/validation_reports/9a10_summary_validation.pdf.gz"
+        ]
+    },
+    "9A11": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a11/structures/9a11.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a11/validation_reports/9a11_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a11/validation_reports/9a11_summary_validation.pdf.gz"
+        ]
+    },
+    "9A12": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a12/structures/9a12.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a12/validation_reports/9a12_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a12/validation_reports/9a12_summary_validation.pdf.gz"
+        ]
+    },
+    "9A13": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a13/structures/9a13.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a13/validation_reports/9a13_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a13/validation_reports/9a13_summary_validation.pdf.gz"
+        ]
+    },
+    "9A14": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a14/structures/9a14.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a14/validation_reports/9a14_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a14/validation_reports/9a14_summary_validation.pdf.gz"
+        ]
+    },
+    "9A15": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a15/structures/9a15.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a15/validation_reports/9a15_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a15/validation_reports/9a15_summary_validation.pdf.gz"
+        ]
+    },
+    "9A16": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a16/structures/9a16.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a16/validation_reports/9a16_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a16/validation_reports/9a16_summary_validation.pdf.gz"
+        ]
+    },
+    "9A17": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a17/structures/9a17.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a17/validation_reports/9a17_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a17/validation_reports/9a17_summary_validation.pdf.gz"
+        ]
+    },
+    "9A18": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a18/structures/9a18.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a18/validation_reports/9a18_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a18/validation_reports/9a18_summary_validation.pdf.gz"
+        ]
+    },
+    "9A19": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a19/structures/9a19.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a19/validation_reports/9a19_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a19/validation_reports/9a19_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1a/structures/9a1a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1a/validation_reports/9a1a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1a/validation_reports/9a1a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1b/structures/9a1b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1b/validation_reports/9a1b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1b/validation_reports/9a1b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1c/structures/9a1c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1c/validation_reports/9a1c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1c/validation_reports/9a1c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1d/structures/9a1d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1d/validation_reports/9a1d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1d/validation_reports/9a1d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1e/structures/9a1e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1e/validation_reports/9a1e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1e/validation_reports/9a1e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1f/structures/9a1f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1f/validation_reports/9a1f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1f/validation_reports/9a1f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1g/structures/9a1g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1g/validation_reports/9a1g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1g/validation_reports/9a1g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1h/structures/9a1h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1h/validation_reports/9a1h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1h/validation_reports/9a1h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1i/structures/9a1i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1i/validation_reports/9a1i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1i/validation_reports/9a1i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1j/structures/9a1j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1j/validation_reports/9a1j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1j/validation_reports/9a1j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1k/structures/9a1k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1k/validation_reports/9a1k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1k/validation_reports/9a1k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1l/structures/9a1l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1l/validation_reports/9a1l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1l/validation_reports/9a1l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1m/structures/9a1m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1m/validation_reports/9a1m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1m/validation_reports/9a1m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1n/structures/9a1n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1n/validation_reports/9a1n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1n/validation_reports/9a1n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1o/structures/9a1o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1o/validation_reports/9a1o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1o/validation_reports/9a1o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1p/structures/9a1p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1p/validation_reports/9a1p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1p/validation_reports/9a1p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1q/structures/9a1q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1q/validation_reports/9a1q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1q/validation_reports/9a1q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1r/structures/9a1r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1r/validation_reports/9a1r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1r/validation_reports/9a1r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1s/structures/9a1s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1s/validation_reports/9a1s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1s/validation_reports/9a1s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1t/structures/9a1t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1t/validation_reports/9a1t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1t/validation_reports/9a1t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1u/structures/9a1u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1u/validation_reports/9a1u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1u/validation_reports/9a1u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1v/structures/9a1v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1v/validation_reports/9a1v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1v/validation_reports/9a1v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1y/structures/9a1y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1y/validation_reports/9a1y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1y/validation_reports/9a1y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A1Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a1/9a1z/structures/9a1z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a1/9a1z/validation_reports/9a1z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a1/9a1z/validation_reports/9a1z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A20": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a20/structures/9a20.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a20/validation_reports/9a20_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a20/validation_reports/9a20_summary_validation.pdf.gz"
+        ]
+    },
+    "9A21": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a21/structures/9a21.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a21/validation_reports/9a21_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a21/validation_reports/9a21_summary_validation.pdf.gz"
+        ]
+    },
+    "9A22": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a22/structures/9a22.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a22/validation_reports/9a22_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a22/validation_reports/9a22_summary_validation.pdf.gz"
+        ]
+    },
+    "9A23": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a23/structures/9a23.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a23/validation_reports/9a23_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a23/validation_reports/9a23_summary_validation.pdf.gz"
+        ]
+    },
+    "9A24": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a24/structures/9a24.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a24/validation_reports/9a24_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a24/validation_reports/9a24_summary_validation.pdf.gz"
+        ]
+    },
+    "9A25": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a25/structures/9a25.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a25/validation_reports/9a25_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a25/validation_reports/9a25_summary_validation.pdf.gz"
+        ]
+    },
+    "9A26": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a26/structures/9a26.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a26/validation_reports/9a26_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a26/validation_reports/9a26_summary_validation.pdf.gz"
+        ]
+    },
+    "9A27": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a27/structures/9a27.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a27/validation_reports/9a27_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a27/validation_reports/9a27_summary_validation.pdf.gz"
+        ]
+    },
+    "9A28": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a28/structures/9a28.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a28/validation_reports/9a28_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a28/validation_reports/9a28_summary_validation.pdf.gz"
+        ]
+    },
+    "9A29": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a29/structures/9a29.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a29/validation_reports/9a29_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a29/validation_reports/9a29_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2a/structures/9a2a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2a/validation_reports/9a2a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2a/validation_reports/9a2a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2b/structures/9a2b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2b/validation_reports/9a2b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2b/validation_reports/9a2b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2c/structures/9a2c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2c/validation_reports/9a2c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2c/validation_reports/9a2c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2d/structures/9a2d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2d/validation_reports/9a2d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2d/validation_reports/9a2d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2e/structures/9a2e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2e/validation_reports/9a2e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2e/validation_reports/9a2e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2f/structures/9a2f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2f/validation_reports/9a2f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2f/validation_reports/9a2f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2g/structures/9a2g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2g/validation_reports/9a2g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2g/validation_reports/9a2g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2h/structures/9a2h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2h/validation_reports/9a2h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2h/validation_reports/9a2h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2i/structures/9a2i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2i/validation_reports/9a2i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2i/validation_reports/9a2i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2j/structures/9a2j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2j/validation_reports/9a2j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2j/validation_reports/9a2j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2k/structures/9a2k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2k/validation_reports/9a2k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2k/validation_reports/9a2k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2l/structures/9a2l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2l/validation_reports/9a2l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2l/validation_reports/9a2l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2m/structures/9a2m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2m/validation_reports/9a2m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2m/validation_reports/9a2m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2n/structures/9a2n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2n/validation_reports/9a2n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2n/validation_reports/9a2n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2o/structures/9a2o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2o/validation_reports/9a2o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2o/validation_reports/9a2o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2p/structures/9a2p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2p/validation_reports/9a2p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2p/validation_reports/9a2p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2q/structures/9a2q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2q/validation_reports/9a2q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2q/validation_reports/9a2q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2r/structures/9a2r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2r/validation_reports/9a2r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2r/validation_reports/9a2r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2s/structures/9a2s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2s/validation_reports/9a2s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2s/validation_reports/9a2s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2t/structures/9a2t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2t/validation_reports/9a2t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2t/validation_reports/9a2t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2u/structures/9a2u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2u/validation_reports/9a2u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2u/validation_reports/9a2u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2v/structures/9a2v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2v/validation_reports/9a2v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2v/validation_reports/9a2v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2w/structures/9a2w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2w/validation_reports/9a2w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2w/validation_reports/9a2w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2x/structures/9a2x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2x/validation_reports/9a2x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2x/validation_reports/9a2x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2y/structures/9a2y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2y/validation_reports/9a2y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2y/validation_reports/9a2y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A2Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a2/9a2z/structures/9a2z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a2/9a2z/validation_reports/9a2z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a2/9a2z/validation_reports/9a2z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A30": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a30/structures/9a30.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a30/validation_reports/9a30_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a30/validation_reports/9a30_summary_validation.pdf.gz"
+        ]
+    },
+    "9A31": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a31/structures/9a31.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a31/validation_reports/9a31_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a31/validation_reports/9a31_summary_validation.pdf.gz"
+        ]
+    },
+    "9A32": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a32/structures/9a32.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a32/validation_reports/9a32_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a32/validation_reports/9a32_summary_validation.pdf.gz"
+        ]
+    },
+    "9A33": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a33/structures/9a33.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a33/validation_reports/9a33_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a33/validation_reports/9a33_summary_validation.pdf.gz"
+        ]
+    },
+    "9A34": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a34/structures/9a34.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a34/validation_reports/9a34_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a34/validation_reports/9a34_summary_validation.pdf.gz"
+        ]
+    },
+    "9A35": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a35/structures/9a35.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a35/validation_reports/9a35_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a35/validation_reports/9a35_summary_validation.pdf.gz"
+        ]
+    },
+    "9A36": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a36/structures/9a36.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a36/validation_reports/9a36_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a36/validation_reports/9a36_summary_validation.pdf.gz"
+        ]
+    },
+    "9A37": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a37/structures/9a37.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a37/validation_reports/9a37_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a37/validation_reports/9a37_summary_validation.pdf.gz"
+        ]
+    },
+    "9A38": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a38/structures/9a38.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a38/validation_reports/9a38_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a38/validation_reports/9a38_summary_validation.pdf.gz"
+        ]
+    },
+    "9A39": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a39/structures/9a39.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a39/validation_reports/9a39_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a39/validation_reports/9a39_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3a/structures/9a3a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3a/validation_reports/9a3a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3a/validation_reports/9a3a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3b/structures/9a3b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3b/validation_reports/9a3b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3b/validation_reports/9a3b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3c/structures/9a3c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3c/validation_reports/9a3c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3c/validation_reports/9a3c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3d/structures/9a3d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3d/validation_reports/9a3d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3d/validation_reports/9a3d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3e/structures/9a3e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3e/validation_reports/9a3e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3e/validation_reports/9a3e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3f/structures/9a3f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3f/validation_reports/9a3f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3f/validation_reports/9a3f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3g/structures/9a3g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3g/validation_reports/9a3g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3g/validation_reports/9a3g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3i/structures/9a3i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3i/validation_reports/9a3i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3i/validation_reports/9a3i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3j/structures/9a3j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3j/validation_reports/9a3j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3j/validation_reports/9a3j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3k/structures/9a3k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3k/validation_reports/9a3k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3k/validation_reports/9a3k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3l/structures/9a3l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3l/validation_reports/9a3l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3l/validation_reports/9a3l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3m/structures/9a3m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3m/validation_reports/9a3m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3m/validation_reports/9a3m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3n/structures/9a3n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3n/validation_reports/9a3n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3n/validation_reports/9a3n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3o/structures/9a3o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3o/validation_reports/9a3o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3o/validation_reports/9a3o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3p/structures/9a3p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3p/validation_reports/9a3p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3p/validation_reports/9a3p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3q/structures/9a3q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3q/validation_reports/9a3q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3q/validation_reports/9a3q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3r/structures/9a3r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3r/validation_reports/9a3r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3r/validation_reports/9a3r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3s/structures/9a3s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3s/validation_reports/9a3s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3s/validation_reports/9a3s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3t/structures/9a3t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3t/validation_reports/9a3t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3t/validation_reports/9a3t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3u/structures/9a3u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3u/validation_reports/9a3u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3u/validation_reports/9a3u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3v/structures/9a3v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3v/validation_reports/9a3v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3v/validation_reports/9a3v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3w/structures/9a3w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3w/validation_reports/9a3w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3w/validation_reports/9a3w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3x/structures/9a3x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3x/validation_reports/9a3x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3x/validation_reports/9a3x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3y/structures/9a3y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3y/validation_reports/9a3y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3y/validation_reports/9a3y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A3Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a3/9a3z/structures/9a3z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a3/9a3z/validation_reports/9a3z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a3/9a3z/validation_reports/9a3z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A40": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a40/structures/9a40.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a40/validation_reports/9a40_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a40/validation_reports/9a40_summary_validation.pdf.gz"
+        ]
+    },
+    "9A41": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a41/structures/9a41.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a41/validation_reports/9a41_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a41/validation_reports/9a41_summary_validation.pdf.gz"
+        ]
+    },
+    "9A42": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a42/structures/9a42.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a42/validation_reports/9a42_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a42/validation_reports/9a42_summary_validation.pdf.gz"
+        ]
+    },
+    "9A43": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a43/structures/9a43.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a43/validation_reports/9a43_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a43/validation_reports/9a43_summary_validation.pdf.gz"
+        ]
+    },
+    "9A44": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a44/structures/9a44.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a44/validation_reports/9a44_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a44/validation_reports/9a44_summary_validation.pdf.gz"
+        ]
+    },
+    "9A45": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a45/structures/9a45.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a45/validation_reports/9a45_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a45/validation_reports/9a45_summary_validation.pdf.gz"
+        ]
+    },
+    "9A46": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a46/structures/9a46.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a46/validation_reports/9a46_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a46/validation_reports/9a46_summary_validation.pdf.gz"
+        ]
+    },
+    "9A47": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a47/structures/9a47.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a47/validation_reports/9a47_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a47/validation_reports/9a47_summary_validation.pdf.gz"
+        ]
+    },
+    "9A48": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a48/structures/9a48.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a48/validation_reports/9a48_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a48/validation_reports/9a48_summary_validation.pdf.gz"
+        ]
+    },
+    "9A49": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a49/structures/9a49.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a49/validation_reports/9a49_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a49/validation_reports/9a49_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4a/structures/9a4a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4a/validation_reports/9a4a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4a/validation_reports/9a4a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4b/structures/9a4b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4b/validation_reports/9a4b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4b/validation_reports/9a4b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4c/structures/9a4c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4c/validation_reports/9a4c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4c/validation_reports/9a4c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4d/structures/9a4d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4d/validation_reports/9a4d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4d/validation_reports/9a4d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4e/structures/9a4e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4e/validation_reports/9a4e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4e/validation_reports/9a4e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4f/structures/9a4f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4f/validation_reports/9a4f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4f/validation_reports/9a4f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4g/structures/9a4g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4g/validation_reports/9a4g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4g/validation_reports/9a4g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4h/structures/9a4h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4h/validation_reports/9a4h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4h/validation_reports/9a4h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4i/structures/9a4i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4i/validation_reports/9a4i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4i/validation_reports/9a4i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4j/structures/9a4j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4j/validation_reports/9a4j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4j/validation_reports/9a4j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4k/structures/9a4k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4k/validation_reports/9a4k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4k/validation_reports/9a4k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4l/structures/9a4l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4l/validation_reports/9a4l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4l/validation_reports/9a4l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4m/structures/9a4m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4m/validation_reports/9a4m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4m/validation_reports/9a4m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4n/structures/9a4n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4n/validation_reports/9a4n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4n/validation_reports/9a4n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4o/structures/9a4o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4o/validation_reports/9a4o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4o/validation_reports/9a4o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4p/structures/9a4p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4p/validation_reports/9a4p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4p/validation_reports/9a4p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4q/structures/9a4q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4q/validation_reports/9a4q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4q/validation_reports/9a4q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4r/structures/9a4r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4r/validation_reports/9a4r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4r/validation_reports/9a4r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4s/structures/9a4s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4s/validation_reports/9a4s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4s/validation_reports/9a4s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4t/structures/9a4t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4t/validation_reports/9a4t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4t/validation_reports/9a4t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4u/structures/9a4u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4u/validation_reports/9a4u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4u/validation_reports/9a4u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4v/structures/9a4v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4v/validation_reports/9a4v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4v/validation_reports/9a4v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4w/structures/9a4w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4w/validation_reports/9a4w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4w/validation_reports/9a4w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4x/structures/9a4x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4x/validation_reports/9a4x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4x/validation_reports/9a4x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4y/structures/9a4y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4y/validation_reports/9a4y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4y/validation_reports/9a4y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A4Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a4/9a4z/structures/9a4z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a4/9a4z/validation_reports/9a4z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a4/9a4z/validation_reports/9a4z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A50": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a50/structures/9a50.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a50/validation_reports/9a50_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a50/validation_reports/9a50_summary_validation.pdf.gz"
+        ]
+    },
+    "9A51": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a51/structures/9a51.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a51/validation_reports/9a51_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a51/validation_reports/9a51_summary_validation.pdf.gz"
+        ]
+    },
+    "9A52": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a52/structures/9a52.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a52/validation_reports/9a52_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a52/validation_reports/9a52_summary_validation.pdf.gz"
+        ]
+    },
+    "9A53": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a53/structures/9a53.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a53/validation_reports/9a53_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a53/validation_reports/9a53_summary_validation.pdf.gz"
+        ]
+    },
+    "9A54": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a54/structures/9a54.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a54/validation_reports/9a54_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a54/validation_reports/9a54_summary_validation.pdf.gz"
+        ]
+    },
+    "9A55": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a55/structures/9a55.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a55/validation_reports/9a55_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a55/validation_reports/9a55_summary_validation.pdf.gz"
+        ]
+    },
+    "9A56": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a56/structures/9a56.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a56/validation_reports/9a56_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a56/validation_reports/9a56_summary_validation.pdf.gz"
+        ]
+    },
+    "9A57": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a57/structures/9a57.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a57/validation_reports/9a57_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a57/validation_reports/9a57_summary_validation.pdf.gz"
+        ]
+    },
+    "9A58": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a58/structures/9a58.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a58/validation_reports/9a58_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a58/validation_reports/9a58_summary_validation.pdf.gz"
+        ]
+    },
+    "9A59": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a59/structures/9a59.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a59/validation_reports/9a59_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a59/validation_reports/9a59_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5a/structures/9a5a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5a/validation_reports/9a5a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5a/validation_reports/9a5a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5b/structures/9a5b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5b/validation_reports/9a5b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5b/validation_reports/9a5b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5c/structures/9a5c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5c/validation_reports/9a5c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5c/validation_reports/9a5c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5d/structures/9a5d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5d/validation_reports/9a5d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5d/validation_reports/9a5d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5e/structures/9a5e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5e/validation_reports/9a5e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5e/validation_reports/9a5e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5f/structures/9a5f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5f/validation_reports/9a5f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5f/validation_reports/9a5f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5g/structures/9a5g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5g/validation_reports/9a5g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5g/validation_reports/9a5g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5h/structures/9a5h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5h/validation_reports/9a5h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5h/validation_reports/9a5h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5i/structures/9a5i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5i/validation_reports/9a5i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5i/validation_reports/9a5i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5j/structures/9a5j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5j/validation_reports/9a5j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5j/validation_reports/9a5j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5k/structures/9a5k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5k/validation_reports/9a5k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5k/validation_reports/9a5k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5l/structures/9a5l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5l/validation_reports/9a5l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5l/validation_reports/9a5l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5m/structures/9a5m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5m/validation_reports/9a5m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5m/validation_reports/9a5m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5n/structures/9a5n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5n/validation_reports/9a5n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5n/validation_reports/9a5n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5o/structures/9a5o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5o/validation_reports/9a5o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5o/validation_reports/9a5o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5p/structures/9a5p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5p/validation_reports/9a5p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5p/validation_reports/9a5p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5q/structures/9a5q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5q/validation_reports/9a5q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5q/validation_reports/9a5q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5r/structures/9a5r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5r/validation_reports/9a5r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5r/validation_reports/9a5r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5s/structures/9a5s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5s/validation_reports/9a5s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5s/validation_reports/9a5s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5t/structures/9a5t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5t/validation_reports/9a5t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5t/validation_reports/9a5t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5u/structures/9a5u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5u/validation_reports/9a5u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5u/validation_reports/9a5u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5v/structures/9a5v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5v/validation_reports/9a5v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5v/validation_reports/9a5v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5w/structures/9a5w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5w/validation_reports/9a5w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5w/validation_reports/9a5w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5x/structures/9a5x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5x/validation_reports/9a5x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5x/validation_reports/9a5x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5y/structures/9a5y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5y/validation_reports/9a5y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5y/validation_reports/9a5y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A5Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a5/9a5z/structures/9a5z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a5/9a5z/validation_reports/9a5z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a5/9a5z/validation_reports/9a5z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A60": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a60/structures/9a60.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a60/validation_reports/9a60_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a60/validation_reports/9a60_summary_validation.pdf.gz"
+        ]
+    },
+    "9A61": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a61/structures/9a61.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a61/validation_reports/9a61_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a61/validation_reports/9a61_summary_validation.pdf.gz"
+        ]
+    },
+    "9A62": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a62/structures/9a62.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a62/validation_reports/9a62_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a62/validation_reports/9a62_summary_validation.pdf.gz"
+        ]
+    },
+    "9A63": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a63/structures/9a63.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a63/validation_reports/9a63_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a63/validation_reports/9a63_summary_validation.pdf.gz"
+        ]
+    },
+    "9A64": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a64/structures/9a64.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a64/validation_reports/9a64_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a64/validation_reports/9a64_summary_validation.pdf.gz"
+        ]
+    },
+    "9A65": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a65/structures/9a65.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a65/validation_reports/9a65_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a65/validation_reports/9a65_summary_validation.pdf.gz"
+        ]
+    },
+    "9A66": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a66/structures/9a66.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a66/validation_reports/9a66_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a66/validation_reports/9a66_summary_validation.pdf.gz"
+        ]
+    },
+    "9A67": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a67/structures/9a67.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a67/validation_reports/9a67_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a67/validation_reports/9a67_summary_validation.pdf.gz"
+        ]
+    },
+    "9A68": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a68/structures/9a68.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a68/validation_reports/9a68_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a68/validation_reports/9a68_summary_validation.pdf.gz"
+        ]
+    },
+    "9A69": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a69/structures/9a69.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a69/validation_reports/9a69_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a69/validation_reports/9a69_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6a/structures/9a6a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6a/validation_reports/9a6a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6a/validation_reports/9a6a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6b/structures/9a6b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6b/validation_reports/9a6b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6b/validation_reports/9a6b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6c/structures/9a6c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6c/validation_reports/9a6c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6c/validation_reports/9a6c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6d/structures/9a6d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6d/validation_reports/9a6d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6d/validation_reports/9a6d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6e/structures/9a6e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6e/validation_reports/9a6e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6e/validation_reports/9a6e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6f/structures/9a6f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6f/validation_reports/9a6f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6f/validation_reports/9a6f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6g/structures/9a6g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6g/validation_reports/9a6g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6g/validation_reports/9a6g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6h/structures/9a6h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6h/validation_reports/9a6h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6h/validation_reports/9a6h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6i/structures/9a6i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6i/validation_reports/9a6i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6i/validation_reports/9a6i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6j/structures/9a6j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6j/validation_reports/9a6j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6j/validation_reports/9a6j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6k/structures/9a6k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6k/validation_reports/9a6k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6k/validation_reports/9a6k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6l/structures/9a6l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6l/validation_reports/9a6l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6l/validation_reports/9a6l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6m/structures/9a6m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6m/validation_reports/9a6m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6m/validation_reports/9a6m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6n/structures/9a6n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6n/validation_reports/9a6n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6n/validation_reports/9a6n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6o/structures/9a6o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6o/validation_reports/9a6o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6o/validation_reports/9a6o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6p/structures/9a6p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6p/validation_reports/9a6p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6p/validation_reports/9a6p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6q/structures/9a6q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6q/validation_reports/9a6q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6q/validation_reports/9a6q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6r/structures/9a6r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6r/validation_reports/9a6r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6r/validation_reports/9a6r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6s/structures/9a6s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6s/validation_reports/9a6s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6s/validation_reports/9a6s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6t/structures/9a6t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6t/validation_reports/9a6t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6t/validation_reports/9a6t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6u/structures/9a6u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6u/validation_reports/9a6u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6u/validation_reports/9a6u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6v/structures/9a6v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6v/validation_reports/9a6v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6v/validation_reports/9a6v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6w/structures/9a6w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6w/validation_reports/9a6w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6w/validation_reports/9a6w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6x/structures/9a6x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6x/validation_reports/9a6x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6x/validation_reports/9a6x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6y/structures/9a6y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6y/validation_reports/9a6y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6y/validation_reports/9a6y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A6Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a6/9a6z/structures/9a6z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a6/9a6z/validation_reports/9a6z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a6/9a6z/validation_reports/9a6z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A70": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a70/structures/9a70.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a70/validation_reports/9a70_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a70/validation_reports/9a70_summary_validation.pdf.gz"
+        ]
+    },
+    "9A71": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a71/structures/9a71.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a71/validation_reports/9a71_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a71/validation_reports/9a71_summary_validation.pdf.gz"
+        ]
+    },
+    "9A72": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a72/structures/9a72.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a72/validation_reports/9a72_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a72/validation_reports/9a72_summary_validation.pdf.gz"
+        ]
+    },
+    "9A73": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a73/structures/9a73.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a73/validation_reports/9a73_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a73/validation_reports/9a73_summary_validation.pdf.gz"
+        ]
+    },
+    "9A74": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a74/structures/9a74.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a74/validation_reports/9a74_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a74/validation_reports/9a74_summary_validation.pdf.gz"
+        ]
+    },
+    "9A75": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a75/structures/9a75.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a75/validation_reports/9a75_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a75/validation_reports/9a75_summary_validation.pdf.gz"
+        ]
+    },
+    "9A76": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a76/structures/9a76.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a76/validation_reports/9a76_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a76/validation_reports/9a76_summary_validation.pdf.gz"
+        ]
+    },
+    "9A77": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a77/structures/9a77.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a77/validation_reports/9a77_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a77/validation_reports/9a77_summary_validation.pdf.gz"
+        ]
+    },
+    "9A78": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a78/structures/9a78.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a78/validation_reports/9a78_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a78/validation_reports/9a78_summary_validation.pdf.gz"
+        ]
+    },
+    "9A79": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a79/structures/9a79.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a79/validation_reports/9a79_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a79/validation_reports/9a79_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7a/structures/9a7a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7a/validation_reports/9a7a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7a/validation_reports/9a7a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7b/structures/9a7b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7b/validation_reports/9a7b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7b/validation_reports/9a7b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7c/structures/9a7c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7c/validation_reports/9a7c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7c/validation_reports/9a7c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7d/structures/9a7d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7d/validation_reports/9a7d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7d/validation_reports/9a7d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7e/structures/9a7e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7e/validation_reports/9a7e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7e/validation_reports/9a7e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7f/structures/9a7f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7f/validation_reports/9a7f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7f/validation_reports/9a7f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7g/structures/9a7g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7g/validation_reports/9a7g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7g/validation_reports/9a7g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7H": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7h/structures/9a7h.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7h/validation_reports/9a7h_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7h/validation_reports/9a7h_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7i/structures/9a7i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7i/validation_reports/9a7i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7i/validation_reports/9a7i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7j/structures/9a7j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7j/validation_reports/9a7j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7j/validation_reports/9a7j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7k/structures/9a7k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7k/validation_reports/9a7k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7k/validation_reports/9a7k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7l/structures/9a7l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7l/validation_reports/9a7l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7l/validation_reports/9a7l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7m/structures/9a7m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7m/validation_reports/9a7m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7m/validation_reports/9a7m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7n/structures/9a7n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7n/validation_reports/9a7n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7n/validation_reports/9a7n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7o/structures/9a7o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7o/validation_reports/9a7o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7o/validation_reports/9a7o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7p/structures/9a7p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7p/validation_reports/9a7p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7p/validation_reports/9a7p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7q/structures/9a7q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7q/validation_reports/9a7q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7q/validation_reports/9a7q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7r/structures/9a7r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7r/validation_reports/9a7r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7r/validation_reports/9a7r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7s/structures/9a7s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7s/validation_reports/9a7s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7s/validation_reports/9a7s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7t/structures/9a7t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7t/validation_reports/9a7t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7t/validation_reports/9a7t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7u/structures/9a7u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7u/validation_reports/9a7u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7u/validation_reports/9a7u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7v/structures/9a7v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7v/validation_reports/9a7v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7v/validation_reports/9a7v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7w/structures/9a7w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7w/validation_reports/9a7w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7w/validation_reports/9a7w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7x/structures/9a7x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7x/validation_reports/9a7x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7x/validation_reports/9a7x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7y/structures/9a7y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7y/validation_reports/9a7y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7y/validation_reports/9a7y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A7Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a7/9a7z/structures/9a7z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a7/9a7z/validation_reports/9a7z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a7/9a7z/validation_reports/9a7z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A80": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a80/structures/9a80.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a80/validation_reports/9a80_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a80/validation_reports/9a80_summary_validation.pdf.gz"
+        ]
+    },
+    "9A81": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a81/structures/9a81.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a81/validation_reports/9a81_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a81/validation_reports/9a81_summary_validation.pdf.gz"
+        ]
+    },
+    "9A82": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a82/structures/9a82.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a82/validation_reports/9a82_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a82/validation_reports/9a82_summary_validation.pdf.gz"
+        ]
+    },
+    "9A83": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a83/structures/9a83.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a83/validation_reports/9a83_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a83/validation_reports/9a83_summary_validation.pdf.gz"
+        ]
+    },
+    "9A84": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a84/structures/9a84.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a84/validation_reports/9a84_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a84/validation_reports/9a84_summary_validation.pdf.gz"
+        ]
+    },
+    "9A85": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a85/structures/9a85.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a85/validation_reports/9a85_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a85/validation_reports/9a85_summary_validation.pdf.gz"
+        ]
+    },
+    "9A86": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a86/structures/9a86.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a86/validation_reports/9a86_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a86/validation_reports/9a86_summary_validation.pdf.gz"
+        ]
+    },
+    "9A87": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a87/structures/9a87.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a87/validation_reports/9a87_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a87/validation_reports/9a87_summary_validation.pdf.gz"
+        ]
+    },
+    "9A88": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a88/structures/9a88.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a88/validation_reports/9a88_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a88/validation_reports/9a88_summary_validation.pdf.gz"
+        ]
+    },
+    "9A89": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a89/structures/9a89.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a89/validation_reports/9a89_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a89/validation_reports/9a89_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8a/structures/9a8a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8a/validation_reports/9a8a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8a/validation_reports/9a8a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8b/structures/9a8b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8b/validation_reports/9a8b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8b/validation_reports/9a8b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8c/structures/9a8c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8c/validation_reports/9a8c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8c/validation_reports/9a8c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8d/structures/9a8d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8d/validation_reports/9a8d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8d/validation_reports/9a8d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8e/structures/9a8e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8e/validation_reports/9a8e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8e/validation_reports/9a8e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8f/structures/9a8f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8f/validation_reports/9a8f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8f/validation_reports/9a8f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8g/structures/9a8g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8g/validation_reports/9a8g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8g/validation_reports/9a8g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8I": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8i/structures/9a8i.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8i/validation_reports/9a8i_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8i/validation_reports/9a8i_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8k/structures/9a8k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8k/validation_reports/9a8k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8k/validation_reports/9a8k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8l/structures/9a8l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8l/validation_reports/9a8l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8l/validation_reports/9a8l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8m/structures/9a8m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8m/validation_reports/9a8m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8m/validation_reports/9a8m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8n/structures/9a8n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8n/validation_reports/9a8n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8n/validation_reports/9a8n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8s/structures/9a8s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8s/validation_reports/9a8s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8s/validation_reports/9a8s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8t/structures/9a8t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8t/validation_reports/9a8t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8t/validation_reports/9a8t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8u/structures/9a8u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8u/validation_reports/9a8u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8u/validation_reports/9a8u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8v/structures/9a8v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8v/validation_reports/9a8v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8v/validation_reports/9a8v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8w/structures/9a8w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8w/validation_reports/9a8w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8w/validation_reports/9a8w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8x/structures/9a8x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8x/validation_reports/9a8x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8x/validation_reports/9a8x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8y/structures/9a8y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8y/validation_reports/9a8y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8y/validation_reports/9a8y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A8Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a8/9a8z/structures/9a8z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a8/9a8z/validation_reports/9a8z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a8/9a8z/validation_reports/9a8z_summary_validation.pdf.gz"
+        ]
+    },
+    "9A90": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a90/structures/9a90.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a90/validation_reports/9a90_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a90/validation_reports/9a90_summary_validation.pdf.gz"
+        ]
+    },
+    "9A91": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a91/structures/9a91.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a91/validation_reports/9a91_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a91/validation_reports/9a91_summary_validation.pdf.gz"
+        ]
+    },
+    "9A92": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a92/structures/9a92.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a92/validation_reports/9a92_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a92/validation_reports/9a92_summary_validation.pdf.gz"
+        ]
+    },
+    "9A93": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a93/structures/9a93.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a93/validation_reports/9a93_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a93/validation_reports/9a93_summary_validation.pdf.gz"
+        ]
+    },
+    "9A94": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a94/structures/9a94.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a94/validation_reports/9a94_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a94/validation_reports/9a94_summary_validation.pdf.gz"
+        ]
+    },
+    "9A95": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a95/structures/9a95.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a95/validation_reports/9a95_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a95/validation_reports/9a95_summary_validation.pdf.gz"
+        ]
+    },
+    "9A96": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a96/structures/9a96.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a96/validation_reports/9a96_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a96/validation_reports/9a96_summary_validation.pdf.gz"
+        ]
+    },
+    "9A97": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a97/structures/9a97.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a97/validation_reports/9a97_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a97/validation_reports/9a97_summary_validation.pdf.gz"
+        ]
+    },
+    "9A98": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a98/structures/9a98.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a98/validation_reports/9a98_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a98/validation_reports/9a98_summary_validation.pdf.gz"
+        ]
+    },
+    "9A99": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a99/structures/9a99.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a99/validation_reports/9a99_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a99/validation_reports/9a99_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9A": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9a/structures/9a9a.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9a/validation_reports/9a9a_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9a/validation_reports/9a9a_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9B": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9b/structures/9a9b.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9b/validation_reports/9a9b_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9b/validation_reports/9a9b_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9C": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9c/structures/9a9c.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9c/validation_reports/9a9c_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9c/validation_reports/9a9c_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9D": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9d/structures/9a9d.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9d/validation_reports/9a9d_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9d/validation_reports/9a9d_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9E": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9e/structures/9a9e.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9e/validation_reports/9a9e_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9e/validation_reports/9a9e_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9F": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9f/structures/9a9f.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9f/validation_reports/9a9f_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9f/validation_reports/9a9f_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9G": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9g/structures/9a9g.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9g/validation_reports/9a9g_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9g/validation_reports/9a9g_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9J": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9j/structures/9a9j.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9j/validation_reports/9a9j_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9j/validation_reports/9a9j_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9K": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9k/structures/9a9k.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9k/validation_reports/9a9k_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9k/validation_reports/9a9k_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9L": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9l/structures/9a9l.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9l/validation_reports/9a9l_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9l/validation_reports/9a9l_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9M": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9m/structures/9a9m.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9m/validation_reports/9a9m_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9m/validation_reports/9a9m_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9N": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9n/structures/9a9n.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9n/validation_reports/9a9n_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9n/validation_reports/9a9n_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9O": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9o/structures/9a9o.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9o/validation_reports/9a9o_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9o/validation_reports/9a9o_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9P": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9p/structures/9a9p.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9p/validation_reports/9a9p_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9p/validation_reports/9a9p_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9Q": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9q/structures/9a9q.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9q/validation_reports/9a9q_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9q/validation_reports/9a9q_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9R": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9r/structures/9a9r.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9r/validation_reports/9a9r_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9r/validation_reports/9a9r_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9S": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9s/structures/9a9s.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9s/validation_reports/9a9s_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9s/validation_reports/9a9s_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9T": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9t/structures/9a9t.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9t/validation_reports/9a9t_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9t/validation_reports/9a9t_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9U": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9u/structures/9a9u.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9u/validation_reports/9a9u_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9u/validation_reports/9a9u_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9V": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9v/structures/9a9v.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9v/validation_reports/9a9v_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9v/validation_reports/9a9v_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9W": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9w/structures/9a9w.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9w/validation_reports/9a9w_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9w/validation_reports/9a9w_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9X": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9x/structures/9a9x.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9x/validation_reports/9a9x_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9x/validation_reports/9a9x_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9Y": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9y/structures/9a9y.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9y/validation_reports/9a9y_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9y/validation_reports/9a9y_summary_validation.pdf.gz"
+        ]
+    },
+    "9A9Z": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/a9/9a9z/structures/9a9z.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/a9/9a9z/validation_reports/9a9z_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/a9/9a9z/validation_reports/9a9z_summary_validation.pdf.gz"
+        ]
+    },
+    "9AA0": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aa0/structures/9aa0.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aa0/validation_reports/9aa0_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aa0/validation_reports/9aa0_summary_validation.pdf.gz"
+        ]
+    },
+    "9AA1": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aa1/structures/9aa1.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aa1/validation_reports/9aa1_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aa1/validation_reports/9aa1_summary_validation.pdf.gz"
+        ]
+    },
+    "9AA2": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aa2/structures/9aa2.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aa2/validation_reports/9aa2_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aa2/validation_reports/9aa2_summary_validation.pdf.gz"
+        ]
+    },
+    "9AA3": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aa3/structures/9aa3.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aa3/validation_reports/9aa3_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aa3/validation_reports/9aa3_summary_validation.pdf.gz"
+        ]
+    },
+    "9AA8": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aa8/structures/9aa8.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aa8/validation_reports/9aa8_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aa8/validation_reports/9aa8_summary_validation.pdf.gz"
+        ]
+    },
+    "9AAA": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aaa/structures/9aaa.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aaa/validation_reports/9aaa_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aaa/validation_reports/9aaa_summary_validation.pdf.gz"
+        ]
+    },
+    "9AAL": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aal/structures/9aal.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aal/validation_reports/9aal_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aal/validation_reports/9aal_summary_validation.pdf.gz"
+        ]
+    },
+    "9AAM": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aam/structures/9aam.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aam/validation_reports/9aam_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aam/validation_reports/9aam_summary_validation.pdf.gz"
+        ]
+    },
+    "9AAN": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aan/structures/9aan.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aan/validation_reports/9aan_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aan/validation_reports/9aan_summary_validation.pdf.gz"
+        ]
+    },
+    "9AAO": {
+        "mmcif": [
+            "/pdb_ihm/data/entries/aa/9aao/structures/9aao.cif.gz"
+        ],
+        "validation_report": [
+            "/pdb_ihm/data/entries/aa/9aao/validation_reports/9aao_full_validation.pdf.gz",
+            "/pdb_ihm/data/entries/aa/9aao/validation_reports/9aao_summary_validation.pdf.gz"
+        ]
+    }
+}

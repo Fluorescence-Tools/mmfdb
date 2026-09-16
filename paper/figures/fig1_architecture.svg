@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 344" width="1120" height="344" role="img" aria-label="MMFDB architecture: access layer, host-neutral core, and pluggable backends">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9.2" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5a6068"/>
+    </marker>
+    <style>
+      text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+      .pl { font-size: 23px; font-weight: 700; fill: #14181c; }
+      .hd { font-size: 13.5px; font-weight: 700; fill: #6b7280; letter-spacing: 1.4px; }
+      .bt { font-size: 16px; font-weight: 600; fill: #14181c; }
+      .bs { font-size: 13px; fill: #5a6068; }
+      .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 12.5px; fill: #5a6068; }
+      .fn { font-size: 12.5px; fill: #7a8189; font-style: italic; }
+      .box { fill: #ffffff; stroke: #c3cad2; stroke-width: 1.3; }
+      .core { fill: #f7f8fa; stroke: #b8c0c9; stroke-width: 1.4; stroke-dasharray: 6 4; }
+      .store { fill: #eaf2fb; stroke: #2b6cb0; stroke-width: 1.4; }
+      .sch { fill: #f1ecfb; stroke: #6b46c1; stroke-width: 1.4; }
+      .prov { fill: #fdf3e3; stroke: #a1620a; stroke-width: 1.4; }
+      .edge { stroke: #5a6068; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+
+  <text class="pl" x="14" y="30">a</text>
+
+  <text class="hd" x="150" y="58" text-anchor="middle">ACCESS</text>
+  <text class="hd" x="560" y="58" text-anchor="middle">CORE &#183; HOST-NEUTRAL</text>
+  <text class="hd" x="970" y="58" text-anchor="middle">BACKENDS</text>
+
+  <!-- Access column -->
+  <rect class="box" x="40" y="78" width="220" height="46" rx="6"/>
+  <text class="bt" x="54" y="97">Embedded</text>
+  <text class="mono" x="54" y="114">MFDatabase (SQLite file)</text>
+
+  <rect class="box" x="40" y="132" width="220" height="46" rx="6"/>
+  <text class="bt" x="54" y="151">JSON-RPC 2.0 / HTTP</text>
+  <text class="mono" x="54" y="168">POST /rpc &#183; /objects</text>
+
+  <rect class="box" x="40" y="186" width="220" height="46" rx="6"/>
+  <text class="bt" x="54" y="205">Command line</text>
+  <text class="mono" x="54" y="222">mmfdb &#183; mmfdb-admin</text>
+
+  <rect class="box" x="40" y="240" width="220" height="46" rx="6"/>
+  <text class="bt" x="54" y="259">Web administrator</text>
+  <text class="bs" x="54" y="276">browser curation UI</text>
+
+  <path class="edge" d="M264,182 L322,182" marker-end="url(#ah)"/>
+
+  <!-- Core -->
+  <rect class="core" x="330" y="70" width="460" height="240" rx="10"/>
+
+  <rect class="store" x="350" y="86" width="420" height="64" rx="6"/>
+  <text class="bt" x="366" y="112">Content-addressed object store</text>
+  <text class="bs" x="366" y="132">MD5 routing + SHA-256 verification &#183; deduplicated &#183; native files kept verbatim</text>
+
+  <rect class="sch" x="350" y="156" width="420" height="64" rx="6"/>
+  <text class="bt" x="366" y="182">Dictionary-derived schema</text>
+  <text class="bs" x="366" y="202">PDBx/mmCIF + IHM + FLR dictionaries &#8594; SQL tables and vocabularies</text>
+
+  <rect class="prov" x="350" y="226" width="420" height="64" rx="6"/>
+  <text class="bt" x="366" y="252">Provenance DAG</text>
+  <text class="bs" x="366" y="272">artifact &#8212;input_to&#8594; operation &#8212;produced&#8594; artifact</text>
+
+  <path class="edge" d="M794,182 L852,182" marker-end="url(#ah)"/>
+
+  <!-- Backends -->
+  <rect class="box" x="860" y="78" width="220" height="46" rx="6"/>
+  <text class="bt" x="874" y="97">SQLite</text>
+  <text class="bs" x="874" y="114">zero-configuration default</text>
+
+  <rect class="box" x="860" y="132" width="220" height="46" rx="6"/>
+  <text class="bt" x="874" y="151">PostgreSQL</text>
+  <text class="bs" x="874" y="168">shared deployments</text>
+
+  <rect class="box" x="860" y="186" width="220" height="46" rx="6"/>
+  <text class="bt" x="874" y="205">Local FS &#183; S3</text>
+  <text class="bs" x="874" y="222">object payloads</text>
+
+  <rect class="box" x="860" y="240" width="220" height="46" rx="6"/>
+  <text class="bt" x="874" y="259">Local &#183; LDAP</text>
+  <text class="bs" x="874" y="276">authentication</text>
+
+  <text class="fn" x="330" y="330">No module under src/mmfdb imports a consumer application &#8212; enforced as a test, so any analysis tool can be a client.</text>
+</svg>
