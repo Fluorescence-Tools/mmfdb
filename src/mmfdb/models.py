@@ -4,9 +4,21 @@ import dataclasses
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, NewType, Optional
 
 import numpy as np
+
+# ── Typed IDs (PRD-25 N1) ──
+# NewType aliases that make ID flows type-safe at the API boundary.
+# At runtime they are plain strings; mypy/pyright treat them as distinct types
+# so an ArtifactId cannot be passed where a SampleId is expected.
+ArtifactId = NewType("ArtifactId", str)
+OperationId = NewType("OperationId", str)
+SampleId = NewType("SampleId", str)
+UserId = NewType("UserId", str)
+SetupId = NewType("SetupId", str)
+ObjectId = NewType("ObjectId", str)
+EdgeId = NewType("EdgeId", str)
 
 # ── Canonical Vocabulary Constants (sourced from the mmCIF dictionary) ──
 
