@@ -60,12 +60,16 @@ from mmfdb.security.auth import (
     require_authenticated,
 )
 from mmfdb.store.database_resolver import (
+
+
     backup_database,
     reset_user_database_from_source,
     resolve_database_path,
     source_database_path,
     user_database_path,
 )
+
+_resolved_db_path: str = ""
 
 VERSIONED_MMFDB_METHODS = {
     "samples.register": "register_sample",
@@ -117,6 +121,7 @@ MAX_OBJECT_UPLOAD_BYTES = int(
 def register_services(
     dispatcher_or_context: Any,
     *,
+    db_path: str = "",
     burst_selection_runner: Callable[..., dict[str, Any]] | None = None,
     deterministic_checks: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
     pipeline_list: Callable[..., list[dict[str, Any]]] | None = None,
@@ -124,20 +129,25 @@ def register_services(
     pipeline_runs: Callable[..., list[dict[str, Any]]] | None = None,
 ) -> None:
     """Register mmfdb RPC handlers."""
+    global _resolved_db_path
+    _resolved_db_path = db_path or str(resolve_database_path())
+    _db_path = _resolved_db_path
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
-    register_auth_services(dispatcher)
+    register_auth_services(dispatcher, db_path=_resolved_db_path)
     register_measurement_services(
         dispatcher,
+        db_path=_resolved_db_path,
         burst_selection_runner=burst_selection_runner,
     )
-    register_ndxplorer_services(dispatcher)
-    register_elabftw_services(dispatcher)
+    register_ndxplorer_services(dispatcher, db_path=_resolved_db_path)
+    register_elabftw_services(dispatcher, db_path=_resolved_db_path)
     # Fluorophore curation (fluorophores.*), migrated from the fluorophore_db plugin.
     from mmfdb.admin.backend.fluorophore_services import (
         register_services as register_fluorophore_services,
     )
     register_fluorophore_services(
         dispatcher,
+        db_path=_resolved_db_path,
         deterministic_checks=deterministic_checks,
     )
 
@@ -284,7 +294,7 @@ def register_services(
                 auth = call_params.pop("auth", None)
                 # Protect every legacy method at one fail-closed boundary.
                 # Older handlers receive only parameters they declare.
-                with MFDatabase(resolve_database_path()) as auth_db:
+                with MFDatabase(_resolved_db_path or str(resolve_database_path())) as auth_db:
                     _require_auth(auth, auth_db.conn)
                 if accepts_auth:
                     call_params["auth"] = auth
@@ -377,7 +387,7 @@ def datasets_browse_handler(
     dict
         ``datasets``, ``total``, ``sample_counts``.
     """
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         owner_id = _resolve_owner_id(db, auth)
         return db.browse_datasets(
             scope=scope,
@@ -409,7 +419,7 @@ def datasets_open_handler(
     dict
         ``local_path`` (str) key.
     """
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "artifact", artifact_id, PERM_READ)
         local_path = db.open_dataset(artifact_id)
@@ -528,14 +538,14 @@ def status_handler(auth: dict[str, Any] | None = None, **_: Any) -> dict[str, An
     """
     from mmfdb.config import configured_object_store_backend
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         target = db.database_target
         res = {
             "source_database": str(source_database_path()),
             "user_database": str(user_database_path()),
             "database_dialect": target.dialect if target is not None else "unknown",
             "database_location": (
-                target.display_location if target is not None else str(resolve_database_path())
+                target.display_location if target is not None else str(_resolved_db_path or resolve_database_path())
             ),
             "object_store_backend": configured_object_store_backend(),
             "schema_version": db.get_schema_version(),
@@ -565,14 +575,14 @@ def status_handler(auth: dict[str, Any] | None = None, **_: Any) -> dict[str, An
 
 
 def list_samples_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         rows = db.list_samples()
         filtered = _require_or_acl_filter(auth, db.conn, "sample", rows, id_key="sample_id")
         return {"samples": [_json_row(row) for row in filtered]}
 
 
 def search_samples_handler(query: str | None = None, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         all_samples = db.list_samples()
         filtered = _require_or_acl_filter(auth, db.conn, "sample", all_samples, id_key="sample_id")
         if not query:
@@ -590,7 +600,7 @@ def search_samples_handler(query: str | None = None, auth: dict[str, Any] | None
 
 
 def get_sample_handler(sample_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_or_acl_access(auth, db.conn, "sample", sample_id)
         sample = db.get_sample_full(sample_id)
         return {"sample": sample}
@@ -598,7 +608,7 @@ def get_sample_handler(sample_id: str, auth: dict[str, Any] | None = None) -> di
 
 def list_sample_conditions_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List sample conditions for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         rows = db.conn.execute(
             "SELECT * FROM flr_sample_condition WHERE deleted_at IS NULL ORDER BY condition_id"
@@ -610,7 +620,7 @@ def get_sample_condition_handler(
     condition_id: str,
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"condition": _get_sample_condition_row(db, condition_id)}
 
 
@@ -619,7 +629,7 @@ def delete_sample_condition_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Soft-delete a sample condition."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         with db.conn:
             db.dao.soft_delete("flr_sample_condition", condition_id, deleted_at=_utc_now())
@@ -648,7 +658,7 @@ def list_protocols_handler(
     scope: str = "all", auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """List the latest version of each protocol, scoped own/public/all."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"protocols": db.list_protocols(scope=scope)}
 
 
@@ -656,7 +666,7 @@ def get_protocol_handler(
     name: str, version: Any = "latest", auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return a protocol (default latest) with its declared parameter schema."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         protocol = db.get_protocol(name, version=version)
         schema = db.get_protocol_parameter_schema(protocol) if protocol else {}
         return {"protocol": protocol, "parameter_schema": _schema_to_jsonable(schema)}
@@ -666,7 +676,7 @@ def list_protocol_versions_handler(
     name: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return all versions of a protocol name (oldest first)."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"versions": db.list_protocol_versions(name)}
 
 
@@ -680,7 +690,7 @@ def create_protocol_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create a protocol (or a new version); an invalid category returns an error."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             protocol_id, version = db.create_protocol(
                 name, category, operation_type=operation_type, setup_id=setup_id,
@@ -695,7 +705,7 @@ def protocol_for_operation_handler(
     operation_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return the protocol/version recorded on an operation (run provenance)."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         row = db.conn.execute(
             "SELECT protocol_id, protocol_version FROM mmfdb_operation "
             "WHERE operation_id = ?",
@@ -715,7 +725,7 @@ def list_studies_handler(
     scope: str = "all", auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """List studies scoped mine/public/all."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"studies": db.list_studies(scope=scope)}
 
 
@@ -723,7 +733,7 @@ def get_study_handler(
     study_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return a study with its members and configurable fields."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {
             "study": db.get_study(study_id),
             "members": db.list_study_members(study_id),
@@ -738,7 +748,7 @@ def create_study_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create a study; a missing name returns an error."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             return {"study_id": db.create_study(name, description, is_public=is_public)}
         except ValueError as exc:
@@ -753,7 +763,7 @@ def add_study_member_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Add a sample/artifact to a study; a bad member_type returns an error."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             db.add_study_member(study_id, member_type, member_id, role=role)
             return {"members": db.list_study_members(study_id)}
@@ -765,7 +775,7 @@ def set_study_field_handler(
     study_id: str, key: str, value: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Set a configurable per-study field."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         db.set_study_field(study_id, key, value)
         return {"fields": db.get_study_fields(study_id)}
 
@@ -778,7 +788,7 @@ def list_reagent_lots_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List reagent lots, optionally filtered by kind and excluding expired ones."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"lots": reagents.list_lots(db, kind, include_expired=include_expired)}
 
 
@@ -791,7 +801,7 @@ def create_reagent_lot_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create a reagent lot; a bad kind / missing name returns an error."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             lot_id = reagents.add_reagent_lot(
                 db, kind=kind, name=name, lot_number=lot_number, vendor=vendor,
@@ -806,7 +816,7 @@ def expired_reagent_lots_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List lots whose expiry is in the past (QC)."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"lots": reagents.expired_lots(db)}
 
 
@@ -814,7 +824,7 @@ def list_reagent_usage_handler(
     target_type: str, target_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """List the reagent lots used by an operation/setup/sample."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"lots": reagents.list_reagents_for(db, target_type, target_id)}
 
 
@@ -826,7 +836,7 @@ def add_reagent_usage_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Link a lot to an operation/setup/sample; a bad target_type returns an error."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             reagents.link_reagent(db, lot_id, target_type, target_id, role=role)
             return {"lots": reagents.list_reagents_for(db, target_type, target_id)}
@@ -842,7 +852,7 @@ def list_calibrations_handler(
     """List calibration records (type/method/value/notes), newest first."""
     from mmfdb.lifecycle.staleness import list_calibrations
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"calibrations": list_calibrations(db)}
 
 
@@ -852,7 +862,7 @@ def stale_calibrations_handler(
     """List uses whose calibration is superseded by a newer one of the same type."""
     from mmfdb.lifecycle.staleness import find_stale_calibration_uses
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         stale = find_stale_calibration_uses(db)
         return {"stale": [dataclasses.asdict(s) for s in stale]}
 
@@ -873,7 +883,7 @@ def create_calibration_handler(
         numeric = float(value)
     except (TypeError, ValueError):
         return {"error": f"value {value!r} is not a number"}
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         artifact_id = register_calibration(
             data={calibration_type: numeric},
             calibration_type=calibration_type,
@@ -900,7 +910,7 @@ def list_pipelines_handler(
             error_code=OPERATION_FAILED,
         )
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"pipelines": list_pipelines(db, scope=scope)}
 
 
@@ -917,7 +927,7 @@ def get_pipeline_handler(
             error_code=OPERATION_FAILED,
         )
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         pipeline = get_pipeline(db, pipeline_id)
     if pipeline is None:
         return {"error": f"unknown pipeline_id {pipeline_id!r}"}
@@ -949,7 +959,7 @@ def list_pipeline_runs_handler(
             error_code=OPERATION_FAILED,
         )
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"runs": list_pipeline_runs(db, pipeline_id)}
 
 
@@ -959,7 +969,7 @@ def lifecycle_state_handler(
     entity_type: str, entity_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return an entity's current lifecycle state (or ``None``)."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"state": db.get_state(entity_type, entity_id)}
 
 
@@ -967,7 +977,7 @@ def lifecycle_history_handler(
     entity_type: str, entity_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return an entity's ordered transition history (already JSON-safe dicts)."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"history": db.get_state_history(entity_type, entity_id)}
 
 
@@ -982,7 +992,7 @@ def lifecycle_transition_handler(
     """Transition an entity; an illegal jump is returned as ``error`` (not raised)."""
     from mmfdb.lifecycle.lifecycle import StateTransitionError
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         try:
             changed = db.transition_state(
                 entity_type, entity_id, to_state,
@@ -1017,25 +1027,25 @@ def save_sample_condition_handler(condition: dict[str, Any], auth: dict[str, Any
     condition_id = str(condition.get("condition_id") or "").strip()
     if not condition_id:
         raise ValueError("condition_id is required")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = _save_sample_condition_row(db, condition)
     return {"condition": _json_row(row)}
 
 
 def get_probe_handler(probe_id: int) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         row = db.get_probe(probe_id)
         return {"probe": _json_row(row) if row else {}}
 
 
 def get_probe_optical_properties_handler(probe_id: int) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         return {"optical_properties": [_json_row(row) for row in db.get_optical_properties(probe_id)]}
 
 
 def list_probes_handler() -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         probes = []
         for row in db.get_probes():
             item = _json_row(row)
@@ -1047,7 +1057,7 @@ def list_probes_handler() -> dict[str, Any]:
 def save_sample_key_values_handler(
     sample_id: str, key_values: list[dict[str, Any]], auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "sample", sample_id)
         db.clear_sample_key_values(sample_id)
         for item in key_values:
@@ -1065,7 +1075,7 @@ def _list_users_internal(db: Any = None) -> dict[str, Any]:
     """Internal list users — no auth check. Used by save/delete handlers as response."""
     close_db = False
     if db is None:
-        db = MFDatabase(resolve_database_path())
+        db = MFDatabase(_resolved_db_path or str(resolve_database_path()))
         close_db = True
     try:
         users = []
@@ -1081,7 +1091,7 @@ def _list_users_internal(db: Any = None) -> dict[str, Any]:
 
 
 def list_users_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_admin(auth, db.conn)
         return _list_users_internal(db=db)
 
@@ -1095,7 +1105,7 @@ def save_user_handler(user: dict[str, Any], auth: dict[str, Any] | None = None) 
 
     password = user.get("password")
 
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester = _require_admin(auth, db.conn)
         requester_is_admin = True
 
@@ -1290,7 +1300,7 @@ def _table_has_column(conn: Any, table: str, column: str) -> bool:
 
 def delete_user_handler(user_id: str, force: bool = False, requester_id: str = None, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     import sqlite3
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_admin(auth, db.conn)
         target = db.conn.execute(
             "SELECT is_admin FROM flr_sample_users WHERE user_id = ? AND deleted_at IS NULL",
@@ -1342,14 +1352,14 @@ def delete_user_handler(user_id: str, force: bool = False, requester_id: str = N
 
 
 def list_devices_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         return {"devices": [_json_row(row) for row in db.get_devices()]}
 
 
 def get_device_handler(device_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one instrument/device row."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.conn.execute(
             "SELECT * FROM flr_sample_devices WHERE device_id = ? AND deleted_at IS NULL",
@@ -1362,7 +1372,7 @@ def save_device_handler(device: dict[str, Any], auth: dict[str, Any] | None = No
     device_id = str(device.get("device_id") or "").strip()
     if not device_id:
         raise ValueError("device_id is required")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester, is_new = _authorize_legacy_object_mutation(
             db, auth, "device", device_id
         )
@@ -1385,21 +1395,21 @@ def save_device_handler(device: dict[str, Any], auth: dict[str, Any] | None = No
 
 
 def delete_device_handler(device_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "device", device_id)
         db.delete_device(device_id)
     return list_devices_handler(auth=auth)
 
 
 def list_experiment_types_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         return {"experiment_types": [_json_row(row) for row in db.get_experiment_types()]}
 
 
 def get_experiment_type_handler(type_id: int, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one experiment type."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.conn.execute(
             "SELECT * FROM flr_experiment_type WHERE type_id = ? AND deleted_at IS NULL",
@@ -1410,7 +1420,7 @@ def get_experiment_type_handler(type_id: int, auth: dict[str, Any] | None = None
 
 def save_experiment_type_handler(experiment_type: dict[str, Any], auth: dict[str, Any] | None = None) -> dict[str, Any]:
     name = str(experiment_type.get("name") or "").strip()
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if not name:
             existing_names = {row["name"] for row in db.get_experiment_types()}
@@ -1428,7 +1438,7 @@ def save_experiment_type_handler(experiment_type: dict[str, Any], auth: dict[str
 
 
 def delete_experiment_type_handler(type_id: int, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         db.delete_experiment_type(int(type_id))
     return list_experiment_types_handler(auth=auth)
@@ -1440,14 +1450,14 @@ def list_experiments_handler(
     type_id: int | None = None,
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         rows = db.get_experiments(sample_id=sample_id, project_id=project_id, type_id=type_id)
         return {"experiments": [_experiment_row_dict(row) for row in rows]}
 
 
 def get_experiment_handler(experiment_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_experiment(experiment_id)
         if row is None:
@@ -1462,7 +1472,7 @@ def save_experiment_handler(experiment: dict[str, Any], auth: dict[str, Any] | N
     experiment_id = str(experiment.get("experiment_id") or "").strip()
     if not experiment_id:
         raise ValueError("experiment_id is required")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester, is_new = _authorize_legacy_object_mutation(
             db, auth, "experiment", experiment_id
         )
@@ -1498,7 +1508,7 @@ def save_experiment_handler(experiment: dict[str, Any], auth: dict[str, Any] | N
 
 
 def delete_experiment_handler(experiment_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "experiment", experiment_id)
         with db.conn:
             # raw: admin hard delete (dao.soft_delete would only set deleted_at).
@@ -1509,7 +1519,7 @@ def delete_experiment_handler(experiment_id: str, auth: dict[str, Any] | None = 
 def save_experiment_key_values_handler(
     experiment_id: str, key_values: list[dict[str, Any]], auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "experiment", experiment_id)
         db.clear_experiment_key_values(experiment_id)
         for item in key_values:
@@ -1532,7 +1542,7 @@ def save_experiment_data_handler(data: dict[str, Any], auth: dict[str, Any] | No
     if not data_type:
         raise ValueError("data_type is required")
     storage_mode = str(data.get("storage_mode") or "link").strip()
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "experiment", experiment_id)
         if data.get("data_id"):
             current = db.conn.execute(
@@ -1580,7 +1590,7 @@ def save_experiment_data_handler(data: dict[str, Any], auth: dict[str, Any] | No
 
 
 def delete_experiment_data_handler(data_id: int, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         row = db.conn.execute(
             "SELECT experiment_id FROM flr_experiment_data WHERE data_id = ?", (int(data_id),)
         ).fetchone()
@@ -1659,7 +1669,7 @@ def _operation_row_for_gui(row: dict[str, Any] | Any, *, id_key: str, type_key: 
 
 def list_raw_data_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List raw-data artifacts for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         rows = db.get_raw_data_references()
     return {"raw_data": [_raw_data_row_for_gui(row) for row in rows]}
@@ -1667,7 +1677,7 @@ def list_raw_data_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def get_raw_data_handler(raw_data_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one raw-data artifact row."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_raw_data(raw_data_id)
     return {"raw_data": _raw_data_row_for_gui(row) if row else {}}
@@ -1675,7 +1685,7 @@ def get_raw_data_handler(raw_data_id: str, auth: dict[str, Any] | None = None) -
 
 def delete_artifact_handler(artifact_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Soft-delete an artifact and its direct provenance links."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         return db.delete_artifact(artifact_id)
 
@@ -1687,7 +1697,7 @@ def set_artifact_validation_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Set the validation status for a raw or processed artifact."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         artifact = db.set_artifact_validation(
             artifact_id,
@@ -1699,7 +1709,7 @@ def set_artifact_validation_handler(
 
 def list_processing_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List processing operations for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         rows = db.conn.execute(
             """SELECT * FROM mmfdb_operation
@@ -1712,7 +1722,7 @@ def list_processing_handler(auth: dict[str, Any] | None = None) -> dict[str, Any
 
 def get_processing_handler(processing_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one processing operation."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_operation(processing_id)
     return {
@@ -1723,7 +1733,7 @@ def get_processing_handler(processing_id: str, auth: dict[str, Any] | None = Non
 
 def list_processed_data_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List processed-data artifacts for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         rows = db.list_artifacts(artifact_kind="processed_data")
     return {"processed_data": [_processed_data_row_for_gui(row) for row in rows]}
@@ -1731,7 +1741,7 @@ def list_processed_data_handler(auth: dict[str, Any] | None = None) -> dict[str,
 
 def get_processed_data_handler(product_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one processed-data artifact."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_processed_data(product_id)
     return {"processed_data": _processed_data_row_for_gui(row) if row else {}}
@@ -1739,7 +1749,7 @@ def get_processed_data_handler(product_id: str, auth: dict[str, Any] | None = No
 
 def list_analysis_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List analysis operations for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         rows = db.list_analysis_runs()
     return {"analysis": [_operation_row_for_gui(row, id_key="analysis_id", type_key="type") for row in rows]}
@@ -1747,7 +1757,7 @@ def list_analysis_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def get_analysis_handler(analysis_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one analysis operation."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_analysis_run(analysis_id)
     return {
@@ -1758,7 +1768,7 @@ def get_analysis_handler(analysis_id: str, auth: dict[str, Any] | None = None) -
 
 def get_analysis_full_handler(analysis_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one analysis operation with parameters and linked products."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.get_analysis_run_full(analysis_id)
     return {"analysis": row or {}}
@@ -1788,7 +1798,7 @@ def _project_row_dict(row: Any) -> dict[str, Any]:
 
 def list_projects_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List MMFDB project records for the admin Project EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         rows = db.conn.execute(
             """SELECT operation_id, operator_user_id, status, metadata_json,
@@ -1806,7 +1816,7 @@ def list_projects_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def get_project_handler(project_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one MMFDB project record by project ID or version operation ID."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         rows = db.conn.execute(
             """SELECT operation_id, operator_user_id, status, metadata_json,
@@ -1827,7 +1837,7 @@ def get_project_handler(project_id: str, auth: dict[str, Any] | None = None) -> 
 
 def list_branches_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """List MMFDB branches for the admin Branch EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         branches = db.list_branches()
         return {
@@ -1839,7 +1849,7 @@ def list_branches_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def get_branch_handler(branch_uuid: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return one branch by UUID or name."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         branch = db.get_branch(branch_uuid)
         if branch:
@@ -1853,7 +1863,7 @@ def save_branch_handler(branch: dict[str, Any], auth: dict[str, Any] | None = No
     """Create or update a branch record."""
     branch_uuid = str(branch.get("branch_uuid") or "").strip()
     name = str(branch.get("name") or "").strip()
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester = _require_auth(auth, db.conn)
         existing = db.get_branch(branch_uuid) if branch_uuid else db.get_branch(name)
         if existing:
@@ -1892,7 +1902,7 @@ def save_branch_handler(branch: dict[str, Any], auth: dict[str, Any] | None = No
 
 def delete_branch_handler(branch_uuid: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
     """Soft-delete a branch."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "branch", branch_uuid, PERM_WRITE)
         db.delete_branch(branch_uuid)
@@ -1908,7 +1918,7 @@ def save_sample_handler(sample: dict[str, Any], auth: dict[str, Any] | None = No
         structured["name"] = sample_id
         created = create_structured_sample_handler(structured, auth=auth)
         return get_sample_handler(created["sample_id"], auth=auth)
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester, is_new = _authorize_legacy_object_mutation(
             db, auth, "sample", sample_id
         )
@@ -1992,7 +2002,7 @@ def save_sample_handler(sample: dict[str, Any], auth: dict[str, Any] | None = No
 
 
 def delete_sample_handler(sample_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "sample", sample_id)
         db.delete_sample(sample_id)
     return {"ok": True, "sample_id": sample_id}
@@ -2002,7 +2012,7 @@ def get_sample_full_description_handler(
     sample_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return the PRD-02 nested public sample description."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_or_acl_access(auth, db.conn, "sample", sample_id)
         description = get_sample_full_description(db, sample_id)
     return {"description": description}
@@ -2012,7 +2022,7 @@ def validate_sample_export_handler(
     sample_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return export validation warnings for a sample."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_or_acl_access(auth, db.conn, "sample", sample_id)
         warnings = validate_sample_for_export(db, sample_id)
     return {"warnings": warnings, "valid": not warnings}
@@ -2025,7 +2035,7 @@ def create_structured_sample_handler(
     from mmfdb.samples.sample_manager import _slugify, _unique_sample_id
 
     definition = _sample_definition_from_dict(sample_data)
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester = _require_auth(auth, db.conn)
         existing = db.conn.execute(
             "SELECT sample_id FROM flr_sample "
@@ -2077,7 +2087,7 @@ def list_entities_handler(
     sample_id: str | None = None, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """List entities globally or for one sample."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if sample_id:
             rows = db.conn.execute(
@@ -2104,7 +2114,7 @@ def get_entity_handler(
     entity_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return one entity row for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.conn.execute(
             "SELECT * FROM entities WHERE entity_id = ? AND deleted_at IS NULL",
@@ -2122,7 +2132,7 @@ def save_entity_handler(
     if not entity_id:
         raise ValueError("entity_id is required")
     sequence = entity.get("sequence")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester, is_new = _authorize_legacy_object_mutation(
             db, auth, "entity", entity_id
         )
@@ -2150,7 +2160,7 @@ def delete_entity_handler(
     entity_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Soft-delete an entity."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _authorize_legacy_object_mutation(db, auth, "entity", entity_id)
         with db.conn:
             db.dao.soft_delete("entities", entity_id, deleted_at=_utc_now())
@@ -2169,7 +2179,7 @@ def save_probe_handler(
     name = str(probe.get("chromophore_name") or probe.get("name") or "").strip()
     if not name:
         raise ValueError("probe name is required")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         probe_id = _int_or_none(probe.get("probe_id"))
         if probe_id is not None:
@@ -2221,7 +2231,7 @@ def delete_probe_handler(
     probe_id: int, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Soft-delete a probe identity row."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         db.delete_probe(int(probe_id))
     return {"ok": True, "probe_id": int(probe_id)}
@@ -2233,7 +2243,7 @@ def save_probe_optical_properties_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Replace editable optical properties for a probe."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         with db.conn:
             db.dao.soft_delete(
@@ -2262,7 +2272,7 @@ def list_probe_positions_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List probe positions by sample or probe."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         where = ["ppp.deleted_at IS NULL"]
         params: list[Any] = []
@@ -2297,7 +2307,7 @@ def get_probe_position_handler(
     id: int, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return one probe-position row for the generic EntityDock."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.conn.execute(
             """
@@ -2330,7 +2340,7 @@ def save_probe_position_handler(
         raise ValueError("probe_id, entity_id, and residue_number are required")
 
     position_id = _int_or_none(position.get("id"))
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if position_id is None:
             position_id = db.add_poly_probe_position(
@@ -2386,7 +2396,7 @@ def delete_probe_position_handler(
     id: int, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Soft-delete a polymer probe-position row."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         with db.conn:
             db.dao.soft_delete("flr_poly_probe_position", int(id), deleted_at=_utc_now())
@@ -2398,7 +2408,7 @@ def list_detector_channels_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List detector channel definitions."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if setup_id:
             rows = db.list_detector_channels(setup_id)
@@ -2416,7 +2426,7 @@ def list_pie_windows_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List PIE window definitions."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if setup_id:
             rows = db.list_pie_windows(setup_id)
@@ -2434,7 +2444,7 @@ def list_fcs_pairs_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """List FCS channel-pair definitions."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         if setup_id:
             rows = [
@@ -2457,7 +2467,7 @@ def list_fret_pairs_handler(
     sample_id: str | None = None, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """List FRET pair/Forster radius records globally or for one sample."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         if sample_id:
             _require_or_acl_access(auth, db.conn, "sample", sample_id)
         else:
@@ -2488,7 +2498,7 @@ def get_fret_pair_handler(
     forster_radius_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Return one FRET pair/Forster radius row."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         row = db.conn.execute(
             """
@@ -2524,7 +2534,7 @@ def save_fret_pair_handler(
         str(pair.get("forster_radius_id") or "").strip()
         or f"{sample_id}_forster_{donor_probe_id}_{acceptor_probe_id}"
     )
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         with db.conn:
             # raw: hard delete-then-reinsert — a soft delete would leave the row
@@ -2552,7 +2562,7 @@ def delete_fret_pair_handler(
     forster_radius_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Delete a FRET pair/Forster radius record."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         with db.conn:
             # raw: admin hard delete by the UNIQUE forster_radius_id (not the PK).
@@ -2589,7 +2599,7 @@ def populate_mock_data_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Populate the MMFDB with bundled demo data from plugin test fixtures."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
     from mmfdb.admin.seed_example import seed_example
 
@@ -2597,7 +2607,7 @@ def populate_mock_data_handler(
 
 
 def import_file_handler(path: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_auth(auth, db.conn)
         summary = import_structure_file(db, path)
     return {"summary": summary}
@@ -2609,7 +2619,7 @@ def export_sample_handler(
     analysis_id: str | None = None,
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_admin(auth, db.conn)
         if analysis_id is None:
             row = db.conn.execute(
@@ -2630,7 +2640,7 @@ def export_table_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     path = Path(output_path)
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         _require_admin(auth, db.conn)
         rows = _sample_table_rows(db, sample_id)
     _write_table(path, rows)
@@ -2664,7 +2674,7 @@ def _setup_row_for_gui(row: dict[str, Any] | Any) -> dict[str, Any]:
 
 
 def list_setups_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         rows = filter_readable(
             db.conn, principal, "setup", db.list_setups(), id_key="setup_id"
@@ -2673,7 +2683,7 @@ def list_setups_handler(auth: dict[str, Any] | None = None) -> dict[str, Any]:
 
 
 def get_setup_handler(setup_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "setup", setup_id, PERM_READ)
         setup = db.get_setup(setup_id)
@@ -2696,7 +2706,7 @@ def save_setup_handler(setup: dict[str, Any], auth: dict[str, Any] | None = None
     if laser_wavelengths:
         config["laser_wavelengths"] = laser_wavelengths
     detectors = _json_loads_safe(setup.get("detector_channels"))
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         requester = _require_auth(auth, db.conn)
         existing = db.get_setup(setup_id)
         if existing:
@@ -2714,7 +2724,7 @@ def save_setup_handler(setup: dict[str, Any], auth: dict[str, Any] | None = None
 
 
 def delete_setup_handler(setup_id: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "setup", setup_id, PERM_WRITE)
         db.delete_setup(setup_id)
@@ -2725,7 +2735,7 @@ def validate_setup_handler(
     setup_id: str, auth: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Validate a stored setup without bypassing its read ACL."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "setup", setup_id, PERM_READ)
         setup = db.get_setup(setup_id)
@@ -3159,7 +3169,7 @@ def store_object_payload(
             raise ValueError("trusted upload path must be a file")
         if staged_path.stat().st_size > MAX_OBJECT_UPLOAD_BYTES:
             raise ValueError("object upload exceeds the configured size limit")
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         user = db.conn.execute(
             "SELECT user_uuid FROM flr_sample_users WHERE user_id = ? AND deleted_at IS NULL",
@@ -3306,7 +3316,7 @@ def get_object_handler(
     Returns base64-encoded data.
     """
     import base64
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "object", object_uuid, PERM_READ)
         data = db.get_object(object_uuid)
@@ -3319,7 +3329,7 @@ def get_object_info_handler(
     **_: Any,
 ) -> dict[str, Any]:
     """Retrieve object metadata by UUID."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "object", object_uuid, PERM_READ)
         info = db.get_object_info(object_uuid)
@@ -3336,7 +3346,7 @@ def delete_object_handler(
     **_: Any,
 ) -> dict[str, Any]:
     """Delete an object or decrement its refcount."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         require_access(db.conn, principal, "object", object_uuid, PERM_MANAGE)
         owned_reference = db.conn.execute(
@@ -3369,7 +3379,7 @@ def list_objects_handler(
     **_: Any,
 ) -> dict[str, Any]:
     """List objects with optional filtering."""
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         principal = _require_auth(auth, db.conn)
         objects = db.list_objects(
             filename=filename,
