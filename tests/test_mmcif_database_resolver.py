@@ -62,7 +62,15 @@ def test_copy_source_to_user_path(monkeypatch):
         user_root.mkdir()
         source_db = source / "sample_management.db"
         user_db = user_root / "flr" / "sample_management.db"
-        source_db.write_bytes(b"curated-db")
+        # A real database, because installing the seed migrates the copy.
+        seed_conn = sqlite3.connect(source_db)
+        try:
+            schema.migrate_schema(seed_conn)
+            seed_conn.execute("CREATE TABLE curated (value TEXT)")
+            seed_conn.execute("INSERT INTO curated VALUES ('curated-db')")
+            seed_conn.commit()
+        finally:
+            seed_conn.close()
 
         monkeypatch.setattr(database_resolver, "source_database_path", lambda: source_db)
         monkeypatch.setattr(database_resolver, "user_database_path", lambda: user_db)
@@ -70,7 +78,11 @@ def test_copy_source_to_user_path(monkeypatch):
         resolved = database_resolver.resolve_database_path()
 
         assert resolved == user_db
-        assert user_db.read_bytes() == b"curated-db"
+        copied = sqlite3.connect(f"file:{user_db}?mode=ro", uri=True)
+        try:
+            assert copied.execute("SELECT value FROM curated").fetchone()[0] == "curated-db"
+        finally:
+            copied.close()
 
 
 def test_packaged_seed_resolves_when_nothing_is_configured(monkeypatch):
@@ -87,15 +99,22 @@ def test_packaged_seed_resolves_when_nothing_is_configured(monkeypatch):
     assert resolved.stat().st_size > 0
 
 
-def test_packaged_seed_is_curated_and_on_the_current_schema():
-    """A stale seed cannot be migrated forward, so it must track the schema."""
+def test_packaged_seed_is_curated_and_openable():
+    """The seed carries the curated reference content and is self-consistent.
+
+    Its schema version is deliberately not pinned to the current one: the seed
+    is package data written once, and the install migrates the copy it makes
+    (see the migration test below).
+    """
     data_dir = Path(database_resolver.__file__).resolve().parent.parent / "data"
     seed = data_dir / database_resolver.SOURCE_DB_NAME
 
     conn = sqlite3.connect(f"file:{seed}?mode=ro", uri=True)
     try:
         version = conn.execute("SELECT version FROM _schema_version").fetchone()[0]
-        assert version == schema.SCHEMA_VERSION
+        assert 0 < version <= schema.SCHEMA_VERSION, (
+            f"seed schema {version} is newer than this MMFDB's {schema.SCHEMA_VERSION}"
+        )
         assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
         for table, minimum in (
             ("probes", 7),
@@ -106,6 +125,50 @@ def test_packaged_seed_is_curated_and_on_the_current_schema():
         ):
             count = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
             assert count >= minimum, f"{table}: {count} < {minimum}"
+    finally:
+        conn.close()
+
+
+def test_a_seed_behind_the_schema_is_migrated_when_it_is_installed(monkeypatch, tmp_path):
+    """A seed written for an older schema still yields a current database.
+
+    The seed is package data: it is written once and every release after that
+    leaves it behind. The copy made on first run is migrated, so the version it
+    was written at never reaches the user.
+    """
+    seed = tmp_path / "seed" / "sample_management.db"
+    seed.parent.mkdir()
+    user_db = tmp_path / "user" / "flr" / "sample_management.db"
+
+    conn = sqlite3.connect(seed)
+    try:
+        schema.migrate_schema(conn)
+        conn.commit()
+        # Wind the stamp back to a version this MMFDB has a migration for, as a
+        # seed shipped by an earlier release would be.
+        older = max(v for v in schema.MIGRATIONS if v <= schema.SCHEMA_VERSION)
+        schema.set_schema_version(conn, older - 1)
+        conn.commit()
+    finally:
+        conn.close()
+
+    monkeypatch.setattr(database_resolver, "configured_database_url", lambda: None)
+    monkeypatch.setattr(database_resolver, "source_database_path", lambda: seed)
+    monkeypatch.setattr(database_resolver, "user_database_path", lambda: user_db)
+
+    resolved = Path(database_resolver.resolve_database_location())
+
+    assert resolved == user_db
+    conn = sqlite3.connect(f"file:{resolved}?mode=ro", uri=True)
+    try:
+        assert schema.get_schema_version(conn) == schema.SCHEMA_VERSION
+        assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
+    finally:
+        conn.close()
+    # The seed itself is package data and is never written to.
+    conn = sqlite3.connect(f"file:{seed}?mode=ro", uri=True)
+    try:
+        assert schema.get_schema_version(conn) == older - 1
     finally:
         conn.close()
 
