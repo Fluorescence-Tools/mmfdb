@@ -104,6 +104,15 @@ class DatabaseTarget:
 
 def parse_database_target(location: str | Path) -> DatabaseTarget:
     """Parse a filesystem path or SQL URL without silently changing dialects."""
+    if not isinstance(location, str) and not hasattr(location, "__fspath__"):
+        # str() on an arbitrary object would turn a repr like
+        # "<sqlite3.Connection object at 0x…>" into a valid file name, and
+        # SQLite would then silently create that file.  Fail instead.
+        raise TypeError(
+            "database location must be a str or os.PathLike, got "
+            f"{type(location).__name__}; to reuse an open connection pass it "
+            "as `connection=`, not as the path"
+        )
     raw = str(location)
     if raw == ":memory:" or "://" not in raw:
         return DatabaseTarget("sqlite", raw, SQLITE_CAPABILITIES)
