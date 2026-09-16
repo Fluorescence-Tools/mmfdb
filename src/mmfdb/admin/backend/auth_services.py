@@ -27,8 +27,12 @@ from mmfdb.security.auth import (
 from mmfdb.store.database_resolver import resolve_database_path
 
 
+
+
+_resolved_db_path: str = ""
+
 def _get_db():
-    return MFDatabase(resolve_database_path())
+    return MFDatabase(_resolved_db_path or str(resolve_database_path()))
 
 
 def _auth_config() -> dict[str, Any] | None:
@@ -46,7 +50,10 @@ def _get_conn(db):
     return db.conn
 
 
-def register_services(dispatcher_or_context: Any) -> None:
+def register_services(dispatcher_or_context: Any, *, db_path: str = "") -> None:
+    global _resolved_db_path
+    _resolved_db_path = db_path or str(resolve_database_path())
+    _db_path = _resolved_db_path
     """Register auth/group/permission RPC handlers."""
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
 
@@ -603,7 +610,7 @@ def require_handler_auth(
     Returns ``(db, conn, principal)``. Caller must close ``db``.
     """
     from mmfdb.repository import MFDatabase
-    db = MFDatabase(resolve_database_path())
+    db = MFDatabase(_resolved_db_path or str(resolve_database_path()))
     conn = db.conn
     principal = principal_from_rpc_auth(conn, auth)
     require_authenticated(principal)

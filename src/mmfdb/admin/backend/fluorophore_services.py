@@ -1,5 +1,7 @@
 """ZMQ RPC backend services for the Fluorophore DB plugin.
 
+_resolved_db_path: str = ""
+
 Registered via the manifest's ``services`` entrypoint. Every handler
 receives ``auth`` as the last keyword argument (injected by the
 dispatcher).
@@ -17,16 +19,18 @@ from mmfdb.repository import MFDatabase
 from mmfdb.store.database_resolver import resolve_database_path
 
 
+
+
 @contextlib.contextmanager
 def _db():
     """Open the configured MMFDB for one handler call, closing it afterwards.
 
-    Matches the per-call ``with MFDatabase(resolve_database_path()) as db:``
+    Matches the per-call ``with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:``
     lifecycle used by the other mmfdb-admin services. The old non-context form
     leaked a SQLite connection per call, which stalled the GUI's blocking RPC
     against the embedded server.
     """
-    with MFDatabase(resolve_database_path()) as db:
+    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
         yield db
 
 
@@ -472,6 +476,7 @@ def handle_merge_probes(
 def register_services(
     dispatcher: Any,
     *,
+    db_path: str = "",
     deterministic_checks: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
 ) -> None:
     """Register all fluorophore RPC handlers with the dispatcher.
@@ -481,6 +486,9 @@ def register_services(
     expand ``**params`` (matching the convention used by the other mmfdb-admin
     service registrations).
     """
+    global _resolved_db_path
+    _resolved_db_path = db_path or str(resolve_database_path())
+    _db_path = _resolved_db_path
     def _kw(handler):
         return lambda params, _h=handler: _h(**(params or {}))
 
