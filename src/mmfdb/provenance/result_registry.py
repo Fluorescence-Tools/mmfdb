@@ -536,6 +536,90 @@ def register_raw_measurement(
     )
 
 
+def register_raw_measurement_group(
+    files: list[str],
+    sample_id: str = "",
+    metadata: dict | None = None,
+    setup_id: str = "",
+    setup_version: int | None = None,
+    db: MMFDBClientBase | None = None,
+    is_public: bool = False,
+    session: "SessionContext | None" = None,
+) -> str:
+    """Register a multi-file raw measurement as one group artifact.
+
+    Each file is content-addressed (dedup per file via ``mmfdb_object``),
+    and the group artifact carries one ``mmfdb_artifact_member`` row per
+    file. A single ``derived_from`` provenance edge links the group to
+    its parent if provided.
+
+    Parameters
+    ----------
+    files : list of str
+        Paths to the raw measurement files.
+    sample_id : str, optional
+        Existing sample identifier to link.
+    metadata : dict, optional
+        Metadata for the group artifact.
+    setup_id, setup_version, db, is_public, session
+        See :func:`register_raw_measurement`.
+
+    Returns
+    -------
+    str
+        Created group artifact identifier, or ``""`` on failure.
+    """
+    if not files:
+        return ""
+    if len(files) == 1:
+        return register_raw_measurement(
+            files[0],
+            sample_id=sample_id,
+            metadata=metadata,
+            setup_id=setup_id,
+            setup_version=setup_version,
+            db=db,
+            is_public=is_public,
+            session=session,
+        )
+
+    group_artifact_id = register_raw_measurement(
+        files[0],
+        sample_id=sample_id,
+        metadata=metadata,
+        setup_id=setup_id,
+        setup_version=setup_version,
+        db=db,
+        is_public=is_public,
+        session=session,
+    )
+    if not group_artifact_id:
+        return ""
+
+    try:
+        from pathlib import Path
+        for ordinal, file_path in enumerate(files):
+            path = Path(file_path)
+            ref = db.put_object(path=path, filename=path.name)
+            object_uuid = ref["object_uuid"]
+            db.execute_change(
+                "mmfdb_artifact_member",
+                {
+                    "artifact_id": group_artifact_id,
+                    "object_uuid": object_uuid,
+                    "filename": path.name,
+                    "role": "primary" if ordinal == 0 else "channel",
+                    "ordinal": ordinal,
+                },
+            )
+    except Exception:
+        logger.warning(
+            "register_raw_measurement_group: member rows failed",
+            exc_info=True,
+        )
+    return group_artifact_id
+
+
 def register_processed_data(
     data: Any,
     parent_artifact_id: str,

@@ -68,6 +68,39 @@ class UserDeviceMixin:
         )
         return [r["user_id"] for r in rows]
 
+    def list_artifact_members(self, artifact_id: str) -> list[dict]:
+        """Return the member files of a group artifact.
+
+        Parameters
+        ----------
+        artifact_id : str
+            The group artifact identifier.
+
+        Returns
+        -------
+        list of dict
+            One dict per member with ``object_uuid``, ``filename``,
+            ``role``, and ``ordinal`` keys.
+        """
+        rows = self.dao.list(
+            "mmfdb_artifact_member",
+            filters={"artifact_id": artifact_id},
+            order_by="ordinal",
+        )
+        return [
+            {
+                "object_uuid": r["object_uuid"],
+                "filename": r.get("filename", ""),
+                "role": r.get("role", ""),
+                "ordinal": r.get("ordinal", 0),
+            }
+            for r in rows
+        ]
+
+    def artifact_member_count(self, artifact_id: str) -> int:
+        """Return the number of member files in a group artifact."""
+        return len(self.list_artifact_members(artifact_id))
+
     def add_user(self, user_id, display_name, email=None, affiliation=None, department=None, role=None, address=None, website=None, phone=None, details=None, user_uuid=None, is_admin=0, password_hash=None, allow_passwordless_login=None):
         if not user_uuid:
             # Check if user already has a uuid
