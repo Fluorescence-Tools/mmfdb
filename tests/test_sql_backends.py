@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sqlite3
+
 import pytest
 
 from mmfdb import config
@@ -172,6 +174,20 @@ def test_database_targets_are_explicit_and_never_turn_urls_into_paths(tmp_path):
 
     with pytest.raises(UnsupportedDatabaseBackend, match="Unsupported.*mysql"):
         parse_database_target("mysql://db.example/mmfdb")
+
+
+def test_a_connection_as_path_is_rejected_and_never_creates_a_file(tmp_path, monkeypatch):
+    # sqlite3.connect() stringifies its argument, so a Connection passed as the
+    # path once created a database literally named
+    # "<sqlite3.Connection object at 0x…>" in the working directory.
+    conn = sqlite3.connect(":memory:")
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(TypeError, match="Connection"):
+        parse_database_target(conn)
+    with pytest.raises(TypeError, match="connection="):
+        MFDatabase(conn)
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_configured_database_url_has_precedence_and_is_not_created_as_file(tmp_path):

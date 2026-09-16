@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 48
+SCHEMA_VERSION = 49
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -705,6 +705,7 @@ CREATE_TABLES_SQL = [
     # exactly why the contradiction (create it here, drop it there) went
     # unnoticed until generate_create_table_for_category started failing loudly.
     _get_dict_ddl("mmfdb_artifact_owner"),
+    _get_dict_ddl("mmfdb_artifact_member"),
     """CREATE TABLE IF NOT EXISTS mmfdb_audit_log (
         log_id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -1087,6 +1088,8 @@ CREATE_INDICES_SQL = [
     "CREATE INDEX IF NOT EXISTS idx_mmfdb_setup_fcs_pair_setup ON mmfdb_setup_fcs_pair (setup_id)",
     "CREATE INDEX IF NOT EXISTS idx_mmfdb_artifact_owner_user ON mmfdb_artifact_owner (user_id)",
     "CREATE UNIQUE INDEX IF NOT EXISTS idx_mmfdb_artifact_owner_uniq ON mmfdb_artifact_owner (artifact_id, user_id)",
+    "CREATE INDEX IF NOT EXISTS idx_mmfdb_artifact_member_artifact ON mmfdb_artifact_member (artifact_id)",
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_mmfdb_artifact_member_uniq ON mmfdb_artifact_member (artifact_id, object_uuid)",
     "CREATE INDEX IF NOT EXISTS idx_mmfdb_setup_calibration_setup ON mmfdb_setup_calibration (setup_id)",
     "CREATE INDEX IF NOT EXISTS idx_mmfdb_audit_log_target ON mmfdb_audit_log (target_type, target_id)",
     "CREATE INDEX IF NOT EXISTS idx_mmfdb_audit_log_timestamp ON mmfdb_audit_log (timestamp)",
@@ -1485,6 +1488,7 @@ def _ensure_lifecycle_columns(conn: sqlite3.Connection, now: str | None = None) 
         ("mmfdb_setup_calibration", True, True),
         ("mmfdb_microtime_shift", True, True),
         ("mmfdb_artifact_owner", True, True),
+        ("mmfdb_artifact_member", True, True),
         ("mmfdb_branch", True, True),
         ("mmfdb_audit_log", True, False),
         ("probes", False, False),
@@ -2088,6 +2092,20 @@ def _migrate_v48_dictionary_provenance(conn: sqlite3.Connection) -> None:
 
 
 MIGRATIONS[48] = _migrate_v48_dictionary_provenance
+
+
+def _migrate_v49_artifact_member(conn: sqlite3.Connection) -> None:
+    """Add the ``mmfdb_artifact_member`` table for file-group membership.
+
+    The table is dictionary-declared (``mmfdb_flr_ext.dic``), so
+    :func:`reconcile_current_schema` creates it. The migration exists only to
+    advance the version stamp so a database opened on the previous version
+    picks up the new table.
+    """
+    reconcile_current_schema(conn)
+
+
+MIGRATIONS[49] = _migrate_v49_artifact_member
 
 
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
