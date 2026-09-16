@@ -29,8 +29,8 @@ def _connection() -> sqlite3.Connection:
 
 def _old_database(connection) -> None:
     """Mark *connection* as an old-schema database, leaving the write uncommitted."""
-    connection.execute("CREATE TABLE IF NOT EXISTS _schema_version (version INTEGER)")
-    connection.execute("INSERT INTO _schema_version (version) VALUES (1)")
+    connection.execute("CREATE TABLE IF NOT EXISTS mmfdb_schema_version (version INTEGER)")
+    connection.execute("INSERT INTO mmfdb_schema_version (version) VALUES (1)")
     connection.execute("CREATE TABLE IF NOT EXISTS mmfdb_schema_version (version INTEGER)")
     connection.execute("INSERT INTO mmfdb_schema_version (version) VALUES (1)")
 

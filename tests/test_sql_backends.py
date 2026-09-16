@@ -100,8 +100,8 @@ class _ProvisionedPostgres:
                         "mmfdb_operation", "mmfdb_object_acl", "mmfdb_audit_log",
                     )
                 ])
-            return _Rows([DatabaseRow(["table_name"], ["_schema_version"])])
-        if 'SELECT version FROM "_schema_version"' in sql:
+            return _Rows([DatabaseRow(["table_name"], ["mmfdb_schema_version"])])
+        if 'SELECT version FROM "mmfdb_schema_version"' in sql:
             return _Rows([DatabaseRow(["version"], [self.version])])
         if "information_schema.table_constraints" in sql:
             return _Rows([DatabaseRow(

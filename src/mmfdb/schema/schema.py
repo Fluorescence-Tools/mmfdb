@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-SCHEMA_VERSION = 49
+SCHEMA_VERSION = 50
 
 # Ordered migration waterfall: target_version → migration function.
 # Each function receives an open sqlite3.Connection and transforms the
@@ -78,7 +78,6 @@ def _get_dict_ddl(category_name: str) -> str:
 
 
 CREATE_TABLES_SQL = [
-    "CREATE TABLE IF NOT EXISTS _schema_version (version INTEGER)",
     "CREATE TABLE IF NOT EXISTS probe_types (type_id INTEGER PRIMARY KEY, type_name TEXT UNIQUE, display_name TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, deleted_at TEXT)",
     """CREATE TABLE IF NOT EXISTS chem_descriptors (
         id INTEGER PRIMARY KEY, descriptor_type TEXT, descriptor TEXT,
@@ -1546,27 +1545,24 @@ def _ensure_lifecycle_columns(conn: sqlite3.Connection, now: str | None = None) 
 
 
 def get_schema_version(conn: sqlite3.Connection) -> int:
+    """Return the schema version stamped on *conn*, or 0 when unstamped.
+
+    ``mmfdb_schema_version`` is the stamp. A second table, ``_schema_version``,
+    used to be written beside it with the same number, and readers took
+    whichever they found first -- so a database could disagree with itself and
+    the disagreement was invisible. Migration 50 drops it.
+    """
     try:
         row = conn.execute("SELECT version FROM mmfdb_schema_version").fetchone()
-        if row is not None:
-            return row[0]
-    except sqlite3.OperationalError:
-        pass
-    try:
-        row = conn.execute("SELECT version FROM _schema_version").fetchone()
-        return row[0] if row else 0
     except sqlite3.OperationalError:
         return 0
+    return int(row[0]) if row is not None else 0
 
 
 def set_schema_version(conn: sqlite3.Connection, version: int):
-    try:
-        conn.execute("DELETE FROM mmfdb_schema_version")
-        conn.execute("INSERT INTO mmfdb_schema_version (version) VALUES (?)", (version,))
-    except sqlite3.OperationalError:
-        pass
-    conn.execute("DELETE FROM _schema_version")
-    conn.execute("INSERT INTO _schema_version (version) VALUES (?)", (version,))
+    """Stamp *conn* with *version*."""
+    conn.execute("DELETE FROM mmfdb_schema_version")
+    conn.execute("INSERT INTO mmfdb_schema_version (version) VALUES (?)", (version,))
 
 
 def bootstrap_identity(conn: sqlite3.Connection) -> None:
@@ -2108,6 +2104,21 @@ def _migrate_v49_artifact_member(conn: sqlite3.Connection) -> None:
 MIGRATIONS[49] = _migrate_v49_artifact_member
 
 
+def _migrate_v50_single_version_stamp(conn: sqlite3.Connection) -> None:
+    """Drop ``_schema_version``; ``mmfdb_schema_version`` is the stamp.
+
+    Both tables were written with the same number and read with one shadowing
+    the other, so a database could disagree with itself about its own version
+    and nothing would say so. One table cannot. The version a database carries
+    into this migration was read from ``mmfdb_schema_version``, which every
+    database stamped since v18 has.
+    """
+    conn.execute("DROP TABLE IF EXISTS _schema_version")
+
+
+MIGRATIONS[50] = _migrate_v50_single_version_stamp
+
+
 def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
     """Apply any pending schema migrations to bring *conn* up to date.
 
@@ -2142,7 +2153,7 @@ def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
                 "SELECT name FROM sqlite_master "
                 "WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
             )
-            if row[0] not in {"_schema_version", "mmfdb_schema_version"}
+            if row[0] != "mmfdb_schema_version"
         }
         if application_tables:
             names = ", ".join(sorted(application_tables)[:5])
@@ -2181,6 +2192,13 @@ def migrate_schema(conn: sqlite3.Connection) -> MigrationReport | None:
                 with conn:
                     fn(conn)
                     set_schema_version(conn, version)
+        # Whatever the migrations did, the database ends up matching the
+        # dictionary: a table or column that no version-gated step restores
+        # would otherwise stay missing on a stamped database, and whether it
+        # was repaired depended on whether the newest migration happened to
+        # reconcile.
+        with conn:
+            reconcile_current_schema(conn)
         return report
     except Exception:
         conn.rollback()

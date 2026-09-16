@@ -122,8 +122,8 @@ def test_future_schema_is_rejected_even_for_readonly_open(tmp_path: Path) -> Non
 
     path = tmp_path / "future.db"
     connection = sqlite3.connect(path)
-    connection.execute("CREATE TABLE _schema_version (version INTEGER NOT NULL)")
-    connection.execute("INSERT INTO _schema_version VALUES (?)", (SCHEMA_VERSION + 1,))
+    connection.execute("CREATE TABLE mmfdb_schema_version (version INTEGER NOT NULL)")
+    connection.execute("INSERT INTO mmfdb_schema_version VALUES (?)", (SCHEMA_VERSION + 1,))
     connection.commit()
     connection.close()
 

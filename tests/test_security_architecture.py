@@ -488,8 +488,8 @@ def test_legacy_child_mutations_require_parent_write_access(
 
 def test_direct_migration_rejects_future_schema() -> None:
     conn = sqlite3.connect(":memory:")
-    conn.execute("CREATE TABLE _schema_version (version INTEGER NOT NULL)")
-    conn.execute("INSERT INTO _schema_version VALUES (?)", (SCHEMA_VERSION + 1,))
+    conn.execute("CREATE TABLE mmfdb_schema_version (version INTEGER NOT NULL)")
+    conn.execute("INSERT INTO mmfdb_schema_version VALUES (?)", (SCHEMA_VERSION + 1,))
 
     with pytest.raises(RuntimeError, match="newer"):
         migrate_schema(conn)
@@ -511,7 +511,7 @@ def test_v43_migration_disables_prerelease_builtin_credentials(tmp_path: Path) -
             "WHERE user_id = 'user_default'",
             (hash_password("admin"),),
         )
-        db.conn.execute("UPDATE _schema_version SET version = 42")
+        db.conn.execute("UPDATE mmfdb_schema_version SET version = 42")
         db.conn.execute("UPDATE mmfdb_schema_version SET version = 42")
         db.conn.commit()
 
