@@ -27,7 +27,7 @@ def source_database_path() -> Path:
     """Return the curated source database shipped with MMFDB.
 
     The path is returned whether or not the file exists; a missing seed is a
-    broken installation and is reported by :func:`resolve_database_location`
+    broken installation and is reported by :func:`resolve_database_path`
     rather than masked by a placeholder database.
 
     Returns
@@ -68,12 +68,13 @@ def object_store_root() -> Path:
     return root
 
 
-def resolve_database_location() -> str | Path:
-    """Return the configured SQL URL or ensure the local SQLite DB exists.
+def resolve_database_path() -> str | Path:
+    """Return the configured SQL URL, or ensure the local SQLite database exists.
 
-    ``MMFDB_DATABASE_URL`` has explicit precedence over file configuration.
-    Server URLs are returned unchanged and are never passed through filesystem
-    copy/bootstrap logic.
+    Despite the name the result is a *location*, which is a path only for a
+    local SQLite database: ``MMFDB_DATABASE_URL`` takes precedence over file
+    configuration, and a server URL is returned unchanged, never passed
+    through the filesystem copy/bootstrap below.
     """
     database_url = configured_database_url()
     if database_url is not None:
@@ -98,15 +99,6 @@ def resolve_database_location() -> str | Path:
             )
             _create_empty_database(user_path)
     return user_path
-
-
-def resolve_database_path() -> str | Path:
-    """Compatibility alias for :func:`resolve_database_location`.
-
-    The historical name is retained for plugin callers. New code should use
-    ``resolve_database_location`` because the result may be a SQL URL.
-    """
-    return resolve_database_location()
 
 
 def backup_database(db_path: str | Path) -> Path:

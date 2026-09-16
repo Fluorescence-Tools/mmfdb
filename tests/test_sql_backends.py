@@ -197,7 +197,7 @@ def test_configured_database_url_has_precedence_and_is_not_created_as_file(tmp_p
         database_url="postgresql://db.example/mmfdb",
     )
     try:
-        assert database_resolver.resolve_database_location() == (
+        assert database_resolver.resolve_database_path() == (
             "postgresql://db.example/mmfdb"
         )
         assert not (tmp_path / "local.db").exists()

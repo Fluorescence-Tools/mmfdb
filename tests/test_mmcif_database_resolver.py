@@ -156,7 +156,7 @@ def test_a_seed_behind_the_schema_is_migrated_when_it_is_installed(monkeypatch, 
     monkeypatch.setattr(database_resolver, "source_database_path", lambda: seed)
     monkeypatch.setattr(database_resolver, "user_database_path", lambda: user_db)
 
-    resolved = Path(database_resolver.resolve_database_location())
+    resolved = Path(database_resolver.resolve_database_path())
 
     assert resolved == user_db
     conn = sqlite3.connect(f"file:{resolved}?mode=ro", uri=True)
@@ -187,7 +187,7 @@ def test_missing_seed_yields_an_empty_but_migrated_database(monkeypatch, tmp_pat
     )
     monkeypatch.setattr(database_resolver, "user_database_path", lambda: user_db)
 
-    resolved = database_resolver.resolve_database_location()
+    resolved = database_resolver.resolve_database_path()
 
     assert resolved == user_db
     conn = sqlite3.connect(user_db)
