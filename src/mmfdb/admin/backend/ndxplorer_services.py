@@ -45,8 +45,11 @@ def _utc_now() -> str:
 
 def register_ndxplorer_services(dispatcher: Any, *, db_path: str = "") -> None:
     global _resolved_db_path
-    _resolved_db_path = db_path or str(resolve_database_path())
-    _db_path = _resolved_db_path
+    # Pin the path only when the caller named one. Resolving here instead
+    # would freeze the default for the life of the process, and a later
+    # call that resolves to a different database (a switch, a test) would
+    # silently keep talking to the first one.
+    _resolved_db_path = str(db_path) if db_path else ""
     """Register fdb Phase 2 RPC handlers for ndxplorer.
 
     Parameters
