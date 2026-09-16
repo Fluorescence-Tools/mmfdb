@@ -219,6 +219,13 @@ def archive_project_to_mmfdb(
                 "project_format_version": project_format_version,
                 "description": description,
                 "created": created,
+                # This is the authoritative restore record.  Dataset/fit/node
+                # artifacts support provenance and queries, but their partial
+                # reconstruction cannot faithfully recover global fit
+                # structure, linked parameters, windows, or arbitrary UI
+                # state.  The input has already crossed ChiSurf's JSON-safe
+                # project boundary before it reaches this archiver.
+                "fit_structure": project_payload,
                 "ui_state": project_payload.get("ui", {}),
                 "experiments": project_payload.get("experiments", {}),
             },
@@ -375,6 +382,7 @@ def archive_project_to_mmfdb(
                     _session_from_fit_state_payload,
                     _store_fit_state_links,
                     _store_fit_state_parameters,
+                    _session_to_schema,
                     _validate_fit_state_payload,
                 )
                 from mmfdb.adapters.chinet import (
@@ -398,7 +406,12 @@ def archive_project_to_mmfdb(
                 session_artifact_id = None
                 if chinet_session is not None:
                     try:
-                        schema = chinet_session.to_schema()
+                        # The runtime is IMP.bff's GraphSession/GraphPort
+                        # compatibility surface.  The historic ``to_schema``
+                        # method belonged to an older chinet API; the adapter
+                        # now owns the stable persisted wrapper for either
+                        # runtime.
+                        schema = _session_to_schema(chinet_session)
                         session_artifact_id = _artifact_id(
                             CHINET_SESSION_ARTIFACT, chinet_session.oid
                         )
@@ -412,7 +425,7 @@ def archive_project_to_mmfdb(
                                 "schema_name": schema["schema_name"],
                                 "schema_version": schema["schema_version"],
                                 "session_id": chinet_session.oid,
-                                "source": "chinet",
+                                "source": "IMP.bff",
                                 "operation_id": fit_op_id,
                             },
                         )
@@ -450,7 +463,7 @@ def archive_project_to_mmfdb(
                                     "schema_name": "chinet.node.v1",
                                     "session_id": chinet_session.oid,
                                     "node_id": node.oid,
-                                    "source": "chinet",
+                                    "source": "IMP.bff",
                                     "operation_id": fit_op_id,
                                 },
                             )
