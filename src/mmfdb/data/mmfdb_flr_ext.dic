@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.7
+    _dictionary.version          1.8
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -93,6 +93,23 @@ save_flr_sample
 ;
    _category.mandatory_code  no
    _category_key.name        "_flr_sample.id"
+
+save__flr_fret_calibration_parameters.phi_donor
+   _item.name                "_flr_fret_calibration_parameters.phi_donor"
+   _item.category_id         flr_fret_calibration_parameters
+   _item.mandatory_code      no
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_fret_calibration_parameters
+   _mmfdb_schema.column_name phi_donor
+   _item_description.description
+;     Fluorescence quantum yield of the donor.
+;
+;     The IHM-FLR dictionary defines phi_acceptor but not its donor
+;     counterpart, although the detection-correction factor gamma is
+;     (gR*phi_acceptor)/(gG*phi_donor) and needs both. Stored so a
+;     calibration can be read back without the donor yield having to be
+;     remembered separately from the measurement it was determined with.
+;
 
 save__flr_sample.id
    _item.name                "_flr_sample.id"
@@ -3279,6 +3296,340 @@ save__mmfdb_label_score.status
       unresolved   "the position is not resolved in the structure"
       unavailable  "an input the score needs was missing, e.g. no alignment for conservation"
 
+save_mmfdb_optical_property
+   _category.id              mmfdb_optical_property
+   _category.description
+;     A scalar optical property of a probe: a quantum yield, a molar extinction
+;     coefficient, an absorption or emission maximum.
+;
+;     These had nowhere to live.  Nothing in the loaded dictionaries -- mmCIF
+;     std, PDBx, DDL, MA, IHM, IHM-FLR, or the MMFDB extensions -- declares an
+;     item for a fluorescence quantum yield or an extinction coefficient; the
+;     only near matches are `_em_detector.detective_quantum_efficiency`, which
+;     is a detector property, and the crystallographic `_refine.ls_extinction_*`
+;     family, which is about absorption in a crystal and not about a dye.  So
+;     every program in this stack kept them in a private category of its own,
+;     and two files describing the same dye could not be compared.
+;
+;     The shape is deliberately generic -- a name, a value and a unit -- because
+;     it mirrors the `optical_properties` table this database already has, and
+;     because the list of scalars worth recording about a dye is open.  A
+;     property whose name is not in the enumeration below is a property nobody
+;     has agreed on yet; add it here rather than inventing a category.
+;
+;     Spectra are NOT scalars and do not belong here: see _mmfdb_spectrum.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_optical_property.id"
+
+save__mmfdb_optical_property.id
+   _item.name                "_mmfdb_optical_property.id"
+   _item.category_id         mmfdb_optical_property
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  optical_properties
+   _mmfdb_schema.column_name id
+
+save__mmfdb_optical_property.probe_id
+   _item.name                "_mmfdb_optical_property.probe_id"
+   _item.category_id         mmfdb_optical_property
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  optical_properties
+   _mmfdb_schema.column_name probe_id
+   _item_description.description
+;     The probe this is a property of.  Joins to `_flr_probe_list.probe_id`,
+;     so a dye described here and a dye described in flrCIF are the same dye.
+;
+
+save__mmfdb_optical_property.property_name
+   _item.name                "_mmfdb_optical_property.property_name"
+   _item.category_id         mmfdb_optical_property
+   _item_type.code           ucode
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  optical_properties
+   _mmfdb_schema.column_name property_name
+   _item_description.description
+;     WHICH scalar this is.
+;
+;     DELIBERATELY NOT AN ENUMERATION.  An `_item_enumeration` here is a closed
+;     set and generates a CHECK constraint, and the primary dataset in this
+;     stack would violate it: 19882 optical properties are stored under 76
+;     distinct names written by importers that never agreed -- `qy` beside
+;     `q_fluor`, `ext_coeff` beside `molar_extinction`, `em_max` beside
+;     `Emission max`, some of it mojibake -- with `unit` NULL on every one.
+;     Filter and detector properties share the table with dye properties.
+;     Declaring a closed set would make a fresh database reject the data it
+;     exists to hold, which is a worse failure than an uncontrolled column.
+;
+;     The CANONICAL names a writer should use, and what they mean:
+;
+;       quantum_yield           fluorescence quantum yield, dimensionless, 0-1
+;       extinction_coefficient  molar extinction at the absorption maximum
+;       excitation_maximum      wavelength of the absorption maximum
+;       emission_maximum        wavelength of the emission maximum
+;       fluorescence_lifetime   the unquenched fluorescence lifetime
+;       anisotropy_fundamental  the fundamental anisotropy r0, dimensionless
+;       steric_radius           chromophore radius as a steric obstacle
+;       hydrodynamic_radius     radius governing rotational diffusion
+;
+;     A reader must expect others, and must not read a missing `unit` as
+;     dimensionless.  Migrating the stored names onto the canonical ones is a
+;     separate, tracked job; it is not something a dictionary can assert.
+;
+
+save__mmfdb_optical_property.property_value
+   _item.name                "_mmfdb_optical_property.property_value"
+   _item.category_id         mmfdb_optical_property
+   _item_type.code           float
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  optical_properties
+   _mmfdb_schema.column_name property_value
+   _item_description.description
+;     The value.  Absent when the property was not measured -- never zero: a
+;     quantum yield of 0 is a real and unusual claim about a dye.
+;
+
+save__mmfdb_optical_property.unit
+   _item.name                "_mmfdb_optical_property.unit"
+   _item.category_id         mmfdb_optical_property
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  optical_properties
+   _mmfdb_schema.column_name unit
+   _item_description.description
+;     An _mmfdb_column.units term, plus the two an extinction coefficient
+;     needs.  `dimensionless` for a quantum yield or an anisotropy is a
+;     positive claim and should be written rather than omitted.
+;
+    loop_
+    _item_enumeration.value
+      dimensionless
+      nanometres
+      angstroms
+      nanoseconds
+      per_molar_per_centimetre
+
+save_mmfdb_probe
+   _category.id              mmfdb_probe
+   _category.description
+;     What kind of thing a probe is, and who makes it.
+;
+;     Kept in the _mmfdb_ namespace rather than added to _flr_probe_list so a
+;     future IHM-FLR item of the same name cannot collide with it; the schema
+;     binding puts both on the existing `probes` table, so this adds columns,
+;     not a table.
+;
+;     `_flr_probe_list.probe_origin` answers a different question -- how the
+;     probe got onto the molecule (intrinsic / extrinsic).  A fluorescent
+;     protein is intrinsic and a spin label extrinsic, but neither fact tells
+;     you that one fluoresces and the other does not, which is what decides
+;     whether a Forster radius exists at all.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_probe.probe_id"
+
+save__mmfdb_probe.probe_id
+   _item.name                "_mmfdb_probe.probe_id"
+   _item.category_id         mmfdb_probe
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name probe_id
+   _item_description.description
+;     The probe this row describes; the _flr_probe_list.chromophore_name.
+;
+
+save__mmfdb_probe.probe_type
+   _item.name                "_mmfdb_probe.probe_type"
+   _item.category_id         mmfdb_probe
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name probe_type
+   _item_description.description
+;     What the probe is.  Omitting it is read as `unspecified`, which is what
+;     a store written before this item existed means; `unspecified` is
+;     therefore also a value that can be written deliberately.
+;
+    loop_
+    _item_enumeration.value
+      dye
+      fluorescent_protein
+      spin_label
+      unspecified
+
+save__mmfdb_probe.vendor
+   _item.name                "_mmfdb_probe.vendor"
+   _item.category_id         mmfdb_probe
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name vendor
+   _item_description.description
+;     Who supplies it -- ATTO, Lumiprobe, AlexaFluor.  Not an identifier: two
+;     vendors sell probes of the same name and one vendor renames its own.
+;
+
+save__mmfdb_probe.dipole_atoms
+   _item.name                "_mmfdb_probe.dipole_atoms"
+   _item.category_id         mmfdb_probe
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name dipole_atoms
+   _item_description.description
+;     The two atom names whose separation defines the transition dipole,
+;     stored as an array.
+;
+;     Absent is a positive statement, not missing data: it means the probe is
+;     modelled as an isotropic emitter, which is what kappa^2 = 2/3 assumes.
+;     A consumer that silently substitutes the isotropic value for a probe
+;     whose dipole *was* recorded, and lost, gets a plausible orientation
+;     factor and no indication it was invented.
+;
+
+save__mmfdb_probe.positive_atoms
+   _item.name                "_mmfdb_probe.positive_atoms"
+   _item.category_id         mmfdb_probe
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name positive_atoms
+   _item_description.description
+;     Atom names carrying a formal positive charge, as an array.  A probe's
+;     net charge is not decoration: it decides whether the probe is attracted
+;     to or repelled from the surface it is tethered beside, and a
+;     sulfonated dye beside an acidic patch behaves unlike a neutral one.
+;
+
+save__mmfdb_probe.negative_atoms
+   _item.name                "_mmfdb_probe.negative_atoms"
+   _item.category_id         mmfdb_probe
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  probes
+   _mmfdb_schema.column_name negative_atoms
+   _item_description.description
+;     Atom names carrying a formal negative charge, as an array.  See
+;     _mmfdb_probe.positive_atoms.
+;
+
+save_mmfdb_spectrum
+   _category.id              mmfdb_spectrum
+   _category.description
+;     An excitation or emission spectrum of a probe, as two arrays.
+;
+;     Kept out of _mmfdb_optical_property because a spectrum is not a scalar
+;     and flattening it into name/value pairs would lose the pairing between a
+;     wavelength and its intensity.  The only spectral categories anywhere in
+;     the loaded dictionaries are NMR ones (`_pdbx_nmr_spectral_*`), which
+;     describe a different measurement entirely.
+;
+;     A spectral overlap -- and therefore a Forster radius -- is computed from
+;     the donor emission and the acceptor excitation, so these two are what
+;     make R0 derivable rather than supplied.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_spectrum.id"
+
+save__mmfdb_spectrum.id
+   _item.name                "_mmfdb_spectrum.id"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name id
+
+save__mmfdb_spectrum.probe_id
+   _item.name                "_mmfdb_spectrum.probe_id"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           code
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name probe_id
+
+save__mmfdb_spectrum.spectrum_type
+   _item.name                "_mmfdb_spectrum.spectrum_type"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           ucode
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name spectrum_type
+    loop_
+    _item_enumeration.value
+    _item_enumeration.detail
+      absorption          "what the probe absorbs; the acceptor side of an overlap"
+      excitation          "measured excitation, which is absorption only for an ideal dye"
+      emission            "what the probe emits; the donor side of an overlap"
+      transmission        "a filter or dichroic: the fraction passed"
+      reflectance         "a mirror or dichroic: the fraction reflected"
+      quantum_efficiency  "a detector: photoelectrons per incident photon"
+      responsivity        "a detector: output per unit incident power"
+;
+;     The last four are not dye properties.  The table is shared with the
+;     optical components a measurement is made through, because a filter's
+;     transmission and a dye's emission are the same kind of object -- two
+;     arrays against a wavelength axis -- and separating them would mean two
+;     tables and two readers for one shape.
+
+save__mmfdb_spectrum.wavelengths
+   _item.name                "_mmfdb_spectrum.wavelengths"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           text
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name wavelengths
+   _item_description.description
+;     The wavelength axis, paired elementwise with the intensities.  Stored as
+;     an array; in a CIF serialisation the pairing is one row per point.
+;
+
+save__mmfdb_spectrum.intensity_values
+   _item.name                "_mmfdb_spectrum.intensity_values"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           text
+   _item.mandatory_code      yes
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name intensity_values
+
+save__mmfdb_spectrum.wavelength_unit
+   _item.name                "_mmfdb_spectrum.wavelength_unit"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name wavelength_unit
+   _item_description.description
+;     `nm` rather than the `nanometres` of _mmfdb_column.units, because that is
+;     what the 2896 spectra already stored in this stack are labelled with and
+;     a dictionary that renamed them would invalidate every existing row to no
+;     benefit.  The two spellings mean the same thing; a consumer converting
+;     between the column vocabulary and this one maps them.
+;
+    loop_
+    _item_enumeration.value
+      nm
+      um
+
+save__mmfdb_spectrum.intensity_unit
+   _item.name                "_mmfdb_spectrum.intensity_unit"
+   _item.category_id         mmfdb_spectrum
+   _item_type.code           ucode
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  spectra
+   _mmfdb_schema.column_name intensity_unit
+   _item_description.description
+;     `normalized` is the common case and means the peak is 1; it does NOT mean
+;     the area is 1, and a spectral overlap integral has to renormalise.
+;
+    loop_
+    _item_enumeration.value
+      normalized
+      counts
+      per_molar_per_centimetre
+      dimensionless
+
 save_mmfdb_artifact
    _category.id              mmfdb_artifact
    _category.description
@@ -3427,6 +3778,21 @@ save__mmfdb_artifact.row_grain
 ;     or lost.  Stating the grain is what lets an artifact-to-artifact edge
 ;     (see _mmfdb_edge.source_row_column) be resolved to rows.
 ;
+;     `spectrum` is one curve: a wavelength axis and the intensities paired
+;     with it, as `_mmfdb_spectrum` stores them.  It is NOT `curve_point`,
+;     which is one point of one curve -- a table at `spectrum` grain has one
+;     row per (probe, spectrum_type) and carries arrays, which is both what the
+;     `spectra` table holds and, in a serialisation with arrays, about a tenth
+;     the size of the same data written a point per row.
+;
+;     `label_site` is a position on a polymer that a label could be attached
+;     to -- an (asym_id, seq_id) pair, the same thing `_flr_poly_probe_position`
+;     addresses.  It is not `species` and not `state`: those count what a
+;     molecule IS, and this counts a PLACE ON one.  A table of label-site scores
+;     is finer than one row per residue whenever more than one quantity is
+;     scored at a position, which is the normal case -- so a reader joins it on
+;     (asym_id, seq_id, score_type) and not on row order.
+;
 ;     `spot` and `region` are not synonyms and the difference is not pedantry.
 ;     A spot is a point-like detection -- a localisation, with a position and
 ;     at most a width.  A region is an arbitrary connected set of pixels that
@@ -3456,6 +3822,8 @@ save__mmfdb_artifact.row_grain
       pair
       file
       histogram_bin
+      label_site
+      spectrum
 
 save__mmfdb_artifact.storage_mode
    _item.name                "_mmfdb_artifact.storage_mode"
@@ -3803,6 +4171,7 @@ save__mmfdb_operation.operation_type
       psf_determination
       region_detection
       pda_burst_likelihood
+      clustering
 
 save__mmfdb_operation.algorithm
    _item.name                "_mmfdb_operation.algorithm"
@@ -6185,6 +6554,118 @@ save__mmfdb_artifact.url
    _item.mandatory_code      no
    _mmfdb_schema.table_name  mmfdb_artifact
    _mmfdb_schema.column_name url
+
+save__mmfdb_artifact.author
+   _item.name                "_mmfdb_artifact.author"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name author
+   _item_description.description
+;     Who made the data this artifact holds, as they name themselves.
+;
+;     Free text, because an author list is not a controlled vocabulary and a
+;     writer that has to normalise one will get it wrong or drop it.  This is
+;     the upstream author of the DATA, not whoever ran the tool -- that is
+;     _mmfdb_operation.operator_user_id, and the two are routinely different:
+;     a converted rotamer library is somebody else's measurement in this
+;     package's format.
+;
+
+save__mmfdb_artifact.citation
+   _item.name                "_mmfdb_artifact.citation"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name citation
+   _item_description.description
+;     Where the data was published: a DOI where one exists, otherwise enough
+;     of a reference to find it.
+;
+
+save__mmfdb_artifact.license
+   _item.name                "_mmfdb_artifact.license"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name license
+   _item_description.description
+;     An SPDX license identifier, WHERE ONE EXISTS -- "GPL-3.0-only", "MIT".
+;
+;     Deliberately not mandatory and deliberately not the only way to state
+;     terms.  A great deal of scientific data is released under conditions that
+;     have no SPDX identifier at all -- "free for academic use" is the common
+;     one -- and coining a LicenseRef for it would state something the upstream
+;     did not.  Use _mmfdb_artifact.terms for those, and expect to see one or
+;     the other rather than both.
+;
+;     A writer that has neither should say so out of band rather than guess:
+;     an artifact whose terms are unknown is a different thing from one that is
+;     unrestricted, and the difference matters to whoever redistributes it.
+;
+
+save__mmfdb_artifact.terms
+   _item.name                "_mmfdb_artifact.terms"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name terms
+   _item_description.description
+;     The conditions of use in words, for data whose terms have no SPDX
+;     identifier -- "free for academic use", "no commercial redistribution".
+;
+;     Carried verbatim.  A summary of a licence is not a licence.
+;
+
+save__mmfdb_artifact.terms_url
+   _item.name                "_mmfdb_artifact.terms_url"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           code
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name terms_url
+   _item_description.description
+;     Where the terms actually live, so a reader can check them rather than
+;     trust this file's paraphrase.
+;
+
+save__mmfdb_artifact.source
+   _item.name                "_mmfdb_artifact.source"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name source
+   _item_description.description
+;     What this artifact was made FROM, when that is a thing outside this
+;     database -- an upstream file name, a database release, an accession.
+;
+;     _mmfdb_edge.source_node_id says which artifact IN HERE it came from; this
+;     says what came in from outside, which no edge can point at.
+;
+
+save__mmfdb_artifact.redistributed_via
+   _item.name                "_mmfdb_artifact.redistributed_via"
+   _item.category_id         mmfdb_artifact
+   _item_type.code           text
+   _item.mandatory_code      no
+   _mmfdb_schema.table_name  mmfdb_artifact
+   _mmfdb_schema.column_name redistributed_via
+   _item_description.description
+;     The intermediary the data reached this package through, when it did not
+;     come straight from its author.
+;
+;     This exists because the licences differ along that chain and recording
+;     only the immediate source loses it.  The worked case: the Dunbrack 2010
+;     backbone-dependent rotamer library reaches this stack through FASPR,
+;     which is MIT, while the library itself is not -- an artifact naming only
+;     FASPR would understate its obligations, and one naming only Dunbrack
+;     would lose where the bytes were actually obtained.
+;
 
 save__mmfdb_artifact.folder_path
    _item.name                "_mmfdb_artifact.folder_path"
