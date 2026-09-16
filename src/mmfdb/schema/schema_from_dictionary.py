@@ -142,7 +142,7 @@ def _quote_default(value: str, sql_type: str) -> str:
 
 
 def _column_def(item: DictItem, category_name: str) -> str:
-    """Build the ``column TYPE [NOT NULL] [DEFAULT ...]`` fragment."""
+    """Build the ``column TYPE [NOT NULL] [DEFAULT ...] [CHECK (...)]`` fragment."""
     col = item.schema_column or item.attribute
     sql_type = _sql_type_for_item(item)
     parts = [col, sql_type]
@@ -152,6 +152,12 @@ def _column_def(item: DictItem, category_name: str) -> str:
 
     if item.default_value:
         parts.append(f"DEFAULT {_quote_default(item.default_value, sql_type)}")
+
+    if item.enumerations:
+        vals = ", ".join(
+            "'{}'".format(v.replace("'", "''")) for v in item.enumerations
+        )
+        parts.append(f"CHECK ({col} IN ({vals}))")
 
     return " ".join(parts)
 
