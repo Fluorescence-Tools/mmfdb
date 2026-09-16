@@ -130,8 +130,11 @@ def register_services(
 ) -> None:
     """Register mmfdb RPC handlers."""
     global _resolved_db_path
-    _resolved_db_path = db_path or str(resolve_database_path())
-    _db_path = _resolved_db_path
+    # Pin the path only when the caller named one. Resolving here instead
+    # would freeze the default for the life of the process, and a later
+    # call that resolves to a different database (a switch, a test) would
+    # silently keep talking to the first one.
+    _resolved_db_path = str(db_path) if db_path else ""
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
     register_auth_services(dispatcher, db_path=_resolved_db_path)
     register_measurement_services(

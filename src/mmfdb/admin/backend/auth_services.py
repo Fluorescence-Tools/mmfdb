@@ -52,8 +52,11 @@ def _get_conn(db):
 
 def register_services(dispatcher_or_context: Any, *, db_path: str = "") -> None:
     global _resolved_db_path
-    _resolved_db_path = db_path or str(resolve_database_path())
-    _db_path = _resolved_db_path
+    # Pin the path only when the caller named one. Resolving here instead
+    # would freeze the default for the life of the process, and a later
+    # call that resolves to a different database (a switch, a test) would
+    # silently keep talking to the first one.
+    _resolved_db_path = str(db_path) if db_path else ""
     """Register auth/group/permission RPC handlers."""
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
 

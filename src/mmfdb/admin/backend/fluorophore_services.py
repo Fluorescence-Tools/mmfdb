@@ -487,8 +487,11 @@ def register_services(
     service registrations).
     """
     global _resolved_db_path
-    _resolved_db_path = db_path or str(resolve_database_path())
-    _db_path = _resolved_db_path
+    # Pin the path only when the caller named one. Resolving here instead
+    # would freeze the default for the life of the process, and a later
+    # call that resolves to a different database (a switch, a test) would
+    # silently keep talking to the first one.
+    _resolved_db_path = str(db_path) if db_path else ""
     def _kw(handler):
         return lambda params, _h=handler: _h(**(params or {}))
 

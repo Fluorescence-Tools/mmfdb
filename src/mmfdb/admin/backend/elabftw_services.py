@@ -439,7 +439,6 @@ def register_elabftw_services(
 ) -> ELabFTWService:
     """Register one shared eLabFTW service instance and return it for lifecycle use."""
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
-    _db_path = db_path or str(resolve_database_path())
     active = service or ELabFTWService()
     methods = {
         "mmfdb.elabftw.connect": active.connect,
