@@ -55,7 +55,9 @@ SHORT_TOKENS = {
     "npy", "bin", "raw", "map", "mti", "md5", "url", "bh",
     # ordinary words
     "and", "by", "in", "of", "on", "per", "to", "no", "yes", "row", "run",
-    "fit", "int", "kit", "tau", "cmd", "all", "set", "add", "app",
+    "fit", "int", "kit", "tau", "cmd", "all", "set", "add", "app", "dye",
+    # SI unit symbols, which are the spelled-out form
+    "nm", "um",
 }
 
 #: Values that are literally numeric, which no naming rule sensibly applies to.
