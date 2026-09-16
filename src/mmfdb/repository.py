@@ -206,6 +206,15 @@ class MFDatabase(
     ):
         import os as _os
         self._os = _os
+        if db_path is not None and not isinstance(db_path, (str, _os.PathLike)):
+            # A stringified non-path (e.g. a Connection repr) is a valid file
+            # name, so SQLite would silently create that file and the real
+            # database would never be touched.
+            raise TypeError(
+                "MFDatabase db_path must be a str or Path, got "
+                f"{type(db_path).__name__}; to reuse an open connection pass "
+                "it as `connection=`, not as the path"
+            )
         if db_path is None and connection is None:
             db_path = resolve_database_path()
         self.database_target: DatabaseTarget | None = (
@@ -1451,7 +1460,10 @@ class MFDatabase(
             f"SELECT a.*, "
             f"       o.refcount AS object_refcount, "
             f"       o.original_filename AS original_filename, "
-            f"       s.description AS sample_name "
+            f"       s.description AS sample_name, "
+            f"       (SELECT COUNT(*) FROM mmfdb_artifact_member m "
+            f"        WHERE m.artifact_id = a.artifact_id "
+            f"          AND m.deleted_at IS NULL) AS member_count "
             f"FROM mmfdb_artifact a "
             f"LEFT JOIN mmfdb_object o ON o.object_uuid = a.object_uuid "
             f"LEFT JOIN mmfdb_edge e ON e.source_node_id = a.artifact_id "
