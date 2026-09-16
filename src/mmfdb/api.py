@@ -1302,14 +1302,14 @@ def get_chinet_session(artifact_id: str, auth: dict[str, Any] | None = None) -> 
     dict
         RPC result containing artifact and session schema.
     """
-    from mmfdb.adapters.chinet import load_chinet_session
+    from mmfdb.adapters.chinet import _session_to_schema, load_chinet_session
 
     with _database(auth) as db:
         principal = _principal(db, auth)
         _acl_read_or_pass(db.conn, principal, "artifact", artifact_id)
         session = load_chinet_session(db, artifact_id)
         artifact = db.get_artifact(artifact_id)
-        return {"ok": True, "artifact": artifact, "session": session.to_schema()}
+        return {"ok": True, "artifact": artifact, "session": _session_to_schema(session)}
 
 
 def list_chinet_sessions(

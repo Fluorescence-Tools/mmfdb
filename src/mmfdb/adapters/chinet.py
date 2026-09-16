@@ -11,6 +11,10 @@ except ModuleNotFoundError as exc:
     if exc.name != "chinet":
         raise
     chinet = None
+#: ChiSurf's node-graph runtime is IMP.bff now (the vendored chinet module
+#: is gone from its tree); when chinet itself is not importable, the
+#: adapter runs on the bff-backed chinet-surface shim instead.
+from mmfdb.adapters import _bff_compat
 
 from mmfdb.models import (
     PARAMETER_TYPES,
@@ -49,12 +53,12 @@ def _session_to_schema(session: Any) -> dict[str, Any]:
     Wraps chinet's ``session.to_dict()`` serialization with the schema_name/version +
     software metadata the MMFDB records expect (chinet no longer provides ``to_schema``).
     """
-    import chinet as _cn
+    client = _require_chinet()
 
     return {
         "schema_name": CHINET_SESSION_SCHEMA,
         "schema_version": CHINET_SESSION_SCHEMA_VERSION,
-        "software": {"package": "chinet", "version": getattr(_cn, "__version__", "")},
+        "software": {"package": "chinet", "version": getattr(client, "__version__", "")},
         "session": session.to_dict(),
     }
 
@@ -100,10 +104,15 @@ def _require_chinet() -> Any:
     ImportError
         If optional ``chinet`` dependency is not installed.
     """
-    if chinet is None:
-        raise ImportError(
-            "Optional dependency 'chinet' is required for chinet/MMFDB integration"
-        )
+    if chinet is not None:
+        return chinet
+    if _bff_compat._bff is not None:
+        return _bff_compat
+    raise ImportError(
+        "chinet/MMFDB integration requires a node-graph runtime: the "
+        "'chinet' package, or 'IMP.bff' (ChiSurf's replacement) -- neither "
+        "is importable"
+    )
     return chinet
 
 
