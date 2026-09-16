@@ -330,11 +330,10 @@ def _create_empty_database(path: Path) -> None:
 
 
 def _read_schema_version(conn: sqlite3.Connection) -> int | None:
-    try:
-        row = conn.execute("SELECT version FROM _schema_version").fetchone()
-    except sqlite3.OperationalError:
-        return None
-    return int(row[0]) if row is not None else None
+    """Return the stamped schema version, or ``None`` when unstamped."""
+    from mmfdb.schema import schema
+
+    return schema.get_schema_version(conn) or None
 
 
 def _default_reference_spectra_path() -> Path:

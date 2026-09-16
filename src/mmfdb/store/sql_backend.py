@@ -520,15 +520,12 @@ def postgres_schema_version(connection: PostgreSQLConnection) -> int:
     rows = connection.execute(
         """SELECT table_name FROM information_schema.tables
            WHERE table_schema = current_schema()
-             AND table_name IN ('mmfdb_schema_version', '_schema_version')"""
+             AND table_name = 'mmfdb_schema_version'"""
     ).fetchall()
-    names = {str(row[0]) for row in rows}
-    for table in ("mmfdb_schema_version", "_schema_version"):
-        if table in names:
-            row = connection.execute(f'SELECT version FROM "{table}"').fetchone()
-            if row is not None:
-                return int(row[0])
-    return 0
+    if not rows:
+        return 0
+    row = connection.execute('SELECT version FROM "mmfdb_schema_version"').fetchone()
+    return int(row[0]) if row is not None else 0
 
 
 def validate_postgresql_schema(connection: PostgreSQLConnection) -> None:

@@ -15,8 +15,8 @@ def test_backup_before_migration_copies_existing_database():
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "sample_management.db"
         conn = sqlite3.connect(db_path)
-        conn.execute("CREATE TABLE _schema_version (version INTEGER)")
-        conn.execute("INSERT INTO _schema_version VALUES (8)")
+        conn.execute("CREATE TABLE mmfdb_schema_version (version INTEGER)")
+        conn.execute("INSERT INTO mmfdb_schema_version VALUES (8)")
         conn.commit()
         conn.close()
 
@@ -27,7 +27,7 @@ def test_backup_before_migration_copies_existing_database():
         backup = sqlite3.connect(backup_path)
         try:
             assert backup.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
-            assert backup.execute("SELECT version FROM _schema_version").fetchone()[0] == 8
+            assert backup.execute("SELECT version FROM mmfdb_schema_version").fetchone()[0] == 8
         finally:
             backup.close()
 
@@ -111,7 +111,7 @@ def test_packaged_seed_is_curated_and_openable():
 
     conn = sqlite3.connect(f"file:{seed}?mode=ro", uri=True)
     try:
-        version = conn.execute("SELECT version FROM _schema_version").fetchone()[0]
+        version = conn.execute("SELECT version FROM mmfdb_schema_version").fetchone()[0]
         assert 0 < version <= schema.SCHEMA_VERSION, (
             f"seed schema {version} is newer than this MMFDB's {schema.SCHEMA_VERSION}"
         )
@@ -192,7 +192,7 @@ def test_missing_seed_yields_an_empty_but_migrated_database(monkeypatch, tmp_pat
     assert resolved == user_db
     conn = sqlite3.connect(user_db)
     try:
-        assert conn.execute("SELECT version FROM _schema_version").fetchone()[0] == (
+        assert conn.execute("SELECT version FROM mmfdb_schema_version").fetchone()[0] == (
             schema.SCHEMA_VERSION
         )
     finally:
