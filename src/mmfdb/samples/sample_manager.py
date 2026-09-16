@@ -166,13 +166,13 @@ def get_sample(db: MFDatabase, sample_id: str) -> dict[str, Any] | None:
     dict or None
         Sample fields with metadata merged into the top level.
 
+    Notes
+    -----
+    Delegates to the canonical schema-driven read
+    (:meth:`MFDatabase.get_sample`, PRD-25 H3) rather than a hand-written
+    column-subset SELECT, so there is one sample read path.
     """
-    row = db.conn.execute(
-        """SELECT sample_id, description, details, sample_type
-           FROM flr_sample
-           WHERE sample_id = ? AND deleted_at IS NULL""",
-        (sample_id,),
-    ).fetchone()
+    row = db.get_sample(sample_id)
     if not row:
         return None
     return _sample_row_to_dict(row)

@@ -136,6 +136,10 @@ class ArtifactOpsMixin:
         now = _utc_now()
         with self._transaction():
             self.conn.execute("UPDATE mmfdb_operation SET status = ?, updated_at = ? WHERE operation_id = ?", (status, now, operation_id))
+        try:
+            self.transition_state("operation", operation_id, status)
+        except Exception:
+            pass
 
     def get_operations(self, operation_type=None, status=None, workflow_id=None):
         if workflow_id:
@@ -679,6 +683,10 @@ class ArtifactOpsMixin:
                    WHERE operation_id = ?""",
                 (status, error_message, traceback_summary, now, run_id),
             )
+        try:
+            self.transition_state("operation", run_id, status)
+        except Exception:
+            pass
         self.add_audit_log(
             action="update",
             target_type="processing_run",
@@ -1068,6 +1076,10 @@ class ArtifactOpsMixin:
                    WHERE operation_id = ?""",
                 (status, error_message, traceback_summary, now, operation_id),
             )
+            try:
+                self.transition_state("operation", operation_id, status)
+            except Exception:
+                pass
             self.add_audit_log(
                 action="transition_status",
                 target_type="operation",
