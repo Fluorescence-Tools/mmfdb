@@ -88,7 +88,7 @@ def resolve_database_location() -> str | Path:
 
     if not user_path.exists():
         if source_path.exists():
-            _copy_database(source_path, user_path)
+            _install_seed(source_path, user_path)
         else:
             logger.warning(
                 "Curated MMFDB seed missing at %s; creating an empty database at %s. "
@@ -170,10 +170,13 @@ def reset_user_database_from_source() -> dict[str, object]:
     _copy_database(source_path, user_path)
     # The replaced database's write-ahead log describes pages of a file that no
     # longer exists; leaving it beside the seed replays foreign content into it.
+    # This happens before the migration below, which is the first thing to open
+    # the new file.
     for suffix in ("-wal", "-shm"):
         sidecar = Path(f"{user_path}{suffix}")
         if sidecar.exists():
             sidecar.unlink()
+    _migrate_database(user_path)
     with MFDatabase(user_path) as db:
         accounts = ensure_default_accounts(db.conn)
     return {
@@ -245,6 +248,64 @@ def _online_backup(source_path: Path, backup_path: Path) -> None:
     finally:
         if tmp_path.exists():
             tmp_path.unlink()
+
+
+def _install_seed(source_path: Path, user_path: Path) -> None:
+    """Copy the curated seed into place and bring it to the current schema.
+
+    The seed is package data: it is written once, for whichever schema was
+    current that day, and every release after that leaves it behind. Migrating
+    the copy here is what lets a seed lag the code without shipping a database
+    nobody can open -- the seed itself is never written to, and the copy is
+    migrated before anything opens it, so a read-only first open works too.
+    """
+    _copy_database(source_path, user_path)
+    try:
+        _migrate_database(user_path)
+    except Exception as error:
+        raise RuntimeError(
+            f"The curated MMFDB seed at {source_path} could not be brought to "
+            f"schema {_current_schema_version()}: {error}"
+        ) from error
+
+
+def _current_schema_version() -> int:
+    from mmfdb.schema import schema
+
+    return schema.SCHEMA_VERSION
+
+
+def _migrate_database(path: Path) -> None:
+    """Apply pending migrations to the database at *path*.
+
+    No pre-migration backup is taken: this runs on a copy of the seed that
+    nothing has opened yet, so there is no user data to lose -- and if the
+    migration fails the file is removed rather than left half-migrated for
+    the next run to find.
+    """
+    from mmfdb.schema import schema
+
+    conn = sqlite3.connect(str(path))
+    try:
+        before = _read_schema_version(conn)
+        report = schema.migrate_schema(conn)
+        conn.commit()
+    except Exception:
+        conn.close()
+        path.unlink(missing_ok=True)
+        raise
+    finally:
+        try:
+            conn.close()
+        except Exception:  # pragma: no cover - already closed on the error path
+            pass
+    if report is not None:
+        logger.info(
+            "Migrated the seeded database at %s from schema %s to %s",
+            path,
+            before,
+            schema.SCHEMA_VERSION,
+        )
 
 
 def _copy_database(source_path: Path, user_path: Path) -> None:
