@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.8
+    _dictionary.version          1.9
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -3724,6 +3724,7 @@ save__mmfdb_artifact.artifact_kind
       row_mapping
       readme
       sample_metadata
+      analysis_view_state
 
 save__mmfdb_artifact.data_format
    _item.name                "_mmfdb_artifact.data_format"
