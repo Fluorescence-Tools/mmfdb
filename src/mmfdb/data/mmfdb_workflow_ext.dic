@@ -1244,6 +1244,66 @@ save__mmfdb_burst_column.r_experimental_red
    _mmfdb_burst_column.source   .br4
 #
 save_
+save__mmfdb_burst_column.phasor_g
+   _item_description.description "Phasor coordinate g (real part, cosine transform) of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_g"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "g"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
+save__mmfdb_burst_column.phasor_s
+   _item_description.description "Phasor coordinate s (imaginary part, sine transform) of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_s"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "s"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
+save__mmfdb_burst_column.phasor_g_green
+   _item_description.description "Phasor coordinate g (real part, cosine transform) of the green channel of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_g_green"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "g (green)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
+save__mmfdb_burst_column.phasor_s_green
+   _item_description.description "Phasor coordinate s (imaginary part, sine transform) of the green channel of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_s_green"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "s (green)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
+save__mmfdb_burst_column.phasor_g_red
+   _item_description.description "Phasor coordinate g (real part, cosine transform) of the red channel of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_g_red"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "g (red)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
+save__mmfdb_burst_column.phasor_s_red
+   _item_description.description "Phasor coordinate s (imaginary part, sine transform) of the red channel of a pixel's or a burst's decay."
+   _item.name            "_mmfdb_burst_column.phasor_s_red"
+   _item.category_id     mmfdb_burst_column
+   _item_type.code       float
+   _mmfdb_burst_column.column   "s (red)"
+   _mmfdb_burst_column.units    .
+   _mmfdb_burst_column.source   .
+#
+save_
 save_mmfdb_constant
    _category.description
 ;              Scalar calibration constants used by the ndx equation engine
@@ -1338,6 +1398,30 @@ save__mmfdb_constant.tauD0
    _mmfdb_constant.name    "tauD0"
    _mmfdb_constant.symbol  "tauD(0)"
    _mmfdb_constant.units   ns
+   #
+save_
+save__mmfdb_constant.f_rep
+   _item_description.description "Modulation (laser repetition) frequency the phasor coordinates are computed at."
+   _item.name            "_mmfdb_constant.f_rep"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "f_rep"
+   _mmfdb_constant.symbol  f
+   _mmfdb_constant.units   MHz
+   #
+save_
+save__mmfdb_constant.harmonic
+   _item_description.description "Harmonic n of the phasor coordinates; the angular frequency is omega = 2*pi*f_rep*n."
+   _item.name            "_mmfdb_constant.harmonic"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "harmonic"
+   _mmfdb_constant.symbol  n
+   _mmfdb_constant.units   .
    #
 save_
 save__mmfdb_constant.beta
@@ -2018,5 +2102,59 @@ save__mmfdb_derived_column.rh_nm
    _item_type.code       float
    _mmfdb_derived_column.column   "Rh_nm_from_D"
    _mmfdb_derived_column.units    nm
+#
+save_
+save__mmfdb_derived_column.tau_phi
+   _item_description.description "s / (omega*g), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item.name            "_mmfdb_derived_column.tau_phi"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_phi"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.tau_m
+   _item_description.description "sqrt(1/(g^2 + s^2) - 1) / omega. Apparent modulation lifetime."
+   _item.name            "_mmfdb_derived_column.tau_m"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_m"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.tau_phi_green
+   _item_description.description "s (green) / (omega*g (green)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item.name            "_mmfdb_derived_column.tau_phi_green"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_phi (green)"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.tau_m_green
+   _item_description.description "sqrt(1/(g (green)^2 + s (green)^2) - 1) / omega. Apparent modulation lifetime."
+   _item.name            "_mmfdb_derived_column.tau_m_green"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_m (green)"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.tau_phi_red
+   _item_description.description "s (red) / (omega*g (red)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item.name            "_mmfdb_derived_column.tau_phi_red"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_phi (red)"
+   _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.tau_m_red
+   _item_description.description "sqrt(1/(g (red)^2 + s (red)^2) - 1) / omega. Apparent modulation lifetime."
+   _item.name            "_mmfdb_derived_column.tau_m_red"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "tau_m (red)"
+   _mmfdb_derived_column.units    ns
 #
 save_
