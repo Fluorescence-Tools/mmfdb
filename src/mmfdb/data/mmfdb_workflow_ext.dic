@@ -1424,6 +1424,138 @@ save__mmfdb_constant.harmonic
    _mmfdb_constant.units   .
    #
 save_
+save__mmfdb_constant.g_irf
+   _item_description.description "Phasor g of the instrument response (reference) of a pixel's or a burst's decay, at f_rep and harmonic; the measured phasor is divided by (g_irf + i s_irf). (1, 0) is an ideal instrument (no correction)."
+   _item.name            "_mmfdb_constant.g_irf"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "g_irf"
+   _mmfdb_constant.symbol  g_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.s_irf
+   _item_description.description "Phasor s of the instrument response (reference) of a pixel's or a burst's decay, at f_rep and harmonic; together with g_irf it must not be (0, 0)."
+   _item.name            "_mmfdb_constant.s_irf"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "s_irf"
+   _mmfdb_constant.symbol  s_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.g_irf_green
+   _item_description.description "Phasor g of the instrument response (reference) of the green detection channel, at f_rep and harmonic; the measured phasor is divided by (g_irf + i s_irf). (1, 0) is an ideal instrument (no correction)."
+   _item.name            "_mmfdb_constant.g_irf_green"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "g_irf (green)"
+   _mmfdb_constant.symbol  g_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.s_irf_green
+   _item_description.description "Phasor s of the instrument response (reference) of the green detection channel, at f_rep and harmonic; together with g_irf it must not be (0, 0)."
+   _item.name            "_mmfdb_constant.s_irf_green"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "s_irf (green)"
+   _mmfdb_constant.symbol  s_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.g_irf_red
+   _item_description.description "Phasor g of the instrument response (reference) of the red detection channel, at f_rep and harmonic; the measured phasor is divided by (g_irf + i s_irf). (1, 0) is an ideal instrument (no correction)."
+   _item.name            "_mmfdb_constant.g_irf_red"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "g_irf (red)"
+   _mmfdb_constant.symbol  g_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.s_irf_red
+   _item_description.description "Phasor s of the instrument response (reference) of the red detection channel, at f_rep and harmonic; together with g_irf it must not be (0, 0)."
+   _item.name            "_mmfdb_constant.s_irf_red"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "s_irf (red)"
+   _mmfdb_constant.symbol  s_IRF
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.n_bg
+   _item_description.description "Background photons expected in one row (pixel or burst) of a pixel's or a burst's decay; the background fraction is n_bg / Number of Photons. 0 is no background correction."
+   _item.name            "_mmfdb_constant.n_bg"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "n_bg"
+   _mmfdb_constant.symbol  N_bg
+   _mmfdb_constant.units   counts
+   #
+save_
+save__mmfdb_constant.n_bg_green
+   _item_description.description "Background photons expected in one row (pixel or burst) of the green detection channel; the background fraction is n_bg / Number of Photons (green). 0 is no background correction."
+   _item.name            "_mmfdb_constant.n_bg_green"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "n_bg (green)"
+   _mmfdb_constant.symbol  N_bg
+   _mmfdb_constant.units   counts
+   #
+save_
+save__mmfdb_constant.n_bg_red
+   _item_description.description "Background photons expected in one row (pixel or burst) of the red detection channel; the background fraction is n_bg / Number of Photons (red). 0 is no background correction."
+   _item.name            "_mmfdb_constant.n_bg_red"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "n_bg (red)"
+   _mmfdb_constant.symbol  N_bg
+   _mmfdb_constant.units   counts
+   #
+save_
+save__mmfdb_constant.g_bg
+   _item_description.description "Phasor g of the background decay as measured (before the IRF correction). Uncorrelated background spread evenly over the period is at (0, 0)."
+   _item.name            "_mmfdb_constant.g_bg"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "g_bg"
+   _mmfdb_constant.symbol  g_bg
+   _mmfdb_constant.units   .
+   #
+save_
+save__mmfdb_constant.s_bg
+   _item_description.description "Phasor s of the background decay as measured (before the IRF correction). Uncorrelated background spread evenly over the period is at (0, 0)."
+   _item.name            "_mmfdb_constant.s_bg"
+   _item.category_id     mmfdb_constant
+   _item.mandatory_code  no
+   _item_type.code       float
+   #
+   _mmfdb_constant.name    "s_bg"
+   _mmfdb_constant.symbol  s_bg
+   _mmfdb_constant.units   .
+   #
+save_
 save__mmfdb_constant.beta
    _item_description.description "Direct acceptor excitation coefficient at donor wavelength."
    _item.name            "_mmfdb_constant.beta"
@@ -2105,7 +2237,7 @@ save__mmfdb_derived_column.rh_nm
 #
 save_
 save__mmfdb_derived_column.tau_phi
-   _item_description.description "s / (omega*g), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item_description.description "s corr / (omega*g corr), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
    _item.name            "_mmfdb_derived_column.tau_phi"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
@@ -2114,7 +2246,7 @@ save__mmfdb_derived_column.tau_phi
 #
 save_
 save__mmfdb_derived_column.tau_m
-   _item_description.description "sqrt(1/(g^2 + s^2) - 1) / omega. Apparent modulation lifetime."
+   _item_description.description "sqrt(1/(g corr^2 + s corr^2) - 1) / omega. Apparent modulation lifetime."
    _item.name            "_mmfdb_derived_column.tau_m"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
@@ -2123,7 +2255,7 @@ save__mmfdb_derived_column.tau_m
 #
 save_
 save__mmfdb_derived_column.tau_phi_green
-   _item_description.description "s (green) / (omega*g (green)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item_description.description "s corr (green) / (omega*g corr (green)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
    _item.name            "_mmfdb_derived_column.tau_phi_green"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
@@ -2132,7 +2264,7 @@ save__mmfdb_derived_column.tau_phi_green
 #
 save_
 save__mmfdb_derived_column.tau_m_green
-   _item_description.description "sqrt(1/(g (green)^2 + s (green)^2) - 1) / omega. Apparent modulation lifetime."
+   _item_description.description "sqrt(1/(g corr (green)^2 + s corr (green)^2) - 1) / omega. Apparent modulation lifetime."
    _item.name            "_mmfdb_derived_column.tau_m_green"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
@@ -2141,7 +2273,7 @@ save__mmfdb_derived_column.tau_m_green
 #
 save_
 save__mmfdb_derived_column.tau_phi_red
-   _item_description.description "s (red) / (omega*g (red)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
+   _item_description.description "s corr (red) / (omega*g corr (red)), omega = 2*pi*f_rep*harmonic. Apparent phase lifetime."
    _item.name            "_mmfdb_derived_column.tau_phi_red"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
@@ -2150,11 +2282,92 @@ save__mmfdb_derived_column.tau_phi_red
 #
 save_
 save__mmfdb_derived_column.tau_m_red
-   _item_description.description "sqrt(1/(g (red)^2 + s (red)^2) - 1) / omega. Apparent modulation lifetime."
+   _item_description.description "sqrt(1/(g corr (red)^2 + s corr (red)^2) - 1) / omega. Apparent modulation lifetime."
    _item.name            "_mmfdb_derived_column.tau_m_red"
    _item.category_id     mmfdb_derived_column
    _item_type.code       float
    _mmfdb_derived_column.column   "tau_m (red)"
    _mmfdb_derived_column.units    ns
+#
+save_
+save__mmfdb_derived_column.f_bg
+   _item_description.description "n_bg / Number of Photons. Fraction of the photons of a pixel's or a burst's decay that are background."
+   _item.name            "_mmfdb_derived_column.f_bg"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "f_bg"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.f_bg_green
+   _item_description.description "n_bg (green) / Number of Photons (green). Fraction of the photons of the green detection channel that are background."
+   _item.name            "_mmfdb_derived_column.f_bg_green"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "f_bg (green)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.f_bg_red
+   _item_description.description "n_bg (red) / Number of Photons (red). Fraction of the photons of the red detection channel that are background."
+   _item.name            "_mmfdb_derived_column.f_bg_red"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "f_bg (red)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_g_corr
+   _item_description.description "Real part of ((g + i s) - f_bg (g_bg + i s_bg)) / ((1 - f_bg) (g_irf + i s_irf)). Phasor g of a pixel's or a burst's decay, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_g_corr"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "g corr"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_s_corr
+   _item_description.description "Imaginary part of ((g + i s) - f_bg (g_bg + i s_bg)) / ((1 - f_bg) (g_irf + i s_irf)). Phasor s of a pixel's or a burst's decay, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_s_corr"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "s corr"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_g_corr_green
+   _item_description.description "Real part of ((g (green) + i s (green)) - f_bg (green) (g_bg + i s_bg)) / ((1 - f_bg (green)) (g_irf (green) + i s_irf (green))). Phasor g of the green detection channel, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_g_corr_green"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "g corr (green)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_s_corr_green
+   _item_description.description "Imaginary part of ((g (green) + i s (green)) - f_bg (green) (g_bg + i s_bg)) / ((1 - f_bg (green)) (g_irf (green) + i s_irf (green))). Phasor s of the green detection channel, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_s_corr_green"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "s corr (green)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_g_corr_red
+   _item_description.description "Real part of ((g (red) + i s (red)) - f_bg (red) (g_bg + i s_bg)) / ((1 - f_bg (red)) (g_irf (red) + i s_irf (red))). Phasor g of the red detection channel, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_g_corr_red"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "g corr (red)"
+   _mmfdb_derived_column.units    .
+#
+save_
+save__mmfdb_derived_column.phasor_s_corr_red
+   _item_description.description "Imaginary part of ((g (red) + i s (red)) - f_bg (red) (g_bg + i s_bg)) / ((1 - f_bg (red)) (g_irf (red) + i s_irf (red))). Phasor s of the red detection channel, background removed and referenced to the instrument response."
+   _item.name            "_mmfdb_derived_column.phasor_s_corr_red"
+   _item.category_id     mmfdb_derived_column
+   _item_type.code       float
+   _mmfdb_derived_column.column   "s corr (red)"
+   _mmfdb_derived_column.units    .
 #
 save_
