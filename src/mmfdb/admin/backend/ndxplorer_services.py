@@ -61,7 +61,27 @@ def register_ndxplorer_services(dispatcher: Any, *, db_path: str = "") -> None:
         "ndxplorer.load_burst_product": load_burst_product_handler,
         "ndxplorer.record_analysis": record_analysis_handler,
     }.items():
-        dispatcher.register(name, lambda params, _handler=handler: _handler(**params))
+        dispatcher.register(name, _authenticated(handler))
+
+
+def _authenticated(handler: Any) -> Any:
+    """The dispatcher entry for *handler*: the fail-closed auth boundary of the
+    other services (``measurement_services``), then the handler without ``auth``.
+
+    A logged-in client sends ``auth`` with every call; passing it on made the
+    handlers fail ("unexpected keyword argument 'auth'"), and without the check
+    an anonymous call could write processing runs.
+    """
+    def call(params: dict[str, Any]) -> dict[str, Any]:
+        from mmfdb.security.auth import principal_from_rpc_auth, require_authenticated
+
+        call_params = dict(params or {})
+        auth = call_params.pop("auth", None)
+        with MFDatabase(_resolved_db_path or str(resolve_database_path())) as auth_db:
+            require_authenticated(principal_from_rpc_auth(auth_db.conn, auth))
+        return handler(**call_params)
+
+    return call
 
 
 def load_burst_product_handler(processed_data_id: str) -> dict[str, Any]:
