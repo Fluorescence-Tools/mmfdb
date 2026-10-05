@@ -354,3 +354,37 @@ def test_implicit_extension_keeps_its_parent_branch(project_db, payload):
     assert second["branch_uuid"] == branch_uuid
     branch = next(row for row in _rows(path, "mmfdb_branch") if row["branch_uuid"] == branch_uuid)
     assert branch["head_operation_id"] == second["version_id"]
+
+
+def _second_db(tmp_path):
+    """A separate database holding the same user, as on another deployment."""
+    path = tmp_path / "elsewhere.sqlite"
+    with MFDatabase(path) as db:
+        db.add_user("owner", "owner")
+        token = create_session(db.conn, "owner")["token"]
+        db.conn.commit()
+    return path, {"token": token}
+
+
+def test_import_numbers_after_the_projects_newest_version(project_db, payload, tmp_path):
+    """An archive keeps its project id; it must not also keep its version number.
+
+    Importing v1 into the database that already holds v1 of that project made two
+    "v1" rows. Into a database without the project it starts the project at v1.
+    """
+    path, auth = project_db
+    saved = _save(project_db, payload, project_name="decay study")
+    exported = services.export_csp_handler(db_path=str(path), auth=auth["owner"],
+                                           version_id=saved["version_id"])
+    assert exported.get("ok") is True, exported
+    archive = exported["archive_bytes"]
+
+    again = services.import_csp_handler(db_path=str(path), auth=auth["owner"],
+                                        archive_base64=archive, resolve_collisions=True)
+    assert again["project_id"] == saved["project_id"]
+    assert again["version_number"] == 2
+
+    other_path, other_auth = _second_db(tmp_path)
+    fresh = services.import_csp_handler(db_path=str(other_path), auth=other_auth,
+                                        archive_base64=archive, resolve_collisions=False)
+    assert fresh["version_number"] == 1
