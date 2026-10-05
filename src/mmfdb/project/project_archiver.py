@@ -1,22 +1,17 @@
 """Project archiver for MMFDB — decomposes projects into artifacts, parameters, and edges.
 
 This module provides :func:`archive_project_to_mmfdb` which stores a ChiSurf
-project with full provenance: source files in the object store, derived datasets
-as artifacts, fit results with chinet sessions, parameters in the parameter table,
-and dependency edges.  It follows the patterns established by
-:mod:`mmfdb.adapters.chinet` and
-:class:`chisurf.core.experiments.core.reader.ExperimentReader`.
+project with full provenance: source files in the object store, canonical datasets
+and fit members as artifacts, scalar parameters and UID dependency edges. The
+exact validated snapshot remains the sole scientific restore authority.
 """
 
 from __future__ import annotations
 
-import base64
 import logging
 import os
 import uuid
 from typing import Any
-
-logger = logging.getLogger(__name__)
 
 from mmfdb.models import (
     RELATIONSHIP_TYPES,
@@ -26,65 +21,7 @@ from mmfdb.repository import MFDatabase
 from mmfdb.samples.sample_manager import link_artifact_to_sample
 from mmfdb.schema._sqlutil import _json_dumps, _json_loads
 
-# Re-use constants from chinet_adapter when available
-try:
-    from mmfdb.adapters.chinet import (
-        FIT_STATE_SCHEMA,
-    )
-except ImportError:
-    FIT_STATE_SCHEMA = "chisurf.fit_state.v1"
-
-
-def _encode_curve_arrays(ds: dict[str, Any]) -> dict[str, Any]:
-    """Encode x/y/ex/ey arrays from a dataset payload to canonical JSON form.
-
-    Parameters
-    ----------
-    ds : dict
-        Dataset payload with ``x``, ``y``, ``ex``, ``ey`` keys.  Values may
-        be NumPy arrays, plain lists, or already encoded array dictionaries.
-
-    Returns
-    -------
-    dict
-        Same keys but with canonical ``{dtype, shape, data}`` dicts.
-
-    """
-    import numpy as np
-
-    out: dict[str, Any] = {}
-    for key in ("x", "y", "ex", "ey"):
-        arr = ds.get(key)
-        if arr is None:
-            continue
-        if isinstance(arr, dict) and "dtype" in arr and "data" in arr:
-            out[key] = arr  # already encoded
-        else:
-            out[key] = _encode_array(np.asarray(arr))
-    return out
-
-
-def _encode_array(array: Any) -> dict[str, Any]:
-    """Encode an array as canonical JSON-safe dtype/shape/base64 data.
-
-    Parameters
-    ----------
-    array : Any
-        Array-like object.
-
-    Returns
-    -------
-    dict
-        Encoded array with ``dtype``, ``shape``, and base64 ``data`` keys.
-    """
-    import numpy as np
-
-    contiguous = np.ascontiguousarray(array)
-    return {
-        "dtype": str(contiguous.dtype),
-        "shape": list(contiguous.shape),
-        "data": base64.b64encode(contiguous.tobytes()).decode("ascii"),
-    }
+logger = logging.getLogger(__name__)
 
 
 def _dataset_sample_id(ds_payload: dict[str, Any]) -> str:
@@ -101,7 +38,7 @@ def _dataset_sample_id(ds_payload: dict[str, Any]) -> str:
         Sample ID, or an empty string.
 
     """
-    metadata = ds_payload.get("meta_data") or {}
+    metadata = ds_payload.get("metadata") or {}
     if isinstance(metadata, dict):
         return str(metadata.get("sample_id") or "")
     return ""
@@ -118,6 +55,7 @@ def archive_project_to_mmfdb(
     user_id: str = "user_default",
     notes: str = "",
     project_name: str = "",
+    resource_bundle: dict[str, bytes] | None = None,
 ) -> dict[str, Any]:
     """Archive a ChiSurf project to MMFDB with full artifact decomposition.
 
@@ -128,10 +66,8 @@ def archive_project_to_mmfdb(
        content-addressed object store and registers a ``raw_measurement``
        artifact, then stores the derived data (arrays) as a
        ``processed_data`` artifact.
-    3. Delegates each fit to
-       :func:`~mmfdb.adapters.chinet.archive_fit_to_mmfdb`
-       which stores chinet sessions, node artifacts, fit-result artifacts,
-       parameters, and dependency edges.
+    3. Indexes canonical fit members, aggregate parameters and cross-model
+       dependency edges without reconstructing or converting model state.
     4. Creates ``project_contains`` edges linking the project operation to
        every output artifact.
     5. Creates ``derived_from`` edges linking each dataset back to its
@@ -160,6 +96,12 @@ def archive_project_to_mmfdb(
         Owner user id.
     notes : str, default=''
         Free-text notes.
+    project_name : str, default=''
+        Display name when the snapshot metadata has no name.
+    resource_bundle : dict of str to bytes or None, optional
+        Client-supplied resource content keyed by original filename. A supplied
+        bundle exclusively determines attachments and never authorizes reading
+        server filesystem paths. None permits local direct-call source reads.
 
     Returns
     -------
@@ -241,13 +183,18 @@ def archive_project_to_mmfdb(
             source_artifact_id: str | None = None
 
             # 2a. Source file → object store
-            if filename and os.path.isfile(filename):
+            source_bytes = resource_bundle.get(filename) if resource_bundle is not None else None
+            local_source = resource_bundle is None and filename and os.path.isfile(filename)
+            if source_bytes is not None or local_source:
                 source_ref = db.put_object(
-                    path=filename,
+                    data=source_bytes,
+                    path=filename if local_source else None,
                     filename=str(filename),
                 )
                 source_object_uuid = source_ref["object_uuid"]
-                source_artifact_id = f"src_{source_object_uuid[:12]}"
+                source_artifact_id = "src_" + str(uuid.uuid5(
+                    uuid.NAMESPACE_URL, _json_dumps([version_id, filename])
+                ))
                 db.register_artifact(
                     artifact_id=source_artifact_id,
                     artifact_kind="raw_measurement",
@@ -270,19 +217,10 @@ def archive_project_to_mmfdb(
                 object_count += 1
 
             # 2b. Derived data → object store
-            encoded = _encode_curve_arrays(ds_payload)
-            reader_info = ds_payload.get("data_reader") or {}
-            derived_payload = {
-                "schema_version": "1.0",
-                "data_type": ds_payload.get("experiment_name", "processed_data"),
-                "created_by": f"{reader_info.get('module', '')}.{reader_info.get('class', '')}",
-                "source_object_uuids": [source_object_uuid] if source_object_uuid else [],
-                "curves": [{
-                    "name": ds_payload.get("name", ds_id),
-                    **encoded,
-                }],
-                "reader_settings": reader_info.get("state", {}),
-            }
+            reader_info = ds_payload.get("reader") or {}
+            # The validated canonical dataset is the complete provenance index:
+            # preserve dtype, mask, reader state and metadata without conversion.
+            derived_payload = ds_payload
             derived_bytes = _json_dumps(derived_payload).encode("utf-8")
             derived_ref = db.put_object(
                 data=derived_bytes,
@@ -302,7 +240,7 @@ def archive_project_to_mmfdb(
                     "ds_id": ds_id,
                     "name": ds_payload.get("name", ""),
                     "filename": filename,
-                    "experiment_name": ds_payload.get("experiment_name", ""),
+                    "experiment_name": (ds_payload.get("experiment") or {}).get("name", ""),
                     "data_reader_module": reader_info.get("module", ""),
                     "data_reader_class": reader_info.get("class", ""),
                 },
@@ -345,241 +283,125 @@ def archive_project_to_mmfdb(
                     metadata={"source_object_uuid": source_object_uuid},
                 )
 
-        # -- 3. Per-fit: decompose into chinet session, nodes, parameters -
-        for fit_idx, fit_record in enumerate(fits):
-            if not isinstance(fit_record, dict):
+        # Resources referenced by readers/models need not be dataset filenames.
+        # Preserve every supplied attachment, using labels only as metadata.
+        dataset_filenames = {dataset.get("filename") for dataset in datasets.values()}
+        for filename, content in (resource_bundle or {}).items():
+            if filename in dataset_filenames:
                 continue
-            fit_uid = fit_record.get("id", "")
-            for lf_idx, local_fit in enumerate(fit_record.get("local_fits", [])):
-                if not isinstance(local_fit, dict):
-                    continue
-                dataset_ref_id = local_fit.get("dataset_id", "")
-                linked_dataset = ds_id_map.get(dataset_ref_id)
+            source_ref = db.put_object(data=content, filename=filename)
+            source_artifact_id = "src_" + str(uuid.uuid5(
+                uuid.NAMESPACE_URL, _json_dumps([version_id, filename])
+            ))
+            db.register_artifact(
+                artifact_id=source_artifact_id,
+                artifact_kind="raw_measurement",
+                storage_mode="local_file",
+                file_path=filename,
+                object_uuid=source_ref["object_uuid"],
+                size_bytes=source_ref.get("size_bytes"),
+                validation_status="unvalidated",
+            )
+            db.record_operation_link(
+                operation_id=version_id, artifact_id=source_artifact_id,
+                direction="input", role="source_resource",
+            )
+            object_count += 1
 
-                lf_id = local_fit.get("id") or str(lf_idx)
-                fit_op_id = f"fit_{version_id}:{fit_uid}:{lf_id}"
-                # Ensure the fit operation record exists before any
-                # archiving attempt — the chinet path and the fallback
-                # both need it for FK constraints on operation links.
+        # -- 3. Index the validated canonical members and model parameters --
+        parameter_ids: dict[tuple[str, str, str], str] = {}
+        pending_links: list[tuple[str, dict[str, Any]]] = []
+        for fit_idx, fit_record in enumerate(fits):
+            fit_uid = fit_record["uid"]
+            model_owners: list[tuple[str, str, dict[str, Any]]] = []
+            for member_idx, member in enumerate(fit_record["members"]):
+                member_uid = member["uid"]
+                model = member["model"]
+                fit_op_id = f"fit_{version_id}:{fit_uid}:{member_uid}"
                 db.record_operation(
                     operation_id=fit_op_id,
                     operation_type="local_fit",
                     operator_user_id=user_id,
                     status="succeeded",
+                    acl_owner_user_id=user_id,
                     metadata={
-                        "fit_id": fit_uid,
-                        "project_id": project_id,
-                        "version_id": version_id,
+                        "fit_uid": fit_uid, "member_uid": member_uid,
+                        "project_id": project_id, "version_id": version_id,
                     },
                 )
-                fit_state_payload = local_fit.get("fit_state") or {}
-
-                # -- 3a. Build chinet session from serialized payload --
-                from mmfdb.adapters.chinet import (
-                    CHINET_NODE_ARTIFACT,
-                    CHINET_SESSION_ARTIFACT,
-                    _artifact_id,
-                    _session_from_fit_state_payload,
-                    _store_fit_state_links,
-                    _store_fit_state_parameters,
-                    _session_to_schema,
-                    _validate_fit_state_payload,
-                )
-                from mmfdb.adapters.chinet import (
-                    _json_dumps as chinet_json,
-                )
-
-                chinet_session = None
-                try:
-                    _validate_fit_state_payload(fit_state_payload, None)
-                    chinet_session = _session_from_fit_state_payload(
-                        fit_state_payload
-                    )
-                except Exception:
-                    logger.warning(
-                        "Failed to build chinet session for fit %s",
-                        fit_uid,
-                        exc_info=True,
-                    )
-
-                # -- 3b. Store chinet session artifact --
-                session_artifact_id = None
-                if chinet_session is not None:
-                    try:
-                        # The runtime is IMP.bff's GraphSession/GraphPort
-                        # compatibility surface.  The historic ``to_schema``
-                        # method belonged to an older chinet API; the adapter
-                        # now owns the stable persisted wrapper for either
-                        # runtime.
-                        schema = _session_to_schema(chinet_session)
-                        session_artifact_id = _artifact_id(
-                            CHINET_SESSION_ARTIFACT, chinet_session.oid
-                        )
-                        db.register_artifact(
-                            artifact_id=session_artifact_id,
-                            artifact_kind=CHINET_SESSION_ARTIFACT,
-                            storage_mode="embedded_json",
-                            data_format="json",
-                            data_json=chinet_json(schema),
-                            metadata={
-                                "schema_name": schema["schema_name"],
-                                "schema_version": schema["schema_version"],
-                                "session_id": chinet_session.oid,
-                                "source": "IMP.bff",
-                                "operation_id": fit_op_id,
-                            },
-                        )
-                        db.record_operation_link(
-                            operation_id=fit_op_id,
-                            artifact_id=session_artifact_id,
-                            direction="output",
-                            role="chinet_session",
-                        )
-                        chinet_artifacts.append(session_artifact_id)
-
-                        # Store node artifacts
-                        for node_key, node in chinet_session.nodes.items():
-                            node_doc = {
-                                "node_id": node.oid,
-                                "session_id": chinet_session.oid,
-                                "name": str(node_key or node.name),
-                                "callback": node.callback,
-                                "callback_type": (
-                                    node.callback_type_string or ""
-                                ),
-                                "valid": bool(node.node_valid_),
-                                "ports": list(node.ports.keys()),
-                            }
-                            node_art_id = _artifact_id(
-                                CHINET_NODE_ARTIFACT, node.oid
-                            )
-                            db.register_artifact(
-                                artifact_id=node_art_id,
-                                artifact_kind=CHINET_NODE_ARTIFACT,
-                                storage_mode="embedded_json",
-                                data_format="json",
-                                data_json=chinet_json(node_doc),
-                                metadata={
-                                    "schema_name": "chinet.node.v1",
-                                    "session_id": chinet_session.oid,
-                                    "node_id": node.oid,
-                                    "source": "IMP.bff",
-                                    "operation_id": fit_op_id,
-                                },
-                            )
-                            db.record_operation_link(
-                                operation_id=fit_op_id,
-                                artifact_id=node_art_id,
-                                direction="output",
-                                role="chinet_node",
-                            )
-                            db.add_edge(
-                                source_node_type="artifact",
-                                source_node_id=session_artifact_id,
-                                target_node_type="artifact",
-                                target_node_id=node_art_id,
-                                relationship_type="contains",
-                                operation_id=fit_op_id,
-                            )
-                            chinet_artifacts.append(node_art_id)
-                    except Exception:
-                        logger.warning(
-                            "Failed to store chinet artifacts for fit %s",
-                            fit_uid,
-                            exc_info=True,
-                        )
-                        session_artifact_id = None
-
-                # -- 3c. Store fit result artifact --
-                full_fit_data = {
-                    "id": fit_record.get("id", ""),
-                    "name": fit_record.get("name", ""),
-                    "model_name": fit_record.get("model_name", ""),
-                    "fit_range": fit_record.get("fit_range"),
-                    "plot_state": fit_record.get("plot_state"),
-                    "local_fit": local_fit,
-                    "fit_state": fit_state_payload,
-                }
-                fit_artifact_id = f"fit_result:{version_id}:{fit_uid}:{lf_id}"
+                fit_artifact_id = f"fit_result:{version_id}:{fit_uid}:{member_uid}"
                 db.register_artifact(
                     artifact_id=fit_artifact_id,
                     artifact_kind="fit_result",
                     storage_mode="embedded_json",
                     data_format="json",
-                    data_json=chinet_json(full_fit_data),
+                    data_json=_json_dumps({"fit": fit_record, "member_uid": member_uid}),
                     metadata={
-                        "schema_name": FIT_STATE_SCHEMA,
-                        "fit_id": fit_uid,
+                        "schema_name": "chisurf.project.v5",
+                        "fit_uid": fit_uid, "member_uid": member_uid,
                         "fit_name": fit_record.get("name", ""),
-                        "model_name": fit_record.get("model_name", ""),
-                        "fit_range": fit_record.get("fit_range"),
-                        "plot_state": fit_record.get("plot_state"),
-                        "local_fits_count": len(fit_record.get("local_fits", [])),
-                        # Position of this artifact within the project, so the
-                        # restore side can rebuild one fit group holding all of
-                        # its local fits in the original order. A global fit
-                        # writes one artifact per local fit; without these the
-                        # group cannot be reassembled (lf_id is not always the
-                        # index, so artifact-id order is not enough).
-                        "fit_index": fit_idx,
-                        "local_fit_index": lf_idx,
-                        "model_module": fit_state_payload.get(
-                            "model_module"
-                        ),
-                        "model_class": fit_state_payload.get(
-                            "model_class"
-                        ),
-                        "source": "chisurf.core.project.fit_state",
+                        "fit_index": fit_idx, "member_index": member_idx,
+                        "model_module": model["model_module"],
+                        "model_class": model["model_class"],
                     },
                 )
                 db.record_operation_link(
-                    operation_id=fit_op_id,
-                    artifact_id=fit_artifact_id,
-                    direction="output",
-                    role="fit_state",
+                    operation_id=fit_op_id, artifact_id=fit_artifact_id,
+                    direction="output", role="fit_state",
+                )
+                db.add_edge(
+                    source_node_type="operation", source_node_id=version_id,
+                    target_node_type="artifact", target_node_id=fit_artifact_id,
+                    relationship_type="project_contains", operation_id=version_id,
                 )
                 fit_artifacts.append(fit_artifact_id)
-
-                # -- 3d. Link dataset as input --
-                if linked_dataset:
+                for role, dataset_uid in {
+                    "input_data": member["dataset_uid"],
+                    **member.get("dependencies", {}),
+                }.items():
                     db.record_operation_link(
-                        operation_id=fit_op_id,
-                        artifact_id=linked_dataset,
-                        direction="input",
-                        role="input_data",
+                        operation_id=fit_op_id, artifact_id=ds_id_map[dataset_uid],
+                        direction="input", role=role,
                     )
-
-                # -- 3e. Store parameters and link edges --
-                try:
-                    _store_fit_state_parameters(
-                        db, fit_op_id, fit_state_payload, None
+                model_owners.append((member_uid, fit_op_id, model))
+            if fit_record.get("kind") == "group":
+                model_owners.append((fit_uid, version_id, fit_record["aggregate_model"]))
+            for owner_uid, operation_id, model in model_owners:
+                for parameter in model["parameters"]:
+                    uid = parameter["uid"]
+                    # The parameter table upserts its primary key. Scope that
+                    # index key to a version, retaining the science UID verbatim.
+                    key = (fit_uid, owner_uid, uid)
+                    parameter_id = str(uuid.uuid5(uuid.NAMESPACE_URL, _json_dumps([version_id, *key])))
+                    parameter_ids[key] = parameter_id
+                    link = parameter.get("link_target")
+                    parameter_type = "linked" if link else "fixed" if parameter["fixed"] else "free"
+                    bounds = parameter["bounds"]
+                    db.record_parameter(
+                        parameter_uuid=parameter_id, operation_id=operation_id,
+                        name=parameter["name"], value=parameter["value"],
+                        initial_value=parameter["value"], standard_error=parameter.get("error_estimate"),
+                        lower_bound=bounds[0], upper_bound=bounds[1],
+                        bounds_on=parameter["bounds_on"], parameter_type=parameter_type,
+                        metadata={
+                            "schema_name": "chisurf.project.v5",
+                            "fit_uid": fit_uid, "member_uid": owner_uid,
+                            "fit_parameter_uid": uid, "parameter": parameter,
+                            "link_target": link,
+                        },
                     )
-                    _store_fit_state_links(db, fit_op_id, fit_state_payload)
-                except Exception:
-                    logger.warning(
-                        "Failed to store parameters/links for fit %s",
-                        fit_uid,
-                        exc_info=True,
-                    )
-
-                # -- 3f. project_contains edges --
-                db.add_edge(
-                    source_node_type="operation",
-                    source_node_id=version_id,
-                    target_node_type="artifact",
-                    target_node_id=fit_artifact_id,
-                    relationship_type="project_contains",
-                    operation_id=version_id,
-                )
-                if session_artifact_id:
-                    db.add_edge(
-                        source_node_type="operation",
-                        source_node_id=version_id,
-                        target_node_type="artifact",
-                        target_node_id=session_artifact_id,
-                        relationship_type="project_contains",
-                        operation_id=version_id,
-                    )
+                    if link:
+                        pending_links.append((parameter_id, parameter))
+        # All members and global parameters exist before cross-model links.
+        for parameter_id, parameter in pending_links:
+            link = parameter["link_target"]
+            target_key = (link["fit_uid"], link["member_uid"], link["parameter_uid"])
+            db.add_edge(
+                source_node_type="parameter", source_node_id=parameter_id,
+                target_node_type="parameter", target_node_id=parameter_ids[target_key],
+                relationship_type="parameter_depends_on", operation_id=version_id,
+                metadata={"parameter_uid": parameter["uid"], "link_target": link},
+            )
 
         # -- 4. Version lineage edge ----------------------------------------
         if parent_version_id:

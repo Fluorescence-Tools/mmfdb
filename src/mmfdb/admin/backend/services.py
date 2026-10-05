@@ -137,6 +137,9 @@ def register_services(
     _resolved_db_path = str(db_path) if db_path else ""
     dispatcher = getattr(dispatcher_or_context, "dispatcher", dispatcher_or_context)
     register_auth_services(dispatcher, db_path=_resolved_db_path)
+    from mmfdb.project.services import register_services as register_project_services
+
+    register_project_services(dispatcher, db_path=_resolved_db_path)
     register_measurement_services(
         dispatcher,
         db_path=_resolved_db_path,

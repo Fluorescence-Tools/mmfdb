@@ -406,7 +406,7 @@ class SetupCalibMixin:
                     )
 
             # Write structured FCS channel pair rows
-            if fcs_pairs:
+            if fcs_pairs is not None:
                 self.conn.execute(
                     "UPDATE mmfdb_setup_fcs_pair SET deleted_at = ? WHERE setup_id = ? AND deleted_at IS NULL",
                     (now, setup_id)
