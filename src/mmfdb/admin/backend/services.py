@@ -2604,12 +2604,13 @@ def validate_pdbx_value_handler(
 def populate_mock_data_handler(
     auth: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Populate the MMFDB with bundled demo data from plugin test fixtures."""
-    with MFDatabase(_resolved_db_path or str(resolve_database_path())) as db:
+    """Populate the authenticated database with packaged synthetic burst tables."""
+    db_path = _resolved_db_path or str(resolve_database_path())
+    with MFDatabase(db_path) as db:
         _require_auth(auth, db.conn)
     from mmfdb.admin.seed_example import seed_example
 
-    return {"summary": seed_example(resolve_database_path())}
+    return {"summary": seed_example(db_path)}
 
 
 def import_file_handler(path: str, auth: dict[str, Any] | None = None) -> dict[str, Any]:

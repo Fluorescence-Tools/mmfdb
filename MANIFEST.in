@@ -3,7 +3,7 @@ include README.md
 include pyproject.toml
 
 # Package data (also declared via [tool.setuptools.package-data]; kept here for sdists)
-recursive-include src/mmfdb/data *.json *.dic *.db *.sh
+recursive-include src/mmfdb/data *.json *.dic *.db *.sh *.csv
 recursive-include src/mmfdb/webadmin/templates *.html
 recursive-include src/mmfdb/webadmin/static *.css *.js
 

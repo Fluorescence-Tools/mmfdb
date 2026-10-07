@@ -90,3 +90,27 @@ standalone service. Non-loopback remote URLs require HTTPS. An isolated
 development network may opt in to plaintext explicitly with
 `client.allow_insecure_http: true`; URL userinfo, query strings, and fragments
 are always rejected.
+
+
+## Packaged metadata demonstration
+
+The administrative mock-data action seeds the same authenticated database
+that handles the request. It uses three packaged synthetic smFRET burst tables
+(50, 38 and 32 source rows), not a ChiSurf checkout or photon acquisition file.
+A proximity-ratio threshold of 0.5 produces the actual 63-row demonstration
+selection. Source/output bytes are stored in managed objects with their hashes,
+row counts and processing lineage. Repeating the seed keeps existing IDs,
+object references and provenance stable; changed conflicting inputs fail.
+
+For an explicitly selected database:
+
+```python
+from mmfdb.admin.seed_example import seed_example
+
+summary = seed_example(db_path="demo.sqlite")
+```
+
+An optional `data_dir` overrides the packaged CSV sources. Inputs are validated
+before seeding and output artifacts use the selected database's object store.
+The demo writes no user-home report, phantom `.bur` file or fabricated row count.
+The source column vocabulary and filtering operation use the existing dictionary.

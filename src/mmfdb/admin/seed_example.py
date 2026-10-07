@@ -1,20 +1,20 @@
-"""Seed the MMFDB with example single-molecule FRET data.
+"""Seed a synthetic burst-table metadata and provenance demonstration.
 
-Populates the database with a demo DNA sample labeled with Alexa488/Alexa647,
-a user (John Doe), an instrument (MT200), a smFRET experiment, and registers
-actual SPC test data from the burst selection plugin with a burst-selection
-processing run.
-
-Usage::
-
-    python -c "from mmfdb.admin.seed_example import seed_example; seed_example()"
+The small CSV tables come from MMFDB's workflow examples. This is an
+administrative demo, not an SPC acquisition or photon-analysis pipeline.
 """
 
 from __future__ import annotations
 
+import csv
+import hashlib
+import io
 import logging
+import math
 import uuid as _uuid
 from datetime import datetime, timezone
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 
 from mmfdb.repository import MFDatabase
@@ -23,14 +23,9 @@ from mmfdb.store.database_resolver import resolve_database_path
 
 logger = logging.getLogger(__name__)
 
-SPC_DATA_DIR = (
-    Path(__file__).resolve().parents[2]
-    / "burst"
-    / "burst_selection"
-    / "tests"
-    / "data"
-    / "bh_spc132_sm_dna"
-)
+DEMO_FILES = ("bursts.csv", "bursts_rep1.csv", "bursts_rep2.csv")
+DEMO_COLUMNS = ("burst_id", "size", "proximity_ratio")
+SELECTION_MIN = 0.5
 
 DEMO = dict(
     user_id="john_doe",
@@ -45,10 +40,6 @@ DEMO = dict(
 )
 
 DNA_SEQ = list("GAAGTCGAGATGGCTCGAGA")
-
-
-def _spc_path(index: int = 0) -> Path:
-    return SPC_DATA_DIR / f"m{index:03d}.spc"
 
 
 def _upsert_probe(
@@ -197,7 +188,7 @@ def _seed_flr_tables(db: MFDatabase) -> tuple[int, int, int, int]:
             d["sample_id"],
             uuid=str(_uuid.uuid4()),
             description="Demo DNA labeled with Alexa488/Alexa647 for smFRET",
-            details="Example smFRET sample using BH SPC-132 test data",
+            details="Synthetic burst-table demo context; not an acquired measurement",
             num_of_probes=2,
             solvent_phase="liquid",
             sample_condition_id=d["condition_id"],
@@ -233,181 +224,208 @@ def _seed_flr_tables(db: MFDatabase) -> tuple[int, int, int, int]:
             measured_by_device_id=d["device_id"],
             started_at=now,
             status="completed",
-            details="smFRET measurement of demo DNA on MT200 with burst selection",
+            details="Synthetic burst-table selection demonstration; instrument and sample are demo context",
         )
         logger.info("Created experiment %s", d["experiment_id"])
 
     return probe_a488, probe_a647, pos_a488, pos_a647
 
 
-def seed_example(db_path: str | Path | None = None) -> dict[str, object]:
-    """Populate the MMFDB with example smFRET demo data.
+def _demo_tables(
+    data_dir: str | Path | None,
+) -> tuple[Path | Traversable, list[tuple[str, bytes, list[dict[str, str]]]]]:
+    """Read and validate all packaged or explicitly supplied tables before any write."""
+    source = Path(data_dir) if data_dir is not None else files("mmfdb").joinpath("data").joinpath("demo")
+    tables = []
+    for filename in DEMO_FILES:
+        try:
+            payload = source.joinpath(filename).read_bytes()
+            reader = csv.DictReader(io.StringIO(payload.decode("utf-8")), strict=True)
+            if reader.fieldnames != list(DEMO_COLUMNS):
+                raise ValueError("expected burst_id,size,proximity_ratio columns")
+            rows = list(reader)
+            if not rows:
+                raise ValueError("table has no rows")
+            identities = set()
+            for row in rows:
+                if set(row) != set(DEMO_COLUMNS) or any(value is None for value in row.values()):
+                    raise ValueError("invalid table row")
+                identity, size, ratio = (
+                    int(row["burst_id"]),
+                    int(row["size"]),
+                    float(row["proximity_ratio"]),
+                )
+                if (
+                    identity < 0
+                    or identity in identities
+                    or size <= 0
+                    or not math.isfinite(ratio)
+                    or not 0 <= ratio <= 1
+                ):
+                    raise ValueError("invalid burst-table values")
+                identities.add(identity)
+            tables.append((filename, payload, rows))
+        except (OSError, UnicodeError, csv.Error, TypeError, ValueError) as error:
+            raise ValueError(f"invalid demo table {filename}: {error}") from error
+    return source, tables
+
+
+def _register_demo_table(
+    db: MFDatabase,
+    artifact_id: str,
+    filename: str,
+    payload: bytes,
+    row_count: int,
+    columns: tuple[str, ...],
+    *,
+    valid: bool = True,
+) -> None:
+    """Store real table bytes once and attach a truthful content-addressed artifact."""
+    if db.get_artifact(artifact_id) is not None:
+        return
+    reference = db.put_object(data=payload, filename=filename, mime_type="text/csv")
+    db.register_artifact(
+        artifact_id=artifact_id,
+        artifact_kind="burst_table",
+        data_format="csv",
+        storage_mode="managed_archive",
+        experiment_id=DEMO["experiment_id"],
+        object_uuid=reference["object_uuid"],
+        size_bytes=len(payload),
+        row_count=row_count,
+        checksum=hashlib.sha256(payload).hexdigest(),
+        checksum_algorithm="sha256",
+        mime_type="text/csv",
+        validation_status="valid" if valid else "unvalidated",
+        metadata={
+            "synthetic": True,
+            "filename": filename,
+            "columns": list(columns),
+            "description": "MMFDB synthetic burst-table demonstration",
+        },
+    )
+
+
+def seed_example(
+    db_path: str | Path | None = None, *, data_dir: str | Path | None = None
+) -> dict[str, object]:
+    """Populate demo metadata and a real synthetic burst-table selection lineage.
 
     Parameters
     ----------
     db_path : str or pathlib.Path, optional
-        Database path.  Defaults to the user database resolved by
-        :func:`resolve_database_path`.
+        Target database; defaults to the configured database.
+    data_dir : str or pathlib.Path, optional
+        Directory containing the three named demo CSV tables. Defaults to
+        packaged MMFDB resources. All inputs are validated before writes.
 
     Returns
     -------
     dict
-        Summary of seeded records and source test data.
+        Demo IDs, source names and measured input/output row counts. Historical
+        raw_data_ids and used_test_files keys remain aliases for table inputs.
     """
-    path = Path(db_path) if db_path is not None else resolve_database_path()
-    logging.basicConfig(level=logging.INFO)
-    d = DEMO
-    summary: dict[str, object] = {
-        "database_path": str(path),
-        "sample_id": d["sample_id"],
-        "experiment_id": d["experiment_id"],
-        "processing_id": d["processing_id"],
-        "source_data_dir": str(SPC_DATA_DIR),
-        "raw_data_ids": [],
-        "quality_example_raw_data_ids": [],
-        "processed_data_id": None,
-        "used_test_files": [],
-    }
-
+    source, tables = _demo_tables(data_dir)
+    path = db_path if db_path is not None else resolve_database_path()
+    raw_ids = [f"raw_demo_sm_dna_{index:03d}" for index in range(len(tables))]
+    quality_id = "raw_demo_unlinked_sample_red_flag"
+    product_id = f"prod_{DEMO['processing_id']}"
+    output_columns = ("artifact_id", *DEMO_COLUMNS)
+    output_rows = [
+        {"artifact_id": artifact_id, **row}
+        for artifact_id, (_, _, rows) in zip(raw_ids, tables)
+        for row in rows
+        if float(row["proximity_ratio"]) >= SELECTION_MIN
+    ]
+    stream = io.StringIO(newline="")
+    writer = csv.DictWriter(stream, fieldnames=output_columns)
+    writer.writeheader()
+    writer.writerows(output_rows)
+    output = stream.getvalue().encode("utf-8")
+    expected = [
+        (artifact_id, payload, len(rows))
+        for artifact_id, (_, payload, rows) in zip(raw_ids, tables)
+    ]
+    expected.extend(
+        [(quality_id, tables[0][1], len(tables[0][2])), (product_id, output, len(output_rows))]
+    )
     with MFDatabase(path) as db:
-        _seed_flr_tables(db)
-
-        if not SPC_DATA_DIR.is_dir():
-            logger.warning("SPC test data not found at %s -- skipping MMFDB seeding", SPC_DATA_DIR)
-            summary["warning"] = f"SPC test data not found at {SPC_DATA_DIR}"
-            return summary
-
-        raw_ids: list[str] = []
-        for i in range(3):
-            spc_path = _spc_path(i)
-            if not spc_path.exists():
-                continue
-            summary["used_test_files"].append(str(spc_path))
-            raw_id = f"raw_demo_sm_dna_{i:03d}"
-            if db.dao.get("mmfdb_artifact", raw_id) is not None:
-                raw_ids.append(raw_id)
-                continue
-            db.add_raw_data_reference(
-                raw_data_id=raw_id,
-                experiment_id=d["experiment_id"],
-                data_type="SPC",
-                storage_mode="local_file",
-                file_path=str(spc_path.resolve()),
-                size_bytes=spc_path.stat().st_size,
-                checksum=f"demo:{spc_path.name}",
-            )
-            raw_ids.append(raw_id)
-            logger.info("Registered raw data %s (%s, %d bytes)",
-                        raw_id, spc_path.name, spc_path.stat().st_size)
-            link_artifact_to_sample(db, raw_id, d["sample_id"])
-
-        for raw_id in raw_ids:
-            link_artifact_to_sample(db, raw_id, d["sample_id"])
-
-        if not raw_ids:
-            logger.warning("No SPC files found at %s -- skipping processing run", SPC_DATA_DIR)
-            summary["warning"] = f"No SPC files found at {SPC_DATA_DIR}"
-            return summary
-        summary["raw_data_ids"] = raw_ids
-
-        unlinked_path = _spc_path(0)
-        if unlinked_path.exists():
-            unlinked_raw_id = "raw_demo_unlinked_sample_red_flag"
-            if db.dao.get("mmfdb_artifact", unlinked_raw_id) is None:
-                db.add_raw_data_reference(
-                    raw_data_id=unlinked_raw_id,
-                    experiment_id=d["experiment_id"],
-                    data_type="SPC",
-                    storage_mode="local_file",
-                    file_path=str(unlinked_path.resolve()),
-                    size_bytes=unlinked_path.stat().st_size,
-                    checksum=f"demo:unlinked:{unlinked_path.name}",
-                    validation_status="unvalidated",
+        for artifact_id, payload, row_count in expected:
+            existing = db.get_artifact(artifact_id)
+            if existing is not None and (
+                existing["checksum"] != hashlib.sha256(payload).hexdigest()
+                or existing["row_count"] != row_count
+                or not existing["object_uuid"]
+                or db.get_object(existing["object_uuid"]) != payload
+            ):
+                raise ValueError(
+                    f"demo artifact {artifact_id} is already seeded from different data"
                 )
-                logger.info("Registered unlinked red-flag raw data %s", unlinked_raw_id)
-            summary["quality_example_raw_data_ids"] = [unlinked_raw_id]
-
-        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
-
-        # --- Processing run ---
-        if db.dao.get("mmfdb_operation", d["processing_id"]) is None:
-            settings = {
-                "photon_filter": {"routing_channels": [0, 1]},
-                "burst_detection": {
-                    "method": "sliding_window",
-                    "window_width": 1000,
-                    "threshold": 10,
-                },
-                "correction": {"gamma": 1.0, "beta": 1.0, "dir": 0.0},
-            }
-            oid = d["processing_id"]
-            with db._transaction():
+        _seed_flr_tables(db)
+        with db._transaction():
+            for artifact_id, (filename, payload, rows) in zip(raw_ids, tables):
+                _register_demo_table(db, artifact_id, filename, payload, len(rows), DEMO_COLUMNS)
+                link_artifact_to_sample(db, artifact_id, DEMO["sample_id"])
+            _register_demo_table(
+                db,
+                quality_id,
+                tables[0][0],
+                tables[0][1],
+                len(tables[0][2]),
+                DEMO_COLUMNS,
+                valid=False,
+            )
+            _register_demo_table(
+                db, product_id, "selected_bursts.csv", output, len(output_rows), output_columns
+            )
+            link_artifact_to_sample(db, product_id, DEMO["sample_id"])
+            if db.get_operation(DEMO["processing_id"]) is None:
+                now = datetime.now(timezone.utc).isoformat()
                 db.record_operation(
-                    operation_id=oid,
-                    operation_type="burst_selection",
-                    experiment_id=d["experiment_id"],
-                    operator_user_id=d["user_id"],
-                    settings=settings,
-                    software_module="chisurf.plugins.burst.burst_selection",
-                    software_version="1.0",
+                    operation_id=DEMO["processing_id"],
+                    operation_type="burst_filtering",
+                    experiment_id=DEMO["experiment_id"],
+                    operator_user_id=DEMO["user_id"],
+                    settings={
+                        "column": "proximity_ratio",
+                        "minimum": SELECTION_MIN,
+                        "input_rows": sum(len(rows) for _, _, rows in tables),
+                        "output_rows": len(output_rows),
+                        "synthetic": True,
+                    },
+                    software_package="mmfdb",
+                    software_module="mmfdb.admin.seed_example",
                     status="succeeded",
                     started_at=now,
                     ended_at=now,
                 )
-                # Composite-PK junction: values are exactly the 4 PK columns, so
-                # the upsert is an idempotent DO-NOTHING (identity-preserving,
-                # unlike INSERT OR REPLACE which delete-reinserts).
-                for raw_id in raw_ids:
-                    db.dao.upsert(
-                        "mmfdb_operation_artifact",
-                        {"operation_id": oid, "artifact_id": raw_id,
-                         "direction": "input", "role": "raw_data"},
-                        conflict=["operation_id", "artifact_id", "direction", "role"],
+                for ordinal, artifact_id in enumerate(raw_ids):
+                    db.record_operation_link(
+                        DEMO["processing_id"],
+                        artifact_id,
+                        "input",
+                        role="burst_table",
+                        ordinal=ordinal,
                     )
-                db.add_audit_log(
-                    action="create",
-                    target_type="processing_run",
-                    target_id=oid,
-                    operator_user_id=d["user_id"],
-                    details={"experiment_id": d["experiment_id"], "processing_type": "burst_selection"},
+                db.record_operation_link(
+                    DEMO["processing_id"], product_id, "output", role="burst_table"
                 )
-            logger.info("Created processing run %s", oid)
-
-        # --- Processed data product ---
-        prod_id = f"prod_{d['processing_id']}"
-        if db.dao.get("mmfdb_artifact", prod_id) is None:
-            demo_dir = Path.home() / ".chisurf" / "flr" / "demo"
-            demo_dir.mkdir(parents=True, exist_ok=True)
-            bur_path = demo_dir / f"{d['processing_id']}.bur"
-            with db._transaction():
-                db.register_artifact(
-                    artifact_id=prod_id,
-                    artifact_kind="bur",
-                    storage_mode="local_file",
-                    file_path=str(bur_path.resolve()),
-                    row_count=5577,
-                    validation_status="valid",
-                    checksum=f"demo:{bur_path.name}",
-                )
-                # Composite-PK junction — idempotent DO-NOTHING upsert (see above).
-                db.dao.upsert(
-                    "mmfdb_operation_artifact",
-                    {"operation_id": d["processing_id"], "artifact_id": prod_id,
-                     "direction": "output", "role": "bur"},
-                    conflict=["operation_id", "artifact_id", "direction", "role"],
-                )
-                db.add_audit_log(
-                    action="create",
-                    target_type="processed_data",
-                    target_id=prod_id,
-                    details={"processing_id": d["processing_id"], "product_type": "bur"},
-                )
-            logger.info("Created processed data %s", prod_id)
-        link_artifact_to_sample(db, prod_id, d["sample_id"])
-        summary["processed_data_id"] = prod_id
-
-    logger.info("Seeding complete at %s", path)
-    return summary
+    source_files = [str(source.joinpath(filename)) for filename, _, _ in tables]
+    return {
+        "database_path": str(path),
+        "sample_id": DEMO["sample_id"],
+        "experiment_id": DEMO["experiment_id"],
+        "processing_id": DEMO["processing_id"],
+        "source_data_dir": str(source),
+        "source_files": source_files,
+        "used_test_files": source_files,
+        "raw_data_ids": raw_ids,
+        "quality_example_raw_data_ids": [quality_id],
+        "processed_data_id": product_id,
+        "input_row_counts": [len(rows) for _, _, rows in tables],
+        "output_row_count": len(output_rows),
+        "synthetic": True,
+    }
 
 
 if __name__ == "__main__":

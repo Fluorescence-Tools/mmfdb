@@ -64,6 +64,7 @@ include = ["mmfdb*"]
 
 [tool.setuptools.package-data]
 "mmfdb" = [
+    "data/demo/*.csv",
     "data/*.json",
     "data/*.dic",
     "data/*.db",
