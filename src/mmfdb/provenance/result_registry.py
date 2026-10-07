@@ -61,7 +61,7 @@ def register_result(
     setup_version: int | None = None,
     db: MMFDBClientBase | None = None,
     is_public: bool = False,
-    session: "SessionContext | None" = None,
+    session: SessionContext | None = None,
 ) -> str:
     """Register a plugin result in MMFDB.
 
@@ -290,7 +290,7 @@ def _publish_registered_result(
 
 
 def _start_lifecycle(
-    db: "MMFDBClientBase | None", *, artifact_id: str, sample_id: str = ""
+    db: MMFDBClientBase | None, *, artifact_id: str, sample_id: str = ""
 ) -> None:
     """Best-effort initial lifecycle transitions for a freshly registered artifact.
 
@@ -496,7 +496,7 @@ def register_raw_measurement(
     setup_version: int | None = None,
     db: MMFDBClientBase | None = None,
     is_public: bool = False,
-    session: "SessionContext | None" = None,
+    session: SessionContext | None = None,
 ) -> str:
     """Register a raw measurement file.
 
@@ -544,7 +544,7 @@ def register_raw_measurement_group(
     setup_version: int | None = None,
     db: MMFDBClientBase | None = None,
     is_public: bool = False,
-    session: "SessionContext | None" = None,
+    session: SessionContext | None = None,
 ) -> str:
     """Register a multi-file raw measurement as one group artifact.
 
@@ -630,7 +630,7 @@ def register_processed_data(
     setup_id: str = "",
     setup_version: int | None = None,
     db: MMFDBClientBase | None = None,
-    session: "SessionContext | None" = None,
+    session: SessionContext | None = None,
 ) -> str:
     """Register processed data derived from another artifact.
 
@@ -726,6 +726,7 @@ def register_calibration(
     method: str = "",
     notes: str = "",
     db: MMFDBClientBase | None = None,
+    session: SessionContext | None = None,
 ) -> str:
     """Register a calibration result.
 
@@ -748,6 +749,9 @@ def register_calibration(
         Notes or citation text.
     db : MMFDBClientBase, optional
         Explicit database connection.
+    session : SessionContext, optional
+        Resolved acting session forwarded to result registration for artifact,
+        operation and ACL ownership. Omitting it uses the configured default user.
 
     Returns
     -------
@@ -768,6 +772,7 @@ def register_calibration(
         parameters=parameters,
         metadata=meta,
         db=db,
+        session=session,
     )
 
 

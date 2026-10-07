@@ -12,18 +12,17 @@ from __future__ import annotations
 import os
 
 import pytest
-
 from mmfdb import models
-from mmfdb.repository import MFDatabase
+from mmfdb.lifecycle.staleness import (
+    find_stale_calibration_uses,
+    record_calibration_use,
+)
 from mmfdb.provenance.result_registry import (
     register_calibration,
     register_raw_measurement,
     set_global_db,
 )
-from mmfdb.lifecycle.staleness import (
-    find_stale_calibration_uses,
-    record_calibration_use,
-)
+from mmfdb.repository import MFDatabase
 
 
 @pytest.fixture
@@ -151,3 +150,30 @@ def test_lineage_impact_follows_calibrated_by(db, tmp_path):
         db, used_by_id=fit, calibration_artifact_id=cal, used_by_type="artifact"
     )
     assert fit in db.lineage.what_used(cal)
+
+
+@pytest.mark.parametrize("actor", [None, "calibration_actor"])
+def test_calibration_forwards_session_to_artifact_operation_and_acl(db, monkeypatch, actor):
+    """The public wrapper preserves resolved ownership and its default behavior."""
+    from mmfdb.provenance import result_registry
+    from mmfdb.security.session import SessionContext
+
+    monkeypatch.setattr(result_registry, "_resolve_active_user_id", lambda: "registry_fallback")
+    session = SessionContext(user_id=actor, db=db) if actor else None
+    calibration = register_calibration(
+        {"g_factor": 1.25}, "g_factor", db=db, session=session,
+    )
+    assert calibration
+    expected = actor or "registry_fallback"
+    row = db.conn.execute(
+        "SELECT a.created_by_user_id, o.operator_user_id, aa.owner_user_id, oa.owner_user_id "
+        "FROM mmfdb_artifact a "
+        "JOIN mmfdb_operation_artifact link ON link.artifact_id=a.artifact_id "
+        "AND link.direction='output' "
+        "JOIN mmfdb_operation o ON o.operation_id=link.operation_id "
+        "JOIN mmfdb_object_acl aa ON aa.object_type='artifact' AND aa.object_id=a.artifact_id "
+        "JOIN mmfdb_object_acl oa ON oa.object_type='operation' AND oa.object_id=o.operation_id "
+        "WHERE a.artifact_id=?", (calibration,),
+    ).fetchone()
+    assert tuple(row) == (expected,) * 4
+    assert db.list_artifact_owners(calibration) == [expected]
