@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.9
+    _dictionary.version          1.10
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -7221,3 +7221,18 @@ save__flr_analysis_feature.pixel_number
 ;     Flattened pixel index, row * line_length + column.
 ;
 
+save__flr_analysis_feature.diffusion_time_mean
+   _item.name                "_flr_analysis_feature.diffusion_time_mean"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name diffusion_time_mean
+   _item_description.description "Mean FCS diffusion time in milliseconds: the weighted mean of a diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair."
+
+save__flr_analysis_feature.diffusion_time_peak
+   _item.name                "_flr_analysis_feature.diffusion_time_peak"
+   _item.category_id         flr_analysis_feature
+   _item_type.code           float
+   _mmfdb_schema.table_name  flr_analysis_feature
+   _mmfdb_schema.column_name diffusion_time_peak
+   _item_description.description "Peak FCS diffusion time in milliseconds: the time at the maximum of the reported diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair."

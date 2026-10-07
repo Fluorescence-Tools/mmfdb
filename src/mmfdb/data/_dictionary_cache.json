@@ -184879,6 +184879,40 @@
           "schema_column": "pixel_number",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "diffusion_time_mean": {
+          "name": "_flr_analysis_feature.diffusion_time_mean",
+          "category": "flr_analysis_feature",
+          "attribute": "diffusion_time_mean",
+          "description": "Mean FCS diffusion time in milliseconds: the weighted mean of a diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair.",
+          "type_code": "float",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "flr_analysis_feature",
+          "schema_column": "diffusion_time_mean",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "diffusion_time_peak": {
+          "name": "_flr_analysis_feature.diffusion_time_peak",
+          "category": "flr_analysis_feature",
+          "attribute": "diffusion_time_peak",
+          "description": "Peak FCS diffusion time in milliseconds: the time at the maximum of the reported diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair.",
+          "type_code": "float",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "flr_analysis_feature",
+          "schema_column": "diffusion_time_peak",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     }
@@ -361916,6 +361950,40 @@
       "schema_column": "pixel_number",
       "schema_status": "",
       "schema_foreign_key": ""
+    },
+    "_flr_analysis_feature.diffusion_time_mean": {
+      "name": "_flr_analysis_feature.diffusion_time_mean",
+      "category": "flr_analysis_feature",
+      "attribute": "diffusion_time_mean",
+      "description": "Mean FCS diffusion time in milliseconds: the weighted mean of a diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair.",
+      "type_code": "float",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "flr_analysis_feature",
+      "schema_column": "diffusion_time_mean",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_analysis_feature.diffusion_time_peak": {
+      "name": "_flr_analysis_feature.diffusion_time_peak",
+      "category": "flr_analysis_feature",
+      "attribute": "diffusion_time_peak",
+      "description": "Peak FCS diffusion time in milliseconds: the time at the maximum of the reported diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair.",
+      "type_code": "float",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "flr_analysis_feature",
+      "schema_column": "diffusion_time_peak",
+      "schema_status": "",
+      "schema_foreign_key": ""
     }
   },
   "timestamps": {
@@ -361926,7 +361994,7 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1790571912.9845088
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1791367157.5324621
   },
   "hashes": {
     "mmcif_ddl.dic": "fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768",
@@ -361936,7 +362004,7 @@
     "mmcif_ma.dic": "aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844",
     "mmcif_ihm_ext.dic": "9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55",
     "mmcif_ihm_flr_ext.dic": "92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2",
-    "mmfdb_flr_ext.dic": "21cbc7aadbefd077a7dc3b44297e94572c803b966041378be2a0ff1d2dae0068"
+    "mmfdb_flr_ext.dic": "0c85962700d994ed67b02f45fa61b972f39cf579bf3d17614d2af0e9cd62dbbd"
   },
   "dictionary_meta": {
     "mmcif_ddl.dic": {
@@ -361977,7 +362045,7 @@
     "mmfdb_flr_ext.dic": {
       "title": "mmfdb_flr_ext.dic",
       "datablock_id": "mmfdb_flr_ext.dic",
-      "version": "1.9"
+      "version": "1.10"
     }
   }
 }

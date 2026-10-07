@@ -52,6 +52,16 @@ deposition readable without MMFDB.
 
 ## Two ways in
 
+Burst-FCS mean and peak diffusion times use the central
+`_flr_analysis_feature.diffusion_time_mean` and
+`_flr_analysis_feature.diffusion_time_peak` terms, in milliseconds. Extension
+dictionary revision 1.10 declares their optional real-valued columns; the
+generated cache and schema share that definition. A single-component fit uses
+its fitted time for both. A distribution reports its weighted mean and its
+peak separately, for each channel pair. The older `.td4` serialization
+vocabulary remains in the export-only workflow dictionary and does not become
+a second live database category.
+
 - **Embedded** — `mmfdb.repository.MFDatabase` operates directly on a local
   SQLite file, no server. Best for scripts and single-machine analysis (see
   {doc}`mmfdb_08_standalone_no_lockin.ipynb <examples/mmfdb_08_standalone_no_lockin>`).
