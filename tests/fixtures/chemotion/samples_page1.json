@@ -1,0 +1,43 @@
+{
+ "samples": [
+  {
+   "id": 101,
+   "type": "sample",
+   "name": "Acetylsalicylic acid (test chemical)",
+   "short_label": "AF-1",
+   "external_label": "LOT-8841",
+   "description": "synthetic fixture",
+   "supplier": "Example Supplier",
+   "xref": {
+    "cas": "247144-96-5"
+   },
+   "updated_at": "2026-05-02T09:12:00.000Z",
+   "molecule": {
+    "id": 7,
+    "inchikey": "WBQSBZKOGNPJGR-UHFFFAOYSA-N",
+    "inchistring": "InChI=1S/...",
+    "cano_smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "sum_formular": "C9H8O4",
+    "molecular_weight": 180.16
+   }
+  },
+  {
+   "id": 102,
+   "type": "sample",
+   "name": "Rhodamine 110",
+   "short_label": "RH-2",
+   "external_label": "",
+   "description": "",
+   "supplier": null,
+   "xref": {},
+   "updated_at": "2026-06-11T14:00:00.000Z",
+   "molecule": {
+    "id": 9,
+    "inchikey": "OIQCEIJZWVCIKC-UHFFFAOYSA-N",
+    "cano_smiles": "Nc1ccc2c(c1)oc1cc(N)ccc1c2-c1ccccc1C(=O)O",
+    "sum_formular": "C20H14N2O3",
+    "molecular_weight": 330.34
+   }
+  }
+ ]
+}
