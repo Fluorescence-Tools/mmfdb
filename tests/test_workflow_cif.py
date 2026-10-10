@@ -98,3 +98,22 @@ def test_cif_publish_format(tmp_path):
     finally:
         set_global_db(None)
         db.close()
+
+
+def test_single_cif_reads_without_an_unknown_category_warning(tmp_path):
+    """Every category the deposit writes is one the reader has been told about."""
+    import warnings
+
+    pytest = __import__("pytest")
+    pytest.importorskip("ihm")
+    from mmfdb.provenance.pto_graph import read_graph_cif
+
+    wf, wf_path, db, run = _run(tmp_path)
+    cif = write_single_cif(
+        db, run.seed_artifact_id, tmp_path / "d.cif",
+        workflow=wf, workflow_yaml=wf_path.read_text(),
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        graph = read_graph_cif(cif)
+    assert graph["operations"] and graph["artifacts"]

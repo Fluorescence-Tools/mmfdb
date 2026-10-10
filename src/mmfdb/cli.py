@@ -135,6 +135,124 @@ def export_cif(
         click.echo(result["text"], nl=False)
 
 
+@cli.group("project")
+def project() -> None:
+    """Move a ChiSurf ``.pto`` / ``.cs.pto`` between its container and mmCIF."""
+
+
+@project.command("export-cif")
+@click.argument("pto_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--output", "output_path", default=None, type=click.Path(dir_okay=False),
+              help="Write the CIF here instead of to stdout.")
+def project_export_cif(pto_path: str, output_path: str | None) -> None:
+    """Export the provenance of a ``.pto`` (measurement or ``.cs.pto`` project) as mmCIF."""
+    from mmfdb.provenance.pto_graph import graph_from_pto, write_graph_cif
+
+    try:
+        text = write_graph_cif(graph_from_pto(pto_path), output_path)
+    except (OSError, ValueError) as exc:
+        raise click.ClickException(str(exc)) from exc
+    if output_path:
+        click.echo(output_path)
+    else:
+        click.echo(text, nl=False)
+
+
+@project.command("import-cif")
+@click.argument("cif_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--database", default=None, help="Database path or URL (default: the configured one).")
+def project_import_cif(cif_path: str, database: str | None) -> None:
+    """Record the provenance graph of an exported mmCIF in the database."""
+    from mmfdb.provenance.pto_graph import import_graph, read_graph_cif
+
+    graph = read_graph_cif(cif_path)
+    try:
+        with MFDatabase(_database_target(database)) as db:
+            import_graph(db, graph)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(json.dumps({k: len(v) for k, v in graph.items()}))
+
+
+@cli.group("eln")
+def eln() -> None:
+    """Exchange chemicals, instruments and deposits with an electronic lab notebook."""
+
+
+def _eln_gateway(url: str, user: str, collection: int | None):
+    """Build the Chemotion gateway with the token from the credential store or environment."""
+    from mmfdb.eln import ChemotionGateway, credentials
+
+    token = credentials.load_token("chemotion", url, user)
+    if not token:
+        raise click.ClickException(
+            "no token: store one with `mmfdb eln login` or set MMFDB_CHEMOTION_TOKEN")
+    try:
+        return ChemotionGateway(url, token, collection_id=collection)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
+_ELN_OPTIONS = [
+    click.option("--url", required=True, help="Chemotion server root, https://eln.example"),
+    click.option("--user", default="default", show_default=True, help="Account name of the stored token."),
+    click.option("--collection", type=int, default=None, help="Collection id to read from or deposit into."),
+]
+
+
+def _eln_options(fn):
+    for option in reversed(_ELN_OPTIONS):
+        fn = option(fn)
+    return fn
+
+
+@eln.command("login")
+@click.option("--url", required=True)
+@click.option("--user", default="default", show_default=True)
+@click.password_option("--token", prompt="Chemotion token", confirmation_prompt=False)
+def eln_login(url: str, user: str, token: str) -> None:
+    """Store a Chemotion token in the OS credential store."""
+    from mmfdb.eln import credentials
+
+    if not credentials.store_token("chemotion", url, user, token):
+        raise click.ClickException(
+            "no credential store accepted the token; set MMFDB_CHEMOTION_TOKEN instead")
+    click.echo("token stored")
+
+
+@eln.command("pull")
+@_eln_options
+@click.option("--database", default=None)
+@click.option("--kinds", default="chemicals,instruments", show_default=True)
+def eln_pull(url: str, user: str, collection: int | None, database: str | None, kinds: str) -> None:
+    """Import chemicals (as reagent lots) and instruments (as setups) from the ELN."""
+    from mmfdb.eln import ElnUnavailable, pull
+
+    gateway = _eln_gateway(url, user, collection)
+    try:
+        with MFDatabase(_database_target(database)) as db:
+            report = pull(gateway, db, tuple(k.strip() for k in kinds.split(",") if k.strip()))
+    except ElnUnavailable as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(json.dumps(report))
+
+
+@eln.command("deposit")
+@click.argument("pto_path", type=click.Path(exists=True, dir_okay=False))
+@_eln_options
+@click.option("--title", default=None)
+def eln_deposit(pto_path: str, url: str, user: str, collection: int | None, title: str | None) -> None:
+    """Deposit a ``.pto`` / ``.cs.pto`` with its mmCIF provenance as an ELN record."""
+    from mmfdb.eln import ElnUnavailable, deposit_pto
+
+    gateway = _eln_gateway(url, user, collection)
+    try:
+        ref = deposit_pto(gateway, pto_path, title=title)
+    except (ElnUnavailable, ValueError) as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(ref.url or ref.remote_id)
+
+
 @cli.group("workflow")
 def workflow() -> None:
     """Define, run, and export YAML-declared analysis workflows."""

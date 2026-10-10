@@ -198,6 +198,33 @@ save__mmfdb_provenance_operation.ended_at
    _item_type.code           yyyy-mm-dd:hh:mm
    _item.mandatory_code      no
 
+save__mmfdb_provenance_operation.algorithm
+   _item.name                "_mmfdb_provenance_operation.algorithm"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Algorithm term of the operation (the _mmfdb_operation.algorithm value), when the operation type alone does not name it.
+;
+
+save__mmfdb_provenance_operation.settings_hash
+   _item.name                "_mmfdb_provenance_operation.settings_hash"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Hash of the complete settings of the operation. Two operations of one type with equal hashes ran with the same settings.
+;
+
+save__mmfdb_provenance_operation.settings_json
+   _item.name                "_mmfdb_provenance_operation.settings_json"
+   _item.category_id         mmfdb_provenance_operation
+   _item_type.code           text
+   _item.mandatory_code      no
+   _item_description.description
+;     The complete settings of the operation as one JSON object, verbatim. A partial record is not written: a reader reproduces the run from this item alone.
+;
+
 #############
 ## CATEGORY: mmfdb_provenance_artifact
 #############
@@ -245,6 +272,15 @@ save__mmfdb_provenance_artifact.checksum_algorithm
    _item.category_id         mmfdb_provenance_artifact
    _item_type.code           code
    _item.mandatory_code      no
+
+save__mmfdb_provenance_artifact.row_grain
+   _item.name                "_mmfdb_provenance_artifact.row_grain"
+   _item.category_id         mmfdb_provenance_artifact
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     What one row of a tabular artifact is (the _mmfdb_artifact.row_grain term), for example burst or bin. Absent for non-tabular artifacts.
+;
 
 #############
 ## CATEGORY: mmfdb_provenance_edge
@@ -294,6 +330,172 @@ save__mmfdb_provenance_edge.relationship_type
    _item.category_id         mmfdb_provenance_edge
    _item_type.code           line
    _item.mandatory_code      no
+
+save__mmfdb_provenance_edge.operation_id
+   _item.name                "_mmfdb_provenance_edge.operation_id"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Operation that created the edge, when the edge was recorded as part of one.
+;
+
+save__mmfdb_provenance_edge.role
+   _item.name                "_mmfdb_provenance_edge.role"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Role of the artifact in the operation, for an input_to or produced edge (for example source_file or fit_state).
+;
+
+save__mmfdb_provenance_edge.source_row_column
+   _item.name                "_mmfdb_provenance_edge.source_row_column"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Column of the source table that holds the join key, when source and target differ in row grain.
+;
+
+save__mmfdb_provenance_edge.target_row_column
+   _item.name                "_mmfdb_provenance_edge.target_row_column"
+   _item.category_id         mmfdb_provenance_edge
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Column of the target table that the join key is matched to; equal to the source column when omitted.
+;
+
+#############
+## CATEGORY: mmfdb_provenance_parameter
+#############
+
+save_mmfdb_provenance_parameter
+   _category.id              mmfdb_provenance_parameter
+   _category.description
+;     One named, typed parameter value of a recorded operation: a fitted or
+;     fixed model parameter with its uncertainty and bounds.
+;
+   _category.mandatory_code  no
+   _category_key.name        "_mmfdb_provenance_parameter.ordinal"
+
+save__mmfdb_provenance_parameter.ordinal
+   _item.name                "_mmfdb_provenance_parameter.ordinal"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           int
+   _item.mandatory_code      yes
+   _item_description.description
+;     Row number of the parameter in the file.
+;
+
+save__mmfdb_provenance_parameter.parameter_id
+   _item.name                "_mmfdb_provenance_parameter.parameter_id"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Identifier of the parameter node, which an edge between two parameters (for example a link of one parameter to another) refers to.
+;
+
+save__mmfdb_provenance_parameter.operation_id
+   _item.name                "_mmfdb_provenance_parameter.operation_id"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Operation the parameter belongs to; matches _mmfdb_provenance_operation.operation_id.
+;
+
+save__mmfdb_provenance_parameter.name
+   _item.name                "_mmfdb_provenance_parameter.name"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Parameter name as the model defines it.
+;
+
+save__mmfdb_provenance_parameter.value
+   _item.name                "_mmfdb_provenance_parameter.value"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Value of the parameter.
+;
+
+save__mmfdb_provenance_parameter.standard_error
+   _item.name                "_mmfdb_provenance_parameter.standard_error"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Standard error of the value, when estimated.
+;
+
+save__mmfdb_provenance_parameter.initial_value
+   _item.name                "_mmfdb_provenance_parameter.initial_value"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Value the parameter started from.
+;
+
+save__mmfdb_provenance_parameter.lower_bound
+   _item.name                "_mmfdb_provenance_parameter.lower_bound"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Lower bound, in the units of the parameter.
+;
+
+save__mmfdb_provenance_parameter.upper_bound
+   _item.name                "_mmfdb_provenance_parameter.upper_bound"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           float
+   _item.mandatory_code      no
+   _item_description.description
+;     Upper bound, in the units of the parameter.
+;
+
+save__mmfdb_provenance_parameter.bounds_on
+   _item.name                "_mmfdb_provenance_parameter.bounds_on"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Whether the bounds apply to the value itself or to a transformed variable.
+;
+
+save__mmfdb_provenance_parameter.units
+   _item.name                "_mmfdb_provenance_parameter.units"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Units of the value.
+;
+
+save__mmfdb_provenance_parameter.parameter_type
+   _item.name                "_mmfdb_provenance_parameter.parameter_type"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     free, fixed or linked.
+;
+
+save__mmfdb_provenance_parameter.role
+   _item.name                "_mmfdb_provenance_parameter.role"
+   _item.category_id         mmfdb_provenance_parameter
+   _item_type.code           line
+   _item.mandatory_code      no
+   _item_description.description
+;     Role of the parameter in the operation.
+;
 
 #############
 ## CATEGORY: mmfdb_bundle_file

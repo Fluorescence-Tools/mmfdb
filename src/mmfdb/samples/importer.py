@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 
-from mmfdb.cif_writer import canonical_extension_category
+from mmfdb.cif_writer import EXTENSION_CATEGORY_ALIASES, canonical_extension_category
 from mmfdb.repository import MFDatabase
 
 logger = logging.getLogger(__name__)
@@ -35,11 +35,21 @@ def import_structure_file(db: MFDatabase, path: str | Path) -> Dict[str, Any]:
     if systems:
         _import_ihm_systems(db, systems, summary)
     _import_extension_categories(db, path, summary)
+    _import_provenance(db, path, summary)
     if not summary["samples"]:
         sample_id = _sample_id_from_path(path)
         db.add_sample(sample_id, description=path.stem, details=f"Imported from {path}")
         summary["samples"].append(sample_id)
     return summary
+
+
+#: Categories read by :func:`_import_extension_categories` rather than by python-ihm,
+#: in the canonical and the legacy ``_chisurf_`` spelling.
+_OWN_CATEGORIES = frozenset(
+    {"_mmfdb_probe_property", "_mmfdb_probe_spectrum", "_mmfdb_analysis_data",
+     "_mmfdb_analysis_metadata", "_mmfdb_photon_stream", "_struct_ref", "_struct_ref_seq",
+     "_struct_ref_seq_dif", *EXTENSION_CATEGORY_ALIASES}
+)
 
 
 def _read_ihm_systems(path: Path, summary: Dict[str, Any]) -> List[Any]:
@@ -50,13 +60,28 @@ def _read_ihm_systems(path: Path, summary: Dict[str, Any]) -> List[Any]:
         summary["warnings"].append(f"ihm reader unavailable: {exc}")
         return []
 
+    import warnings
+
+    from mmfdb.provenance.pto_graph import category_handlers
+
     try:
-        with path.open("r", encoding="utf-8") as handle:
-            return ihm.reader.read(
+        # Declare MMFDB's own categories to the reader: without handlers every
+        # one of them raises UnknownCategoryWarning, which a strict caller turns
+        # into a failed import. The extension categories this module reads with
+        # its own parser are known too, so they are not reported as unknown.
+        with warnings.catch_warnings(record=True) as caught, path.open("r", encoding="utf-8") as handle:
+            warnings.simplefilter("always")
+            systems = ihm.reader.read(
                 handle,
+                handlers=category_handlers({}),
                 warn_unknown_category=True,
                 warn_unknown_keyword=True,
             )
+        for w in caught:
+            known = any(f"category {name} " in str(w.message) for name in _OWN_CATEGORIES)
+            if not (issubclass(w.category, ihm.reader.UnknownCategoryWarning) and known):
+                warnings.warn(w.message, w.category, stacklevel=2)
+        return systems
     except Exception as exc:
         summary["warnings"].append(f"IHM/PDBx parse failed: {exc}")
         return []
@@ -231,6 +256,21 @@ def _import_extension_categories(db: MFDatabase, path: Path, summary: Dict[str, 
                 _import_struct_ref_seq(db, rows, summary)
             elif category_name == "_struct_ref_seq_dif":
                 _import_struct_ref_seq_dif(db, rows, summary)
+
+
+def _import_provenance(db: MFDatabase, path: Path, summary: Dict[str, Any]) -> None:
+    """Record the ``_mmfdb_provenance_*`` graph of a deposit, when the file has one."""
+    from mmfdb.provenance.pto_graph import import_graph, read_graph_cif
+
+    graph = read_graph_cif(path, tolerate=_OWN_CATEGORIES)
+    if graph["operations"] or graph["artifacts"]:
+        import_graph(db, graph)
+        summary["provenance"] = {
+            "operations": len(graph["operations"]),
+            "artifacts": len(graph["artifacts"]),
+            "edges": len(graph["edges"]),
+            "parameters": len(graph["parameters"]),
+        }
 
 
 def _pdbx_category_rows(category: Any) -> List[Dict[str, Any]]:
