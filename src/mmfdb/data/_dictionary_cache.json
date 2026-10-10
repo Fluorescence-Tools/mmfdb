@@ -181717,6 +181717,7 @@
             "fit.close",
             "fit.close_all",
             "fit.data_set",
+            "fit.group_auto_link",
             "fit.group_link",
             "fit.group_link_toggle",
             "fit.group_unlink",
@@ -181755,6 +181756,7 @@
             "parameter.bounds.set",
             "parameter.fixed",
             "parameter.link",
+            "parameter.prior.set",
             "parameter.scan",
             "parameter.unlink",
             "parameter.value",
@@ -181782,6 +181784,7 @@
             "fit.close": ".",
             "fit.close_all": ".",
             "fit.data_set": ".",
+            "fit.group_auto_link": ".",
             "fit.group_link": ".",
             "fit.group_link_toggle": ".",
             "fit.group_unlink": ".",
@@ -181820,6 +181823,7 @@
             "parameter.bounds.set": ".",
             "parameter.fixed": ".",
             "parameter.link": ".",
+            "parameter.prior.set": ".",
             "parameter.scan": ".",
             "parameter.unlink": ".",
             "parameter.value": ".",
@@ -358126,6 +358130,7 @@
         "fit.close",
         "fit.close_all",
         "fit.data_set",
+        "fit.group_auto_link",
         "fit.group_link",
         "fit.group_link_toggle",
         "fit.group_unlink",
@@ -358164,6 +358169,7 @@
         "parameter.bounds.set",
         "parameter.fixed",
         "parameter.link",
+        "parameter.prior.set",
         "parameter.scan",
         "parameter.unlink",
         "parameter.value",
@@ -358191,6 +358197,7 @@
         "fit.close": ".",
         "fit.close_all": ".",
         "fit.data_set": ".",
+        "fit.group_auto_link": ".",
         "fit.group_link": ".",
         "fit.group_link_toggle": ".",
         "fit.group_unlink": ".",
@@ -358229,6 +358236,7 @@
         "parameter.bounds.set": ".",
         "parameter.fixed": ".",
         "parameter.link": ".",
+        "parameter.prior.set": ".",
         "parameter.scan": ".",
         "parameter.unlink": ".",
         "parameter.value": ".",
@@ -361994,7 +362002,7 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1791367157.5324621
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1791608220.8491116
   },
   "hashes": {
     "mmcif_ddl.dic": "fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768",
@@ -362004,7 +362012,7 @@
     "mmcif_ma.dic": "aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844",
     "mmcif_ihm_ext.dic": "9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55",
     "mmcif_ihm_flr_ext.dic": "92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2",
-    "mmfdb_flr_ext.dic": "0c85962700d994ed67b02f45fa61b972f39cf579bf3d17614d2af0e9cd62dbbd"
+    "mmfdb_flr_ext.dic": "226ea0722825c72b2ce62c00a75c47fb790095648d8c81cc6d2eb5c106d8a188"
   },
   "dictionary_meta": {
     "mmcif_ddl.dic": {

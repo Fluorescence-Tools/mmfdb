@@ -4979,6 +4979,7 @@ save__mmfdb_event_log.action_type
       fit.close                       .
       fit.close_all                   .
       fit.data_set                    .
+      fit.group_auto_link             .
       fit.group_link                  .
       fit.group_link_toggle           .
       fit.group_unlink                .
@@ -5017,6 +5018,7 @@ save__mmfdb_event_log.action_type
       parameter.bounds.set            .
       parameter.fixed                 .
       parameter.link                  .
+      parameter.prior.set             .
       parameter.scan                  .
       parameter.unlink                .
       parameter.value                 .
