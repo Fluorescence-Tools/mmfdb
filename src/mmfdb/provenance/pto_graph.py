@@ -25,6 +25,7 @@ import hashlib
 import inspect
 import io
 import json
+import re
 import tempfile
 import uuid
 import warnings
@@ -505,6 +506,16 @@ def _make_handler(category: str, items: list[str], rows: list[dict]) -> type:
                 {"category": category, "__call__": __call__})
 
 
+def _declared_item_checker():
+    """Return ``f(full_item_name) -> bool`` over the bundled and export dictionaries."""
+    from mmfdb.schema.pdbx_metadata import MmcifDictionary
+
+    dictionary = MmcifDictionary(*[
+        MmcifDictionary.DATA_DIR / n
+        for n in MmcifDictionary.BUNDLED_DICTS + MmcifDictionary.EXPORT_ONLY_DICTS])
+    return lambda name: dictionary.get_item(name) is not None
+
+
 def read_graph_cif(path: str | Path, tolerate: Iterable[str] = ()) -> Graph:
     """Read a graph CIF with python-ihm and return the graph.
 
@@ -519,9 +530,9 @@ def read_graph_cif(path: str | Path, tolerate: Iterable[str] = ()) -> Graph:
     Returns
     -------
     dict
-        The provenance graph. An unknown category, or an unknown keyword of an
-        ``_mmfdb_`` category, raises a warning, which the test suite turns into
-        an error.
+        The provenance graph. An unknown category, or a keyword that no
+        dictionary declares (in any category), raises a warning, which the test
+        suite turns into an error.
     """
     import ihm.reader
 
@@ -530,12 +541,16 @@ def read_graph_cif(path: str | Path, tolerate: Iterable[str] = ()) -> Graph:
         warnings.simplefilter("always")
         ihm.reader.read(handle, handlers=category_handlers(sink),
                         warn_unknown_category=True, warn_unknown_keyword=True)
+    declared = _declared_item_checker()
     for w in caught:
-        # An unknown keyword in a category this module does not own (the sample
-        # and analysis export writes database column names under flrCIF
-        # categories) is not a provenance defect; anything else is passed on.
-        if issubclass(w.category, ihm.reader.UnknownKeywordWarning) and "_mmfdb_" not in str(w.message):
-            continue
+        # python-ihm lags the dictionaries: a keyword the dictionaries declare
+        # (an flrCIF/MMFDB extension item, or a standard item python-ihm does
+        # not read) is correct and merely unread.  Any other unknown keyword --
+        # in any category -- is a column name or a typo and is passed on.
+        if issubclass(w.category, ihm.reader.UnknownKeywordWarning):
+            match = re.search(r"Unknown keyword (\S+) encountered", str(w.message))
+            if match and declared(match.group(1)):
+                continue
         if issubclass(w.category, ihm.reader.UnknownCategoryWarning) and any(
                 f"category {name} " in str(w.message) for name in tolerate):
             continue

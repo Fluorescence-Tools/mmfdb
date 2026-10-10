@@ -142,6 +142,46 @@ def _restore_nan_fields(row: dict[str, Any] | None) -> dict[str, Any] | None:
     return row
 
 
+#: Export loop item -> database column, for the items whose dictionary spelling
+#: differs from the column that stores them.  Everything not listed here is
+#: written from the column of the same name.  ``tests/test_flr_export_items.py``
+#: holds every item written to the dictionaries and to python-ihm, so a column
+#: name that leaks into a standard category fails there.
+_FLR_EXPORT_COLUMNS: dict[str, dict[str, str]] = {
+    "_flr_probe_list": {"details": "description"},
+    "_flr_poly_probe_position": {
+        "seq_id": "residue_number",
+        "comp_id": "residue_name",
+        "details": "description",
+    },
+    "_flr_fret_forster_radius": {"id": "forster_radius_id"},
+    "_flr_fret_analysis": {"id": "analysis_id"},
+    "_struct_ref": {"id": "ref_id"},
+}
+
+
+def _flr_row(category: str, row: Any) -> dict[str, Any]:
+    """Return ``row`` re-keyed from database columns to the category's dictionary items.
+
+    Parameters
+    ----------
+    category : str
+        Export category including the leading underscore.
+    row : mapping
+        A database row.
+
+    Returns
+    -------
+    dict
+        Same-named columns pass through; the renames in
+        :data:`_FLR_EXPORT_COLUMNS` are applied on top.
+    """
+    values = dict(row)
+    for item, column in _FLR_EXPORT_COLUMNS.get(category, {}).items():
+        values[item] = values.get(column)
+    return values
+
+
 class MFDatabase(
     AnalysisMixin,
     ArtifactOpsMixin,
@@ -838,41 +878,34 @@ class MFDatabase(
                     "reactive_probe_name",
                     "probe_origin",
                     "probe_link_type",
-                    "fluorophore_type",
-                    "chromophore_chem_descriptor_id",
-                    "reactive_probe_chem_descriptor_id",
-                    "chromophore_center_atom",
                     "details",
                 ],
             ) as loop:
                 for row in probes:
-                    loop.write(
-                        probe_id=row.get("probe_id"),
-                        chromophore_name=row.get("chromophore_name"),
-                        reactive_probe_flag=row.get("reactive_probe_flag"),
-                        reactive_probe_name=row.get("reactive_probe_name"),
-                        probe_origin=row.get("probe_origin"),
-                        probe_link_type=row.get("probe_link_type"),
-                        fluorophore_type=row.get("fluorophore_type"),
-                        chromophore_chem_descriptor_id=row.get("chromophore_chem_descriptor_id"),
-                        reactive_probe_chem_descriptor_id=row.get("reactive_probe_chem_descriptor_id"),
-                        chromophore_center_atom=row.get("chromophore_center_atom"),
-                        details=row.get("description"),
-                    )
+                    loop.write(**_flr_row("_flr_probe_list", row))
+
+            # The chemical descriptors are not probe-list items in flrCIF: they
+            # have their own category, keyed on the probe.
+            with writer.loop(
+                "_flr_probe_descriptor",
+                [
+                    "probe_id",
+                    "chromophore_chem_descriptor_id",
+                    "reactive_probe_chem_descriptor_id",
+                    "chromophore_center_atom",
+                ],
+            ) as loop:
+                for row in probes:
+                    values = _flr_row("_flr_probe_descriptor", row)
+                    if any(v is not None for k, v in values.items() if k != "probe_id"):
+                        loop.write(**values)
 
             with writer.loop(
                 "_flr_poly_probe_position",
-                ["id", "entity_id", "asym_id", "residue_number", "residue_name", "details"],
+                ["id", "entity_id", "asym_id", "seq_id", "comp_id", "details"],
             ) as loop:
                 for row in positions:
-                    loop.write(
-                        id=row.get("id"),
-                        entity_id=row.get("entity_id"),
-                        asym_id=row.get("asym_id"),
-                        residue_number=row.get("residue_number"),
-                        residue_name=row.get("residue_name"),
-                        details=row.get("description"),
-                    )
+                    loop.write(**_flr_row("_flr_poly_probe_position", row))
 
             with writer.loop(
                 "_flr_sample_probe_details",
@@ -902,32 +935,19 @@ class MFDatabase(
                     "donor_probe_id",
                     "acceptor_probe_id",
                     "forster_radius",
-                    "forster_radius_error_plus",
-                    "forster_radius_error_minus",
-                    "kappa_squared_mode",
-                    "refractive_index",
-                    "citation_id",
+                    "reduced_forster_radius",
+                    "kappa_squared",
+                    "index_of_refraction",
                     "details",
                 ],
             ) as loop:
                 for row in forster:
-                    loop.write(
-                        id=row.get("id"),
-                        donor_probe_id=row.get("donor_probe_id"),
-                        acceptor_probe_id=row.get("acceptor_probe_id"),
-                        forster_radius=row.get("forster_radius"),
-                        forster_radius_error_plus=row.get("forster_radius_error_plus"),
-                        forster_radius_error_minus=row.get("forster_radius_error_minus"),
-                        kappa_squared_mode=row.get("kappa_squared_mode"),
-                        refractive_index=row.get("refractive_index"),
-                        citation_id=row.get("citation_id"),
-                        details=row.get("details"),
-                    )
+                    loop.write(**_flr_row("_flr_fret_forster_radius", row))
 
             with writer.loop(
                 "_flr_fret_analysis",
                 [
-                    "analysis_id",
+                    "id",
                     "experiment_id",
                     "sample_id",
                     "type",
@@ -941,25 +961,12 @@ class MFDatabase(
                     "details",
                 ],
             ) as loop:
-                loop.write(
-                    analysis_id=analysis.get("analysis_id"),
-                    experiment_id=analysis.get("experiment_id"),
-                    sample_id=analysis.get("sample_id"),
-                    type=analysis.get("type"),
-                    method=analysis.get("method"),
-                    sample_probe_id_1=analysis.get("sample_probe_id_1"),
-                    sample_probe_id_2=analysis.get("sample_probe_id_2"),
-                    forster_radius_id=analysis.get("forster_radius_id"),
-                    dataset_list_id=analysis.get("dataset_list_id"),
-                    external_file_id=analysis.get("external_file_id"),
-                    software_id=analysis.get("software_id"),
-                    details=analysis.get("details"),
-                )
+                loop.write(**_flr_row("_flr_fret_analysis", analysis))
 
             with writer.loop(
                 "_struct_ref",
                 [
-                    "ref_id",
+                    "id",
                     "entity_id",
                     "db_name",
                     "db_code",
@@ -971,17 +978,7 @@ class MFDatabase(
                 ],
             ) as loop:
                 for row in struct_refs:
-                    loop.write(
-                        ref_id=row.get("ref_id"),
-                        entity_id=row.get("entity_id"),
-                        db_name=row.get("db_name"),
-                        db_code=row.get("db_code"),
-                        pdbx_db_accession=row.get("pdbx_db_accession"),
-                        pdbx_db_isoform=row.get("pdbx_db_isoform"),
-                        pdbx_seq_one_letter_code=row.get("pdbx_seq_one_letter_code"),
-                        organism=row.get("organism"),
-                        details=row.get("details"),
-                    )
+                    loop.write(**_flr_row("_struct_ref", row))
 
             with writer.loop(
                 "_struct_ref_seq",
@@ -1011,7 +1008,6 @@ class MFDatabase(
             with writer.loop(
                 "_struct_ref_seq_dif",
                 [
-                    "id",
                     "align_id",
                     "seq_num",
                     "mon_id",
@@ -1023,17 +1019,7 @@ class MFDatabase(
                 ],
             ) as loop:
                 for row in struct_ref_seq_difs:
-                    loop.write(
-                        id=row.get("id"),
-                        align_id=row.get("align_id"),
-                        seq_num=row.get("seq_num"),
-                        mon_id=row.get("mon_id"),
-                        db_mon_id=row.get("db_mon_id"),
-                        details=row.get("details"),
-                        pdbx_seq_db_name=row.get("pdbx_seq_db_name"),
-                        pdbx_seq_db_accession_code=row.get("pdbx_seq_db_accession_code"),
-                        pdbx_ordinal=row.get("pdbx_ordinal"),
-                    )
+                    loop.write(**_flr_row("_struct_ref_seq_dif", row))
 
             sample_probe_by_probe = {
                 row.get("probe_id"): row.get("sample_probe_id")
@@ -1084,7 +1070,7 @@ class MFDatabase(
                     id=1,
                     data_type="analysis_metadata",
                     details="ChiSurf FLR analysis metadata",
-                    database_hosted="no",
+                    database_hosted="NO",
                 )
 
             with writer.loop(

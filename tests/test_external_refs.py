@@ -381,7 +381,7 @@ def test_flr_cif_round_trip_preserves_struct_ref(db, tmp_path):
     cif_text = db.export_flr_cif_to_text(include_extension=True)
 
     # Verify the CIF text contains struct_ref categories
-    assert "_struct_ref.ref_id" in cif_text
+    assert "_struct_ref.id" in cif_text  # the item; ref_id is the SQL column
     assert "_struct_ref.db_name" in cif_text
     assert "_struct_ref.pdbx_db_accession" in cif_text
     assert "UNP" in cif_text

@@ -20,7 +20,7 @@ data_mmfdb_flr_ext.dic
 
     _dictionary.title            mmfdb_flr_ext.dic
     _dictionary.datablock_id     mmfdb_flr_ext.dic
-    _dictionary.version          1.10
+    _dictionary.version          1.11
 
 save_flr_fret_forster_radius
    _category.id              flr_fret_forster_radius
@@ -7238,3 +7238,88 @@ save__flr_analysis_feature.diffusion_time_peak
    _mmfdb_schema.table_name  flr_analysis_feature
    _mmfdb_schema.column_name diffusion_time_peak
    _item_description.description "Peak FCS diffusion time in milliseconds: the time at the maximum of the reported diffusion-time distribution, or the fitted time in a single-component diffusion fit. Recorded separately for each channel pair."
+
+# --- Items an export writes that no upstream dictionary declares ---------------
+# Declaration only (no _mmfdb_schema binding): the column already exists, and the
+# export maps it by name (see _FLR_EXPORT_COLUMNS in repository.py).
+
+save__flr_probe_list.details
+   _item.name                "_flr_probe_list.details"
+   _item.category_id         flr_probe_list
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Free-text description of the probe. flrCIF gives the probe list no description item.
+;
+
+save__flr_poly_probe_position.details
+   _item.name                "_flr_poly_probe_position.details"
+   _item.category_id         flr_poly_probe_position
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Free-text description of the labelled position. flrCIF gives the position list no description item.
+;
+
+save__flr_fret_forster_radius.details
+   _item.name                "_flr_fret_forster_radius.details"
+   _item.category_id         flr_fret_forster_radius
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Free-text provenance of the Forster radius (how it was measured or computed).
+;
+
+save__flr_fret_analysis.sample_id
+   _item.name                "_flr_fret_analysis.sample_id"
+   _item.category_id         flr_fret_analysis
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     The sample the analysis was run on. flrCIF reaches it only through the two sample-probe ids.
+;
+
+save__flr_fret_analysis.method
+   _item.name                "_flr_fret_analysis.method"
+   _item.category_id         flr_fret_analysis
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     The analysis method (for example PDA, or a screening algorithm), finer than the flrCIF analysis type.
+;
+
+save__flr_fret_analysis.details
+   _item.name                "_flr_fret_analysis.details"
+   _item.category_id         flr_fret_analysis
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Free-text description of the analysis.
+;
+
+save__ihm_external_files.md5
+   _item.name                "_ihm_external_files.md5"
+   _item.category_id         ihm_external_files
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     MD5 checksum of the external file content, so a reader can detect a changed or substituted file.
+;
+
+save__ihm_external_files.uuid
+   _item.name                "_ihm_external_files.uuid"
+   _item.category_id         ihm_external_files
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Store-assigned identifier of the external file, stable across exports.
+;
+
+save__struct_ref.organism
+   _item.name                "_struct_ref.organism"
+   _item.category_id         struct_ref
+   _item.mandatory_code      no
+   _item_type.code           text
+   _item_description.description
+;     Source organism of the reference sequence.
+;

@@ -47798,6 +47798,23 @@
           "schema_column": "",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "organism": {
+          "name": "_struct_ref.organism",
+          "category": "struct_ref",
+          "attribute": "organism",
+          "description": " Source organism of the reference sequence. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     },
@@ -161146,6 +161163,40 @@
           "schema_column": "",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "md5": {
+          "name": "_ihm_external_files.md5",
+          "category": "ihm_external_files",
+          "attribute": "md5",
+          "description": " MD5 checksum of the external file content, so a reader can detect a changed or substituted file. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "uuid": {
+          "name": "_ihm_external_files.uuid",
+          "category": "ihm_external_files",
+          "attribute": "uuid",
+          "description": " Store-assigned identifier of the external file, stable across exports. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     },
@@ -170248,6 +170299,23 @@
           "schema_column": "probe_link_type",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "details": {
+          "name": "_flr_probe_list.details",
+          "category": "flr_probe_list",
+          "attribute": "details",
+          "description": " Free-text description of the probe. flrCIF gives the probe list no description item. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     },
@@ -170623,6 +170691,23 @@
           "child": null,
           "schema_table": "flr_poly_probe_position",
           "schema_column": "auth_name",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "details": {
+          "name": "_flr_poly_probe_position.details",
+          "category": "flr_poly_probe_position",
+          "attribute": "details",
+          "description": " Free-text description of the labelled position. flrCIF gives the position list no description item. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
           "schema_status": "",
           "schema_foreign_key": ""
         }
@@ -171043,6 +171128,23 @@
           "schema_column": "index_of_refraction",
           "schema_status": "",
           "schema_foreign_key": ""
+        },
+        "details": {
+          "name": "_flr_fret_forster_radius.details",
+          "category": "flr_fret_forster_radius",
+          "attribute": "details",
+          "description": " Free-text provenance of the Forster radius (how it was measured or computed). ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
         }
       }
     },
@@ -171382,6 +171484,57 @@
           "default_value": "",
           "parent": "_software.pdbx_ordinal",
           "child": "_flr_fret_analysis.software_id",
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "sample_id": {
+          "name": "_flr_fret_analysis.sample_id",
+          "category": "flr_fret_analysis",
+          "attribute": "sample_id",
+          "description": " The sample the analysis was run on. flrCIF reaches it only through the two sample-probe ids. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "method": {
+          "name": "_flr_fret_analysis.method",
+          "category": "flr_fret_analysis",
+          "attribute": "method",
+          "description": " The analysis method (for example PDA, or a screening algorithm), finer than the flrCIF analysis type. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
+          "schema_table": "",
+          "schema_column": "",
+          "schema_status": "",
+          "schema_foreign_key": ""
+        },
+        "details": {
+          "name": "_flr_fret_analysis.details",
+          "category": "flr_fret_analysis",
+          "attribute": "details",
+          "description": " Free-text description of the analysis. ",
+          "type_code": "text",
+          "mandatory": false,
+          "enumerations": [],
+          "enum_details": {},
+          "default_value": "",
+          "parent": null,
+          "child": null,
           "schema_table": "",
           "schema_column": "",
           "schema_status": "",
@@ -361992,6 +362145,159 @@
       "schema_column": "diffusion_time_peak",
       "schema_status": "",
       "schema_foreign_key": ""
+    },
+    "_flr_probe_list.details": {
+      "name": "_flr_probe_list.details",
+      "category": "flr_probe_list",
+      "attribute": "details",
+      "description": " Free-text description of the probe. flrCIF gives the probe list no description item. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_poly_probe_position.details": {
+      "name": "_flr_poly_probe_position.details",
+      "category": "flr_poly_probe_position",
+      "attribute": "details",
+      "description": " Free-text description of the labelled position. flrCIF gives the position list no description item. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_fret_forster_radius.details": {
+      "name": "_flr_fret_forster_radius.details",
+      "category": "flr_fret_forster_radius",
+      "attribute": "details",
+      "description": " Free-text provenance of the Forster radius (how it was measured or computed). ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_fret_analysis.sample_id": {
+      "name": "_flr_fret_analysis.sample_id",
+      "category": "flr_fret_analysis",
+      "attribute": "sample_id",
+      "description": " The sample the analysis was run on. flrCIF reaches it only through the two sample-probe ids. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_fret_analysis.method": {
+      "name": "_flr_fret_analysis.method",
+      "category": "flr_fret_analysis",
+      "attribute": "method",
+      "description": " The analysis method (for example PDA, or a screening algorithm), finer than the flrCIF analysis type. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_flr_fret_analysis.details": {
+      "name": "_flr_fret_analysis.details",
+      "category": "flr_fret_analysis",
+      "attribute": "details",
+      "description": " Free-text description of the analysis. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_ihm_external_files.md5": {
+      "name": "_ihm_external_files.md5",
+      "category": "ihm_external_files",
+      "attribute": "md5",
+      "description": " MD5 checksum of the external file content, so a reader can detect a changed or substituted file. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_ihm_external_files.uuid": {
+      "name": "_ihm_external_files.uuid",
+      "category": "ihm_external_files",
+      "attribute": "uuid",
+      "description": " Store-assigned identifier of the external file, stable across exports. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
+    },
+    "_struct_ref.organism": {
+      "name": "_struct_ref.organism",
+      "category": "struct_ref",
+      "attribute": "organism",
+      "description": " Source organism of the reference sequence. ",
+      "type_code": "text",
+      "mandatory": false,
+      "enumerations": [],
+      "enum_details": {},
+      "default_value": "",
+      "parent": null,
+      "child": null,
+      "schema_table": "",
+      "schema_column": "",
+      "schema_status": "",
+      "schema_foreign_key": ""
     }
   },
   "timestamps": {
@@ -362002,7 +362308,7 @@
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ma.dic": 1781724428.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_ext.dic": 1781724426.0,
     "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmcif_ihm_flr_ext.dic": 1781724457.0,
-    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1791608220.8491116
+    "/Users/tpeulen/dev/mmfdb/src/mmfdb/data/mmfdb_flr_ext.dic": 1791628047.767018
   },
   "hashes": {
     "mmcif_ddl.dic": "fbf02316948dfbab7f1261a13c31e892de3648a0dbdae0864c6314bba63e8768",
@@ -362012,7 +362318,7 @@
     "mmcif_ma.dic": "aeb205bbf23d459089c694eec004978c78497e5f5d3dd5642120dd0d62e9b844",
     "mmcif_ihm_ext.dic": "9d2d5ba4a1e683b572cb35b473b3d81312912beb9cd62d1a450b3c36c0fb4f55",
     "mmcif_ihm_flr_ext.dic": "92ac155d1225e7c45484d04747744f8d9548f6b5bfc3fbba98cea365db7ffcb2",
-    "mmfdb_flr_ext.dic": "226ea0722825c72b2ce62c00a75c47fb790095648d8c81cc6d2eb5c106d8a188"
+    "mmfdb_flr_ext.dic": "c2fe6c46c08da3c46ccdc96763696ff058cf576c26c168c7b982f2ad2db9ad57"
   },
   "dictionary_meta": {
     "mmcif_ddl.dic": {
@@ -362053,7 +362359,7 @@
     "mmfdb_flr_ext.dic": {
       "title": "mmfdb_flr_ext.dic",
       "datablock_id": "mmfdb_flr_ext.dic",
-      "version": "1.10"
+      "version": "1.11"
     }
   }
 }
