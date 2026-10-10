@@ -133,18 +133,22 @@ class TestOperationStatusTransition:
             if operation_id:
                 op_id = operation_id["operation_id"]
 
-                # Record the initial state (the operation was created as "pending"
-                # but no transition row exists yet — create it directly so the
-                # transition log is complete).
-                db.conn.execute(
-                    "INSERT INTO mmfdb_state_transition "
-                    "(transition_id, entity_type, entity_id, from_state, to_state, "
-                    "reason, created_at, updated_at, deleted_at) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (1, "operation", op_id, None, "pending", "initial",
-                     "2026-01-01", "2026-01-01", None),
-                )
-                db.conn.commit()
+                # Registering the measurement already logs the initial transition;
+                # create it directly only when this build does not (the log must
+                # be complete either way).
+                if not db.get_state_history("operation", op_id):
+                    next_id = db.conn.execute(
+                        "SELECT COALESCE(MAX(transition_id), 0) + 1 FROM mmfdb_state_transition"
+                    ).fetchone()[0]
+                    db.conn.execute(
+                        "INSERT INTO mmfdb_state_transition "
+                        "(transition_id, entity_type, entity_id, from_state, to_state, "
+                        "reason, created_at, updated_at, deleted_at) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (next_id, "operation", op_id, None, "pending", "initial",
+                         "2026-01-01", "2026-01-01", None),
+                    )
+                    db.conn.commit()
 
                 # Now go pending → running → succeeded (valid per rules)
                 db.update_operation_status(op_id, "running")
