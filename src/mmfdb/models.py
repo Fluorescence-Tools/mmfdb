@@ -962,7 +962,7 @@ class SampleDefinition:
                     f"Consider using a standard probe name."
                 )
             if dic is not None:
-                err = dic.validate_value("_flr_poly_probe.chromophore_name", probe.name)
+                err = dic.validate_value("_flr_probe_list.chromophore_name", probe.name)
                 if err:
                     logger.debug(f"probe[{i}].name '{probe.name}' validation: {err}")
 

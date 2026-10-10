@@ -53,6 +53,7 @@ examples = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-p no:cacheprovider"
+filterwarnings = ["error::ihm.reader.UnknownCategoryWarning"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

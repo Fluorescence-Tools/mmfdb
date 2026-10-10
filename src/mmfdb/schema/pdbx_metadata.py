@@ -194,7 +194,7 @@ class MmcifDictionary:
 
     DATA_DIR = Path(__file__).resolve().parent.parent / "data"
     CACHE_PATH = DATA_DIR / "_dictionary_cache.json"
-    CACHE_VERSION = 5
+    CACHE_VERSION = 6
     _cached_dict: Optional["MmcifDictionary"] = None
     
     #: Dictionaries parsed by :meth:`load_bundled`. Every ``mmfdb_*`` category
@@ -255,6 +255,7 @@ class MmcifDictionary:
         loop_data: List[List[str]] = []
         pending_descriptions: List[str] = []
         category_description: str = ""
+        collecting_category_description = False
         category_mandatory: bool = False
         category_key: Optional[str] = None
         pending_description: Optional[str] = None
@@ -273,16 +274,28 @@ class MmcifDictionary:
                 if not stripped:
                     continue
                 
+                if collecting_category_description:
+                    if stripped.startswith(";"):
+                        text = stripped[1:].strip()
+                        if text:
+                            category_description = (category_description + " " + text).strip()
+                        continue
+                    collecting_category_description = False
+
                 if stripped.startswith("save_"):
                     if in_loop and current_item and loop_tags:
                         self._process_loop_data(current_save, current_item, loop_tags, loop_data)
                     elif current_item and not in_loop:
                         self._register_item(current_save, current_item)
                     
+                    self._flush_category(
+                        current_save, category_description, category_mandatory, category_key
+                    )
                     save_name = stripped[5:].strip()
                     if not save_name.startswith("_"):
                         current_save = save_name
                         category_description = ""
+                        collecting_category_description = False
                         category_mandatory = False
                         category_key = None
                         current_item = None
@@ -367,6 +380,8 @@ class MmcifDictionary:
                     elif stripped.startswith("_category.description"):
                         val = self._extract_value(stripped)
                         category_description = val
+                        # A multi-line value arrives as ``;`` lines below.
+                        collecting_category_description = val == ""
                     elif stripped.startswith("loop_"):
                         in_loop = True
                         loop_tags = []
@@ -483,13 +498,9 @@ class MmcifDictionary:
         # Only create categories for save blocks that don't start with "_"
         # (categories don't have leading underscore, items do)
         if current_save and not current_save.startswith("_"):
-            if current_save not in self._categories:
-                self._categories[current_save] = DictCategory(
-                    name=current_save,
-                    description=category_description,
-                    mandatory=category_mandatory,
-                    key_item=category_key or "",
-                )
+            self._flush_category(
+                current_save, category_description, category_mandatory, category_key
+            )
         
             if in_loop and current_item and loop_tags:
                 self._process_loop_data(current_save, current_item, loop_tags, loop_data)
@@ -501,6 +512,34 @@ class MmcifDictionary:
                 self._categories[item.category] = DictCategory(name=item.category)
             if item.category and item.category in self._categories:
                 self._categories[item.category].items[item.attribute] = item
+
+    def _flush_category(
+        self,
+        save: Optional[str],
+        description: str,
+        mandatory: bool,
+        key_item: Optional[str],
+    ) -> None:
+        """Record the category metadata of a finished save frame.
+
+        Before this ran at every frame boundary only the *last* frame of a file
+        kept its ``_category.description`` / mandatory flag / key, so every
+        other category reported an empty description. A category already
+        recorded (a redefinition in a later file) keeps its first definition
+        but gains a description it lacked.
+        """
+        if not save or save.startswith("_"):
+            return
+        existing = self._categories.get(save)
+        if existing is None:
+            self._categories[save] = DictCategory(
+                name=save,
+                description=description,
+                mandatory=mandatory,
+                key_item=key_item or "",
+            )
+        elif not existing.description and description:
+            existing.description = description
 
     def _extract_value(self, line: str) -> str:
         """Extract the value from a dictionary line."""
